@@ -25,7 +25,9 @@ public class Player : MonoBehaviour
     {
         Vector3 movement = new Vector3(xAxis, 0, zAxis);
         //rb.MovePosition(transform.position + movement * Time.deltaTime * speed);   
-        //Debug.Log(zAxis + " " + xAxis);
+        Debug.Log(zAxis + " " + xAxis);
         rb.velocity = movement * speed;
+        
+        //rb.AddForce(transform.position + movement * speed, ForceMode.Force);
     }
 }
