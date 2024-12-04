@@ -4,36 +4,44 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-    bool playerDetected;
-    GameObject camera;
-    public float playX, playY, playZ;
-    public float camX, camY, camZ;
-
+    private float d1xOg, d1yOg, d1zOg;
+    private float d2xOg, d2yOg, d2zOg;
+    public float d1xPos, d1yPos, d1zPos;
+    public float d2xPos, d2yPos, d2zPos;
+    private GameObject player;
+    public GameObject door1, door2;
     void Start()
     {
-        camera = GameObject.Find("Main Camera");
-        playerDetected = false;
+        d1xOg = door1.transform.position.x;
+        d1yOg = door1.transform.position.y;
+        d1zOg = door1.transform.position.z;
+        d2xOg = door2.transform.position.x;
+        d2yOg = door2.transform.position.y;
+        d2zOg = door2.transform.position.z;
+        player = GameObject.Find("Player");
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (playerDetected)
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-
-            }
-        }
+        OpenClose();
     }
 
-    private void OnTriggerEnter(Collider col)
-    {
-        if (col.CompareTag("Player"))
+    private void OpenClose(){
+        //if (Vector3.Distance(door1.transform.position, new Vector3(d1xOg, d1yOg, d1zOg)) < 0.1)
+        //{
+
+        //}
+        if (Vector3.Distance(player.transform.position, door1.transform.position) < 2 || Vector3.Distance(player.transform.position, door2.transform.position) < 2)
         {
-            playerDetected = true;
-            col.transform.position = new Vector3(playX, playY, playZ);
-            camera.transform.position = new Vector3(camX, camY, camZ);
+            Debug.Log("Open");
+            door1.transform.position = Vector3.MoveTowards(door1.transform.position, new Vector3(d1xPos, d1yPos, d1zPos), 0.1f);
+            door2.transform.position = Vector3.MoveTowards(door2.transform.position, new Vector3(d2xPos, d2yPos, d2zPos), 0.1f);
+        }
+        else if (Vector3.Distance(player.transform.position, transform.position) > 2 || Vector3.Distance(player.transform.position, door2.transform.position) > 2)
+        {
+            Debug.Log("Close");
+            door1.transform.position = Vector3.MoveTowards(door1.transform.position, new Vector3(d1xOg, d1yOg, d1zOg), 0.1f);
+            door2.transform.position = Vector3.MoveTowards(door2.transform.position, new Vector3(d2xOg, d2yOg, d2zOg), 0.1f);
         }
     }
 }
