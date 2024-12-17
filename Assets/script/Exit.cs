@@ -15,14 +15,13 @@ public class Exit : MonoBehaviour
         playerDetected = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (playerDetected)
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
-
+                
             }
         }
     }
