@@ -9,6 +9,7 @@ public class Door : MonoBehaviour
     public float d1xPos, d1yPos, d1zPos;
     public float d2xPos, d2yPos, d2zPos;
     private GameObject player;
+    public bool open = false;
     public GameObject interactable;
     public GameObject door1, door2;
     void Start()
@@ -32,6 +33,7 @@ public class Door : MonoBehaviour
         {
             //Debug.Log("Open");
             interactable.SetActive(true);
+            open = true;
             if (Vector3.Distance(door1.transform.position, new Vector3(d1xPos, d1yPos, d1zPos)) < 0.01f || Vector3.Distance(door2.transform.position, new Vector3(d2xPos, d2yPos, d2zPos)) < 0.01f) {
             }
             else {
@@ -45,6 +47,7 @@ public class Door : MonoBehaviour
             //interactable.GetComponent<Image>().CrossFadeAlpha(0.1f, 2.0f, false);
             //When you get a proper button UI add this so you can fade them in and out.
             interactable.SetActive(false);
+            open = false;
             door1.transform.position = Vector3.MoveTowards(door1.transform.position, new Vector3(d1xOg, d1yOg, d1zOg), 0.04f);
             door2.transform.position = Vector3.MoveTowards(door2.transform.position, new Vector3(d2xOg, d2yOg, d2zOg), 0.04f);     
         }

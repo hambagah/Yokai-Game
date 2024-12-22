@@ -1,38 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Exit : MonoBehaviour
 {
-    bool playerDetected;
-    GameObject camera;
-    public float playX, playY, playZ;
-    public float camX, camY, camZ;
+    public Door doorOpen; 
+    public string stageToPlay;
 
     void Start()
     {
-        camera = GameObject.Find("Main Camera");
-        playerDetected = false;
+        //doorOpen = gameObject.GetComponent<Door>();
     }
 
     void Update()
     {
-        if (playerDetected)
+        if (Input.GetKeyDown(KeyCode.E) && doorOpen.open)
         {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                
-            }
+            SceneManager.LoadScene(stageToPlay, LoadSceneMode.Single);
         }
     }
 
     private void OnTriggerEnter(Collider col)
     {
-        if (col.CompareTag("Player"))
+        /*if (col.CompareTag("Player"))
         {
-            playerDetected = true;
-            col.transform.position = new Vector3(playX, playY, playZ);
-            camera.transform.position = new Vector3(camX, camY, camZ);
-        }
+            SceneManager.LoadScene(stageToPlay, LoadSceneMode.Single);
+        }*/
     }
 }
