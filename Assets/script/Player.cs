@@ -17,18 +17,19 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        zAxis = (Input.GetKey(KeyCode.S) ? -1 : 0) + (Input.GetKey(KeyCode.W) ? 1 : 0);
+        zAxis = (Input.GetKey(KeyCode.X) ? -1 : 0) + (Input.GetKey(KeyCode.W) ? 1 : 0);
         xAxis = (Input.GetKey(KeyCode.A) ? -1 : 0) + (Input.GetKey(KeyCode.D) ? 1 : 0);
         shift = (Input.GetKey(KeyCode.LeftShift) ? 1 : 0);
     }
 
     private void FixedUpdate()
     {
-        Vector3 movement = new Vector3(xAxis, 0, zAxis);
+        //Vector3 movement = new Vector3(xAxis, rb.velocity.y, zAxis);
         //rb.MovePosition(transform.position + movement * Time.deltaTime * speed);   
         //Debug.Log(zAxis + " " + xAxis);
         
-        rb.velocity = movement * (speed + (shift * 5f));
+        //rb.velocity = movement * (speed + (shift * 5f));
+        rb.velocity = new Vector3(xAxis * (speed + (shift * 5f)), rb.velocity.y, zAxis * (speed + (shift * 5f)));
         
         //rb.AddForce(movement*speed, ForceMode.VelocityChange);
         //rb.AddForce(transform.position + movement * speed, ForceMode.Impulse);
