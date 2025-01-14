@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Interactable : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class Interactable : MonoBehaviour
             interactable.SetActive(true);
             if (Input.GetKey(KeyCode.E)) 
             {
-
+                SceneManager.LoadScene(1);
             }
         }
         else interactable.SetActive(false);
