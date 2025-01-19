@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
-using static System.Net.Mime.MediaTypeNames;
 
 [ExecuteAlways]
 public class LightingManager : MonoBehaviour
@@ -17,7 +15,7 @@ public class LightingManager : MonoBehaviour
     {
         if (_preset == null)
         {
-            Debug.LogWarning("LightingPreset is not assigned.");
+            UnityEngine.Debug.LogWarning("LightingPreset is not assigned.");
             return;
         }
 
@@ -34,7 +32,7 @@ public class LightingManager : MonoBehaviour
         }
 
         // Automatic time progression when in Play mode
-        if (Application.isPlaying)
+        if (UnityEngine.Application.isPlaying)
         {
             _timeOfDay += Time.deltaTime * timeMultiplier;
             _timeOfDay %= 24;  // Keep time within 0-24 range
