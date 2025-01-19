@@ -3675,7 +3675,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 685240843}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.004561386, y: 0.9948294, z: -0.052136846, w: 0.08703636}
+  m_LocalRotation: {x: -0.061628457, y: 0.70441604, z: 0.70441604, w: 0.061628457}
   m_LocalPosition: {x: 9.5, y: 20, z: -35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -9022,8 +9022,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _directionalLight: {fileID: 685240844}
   _preset: {fileID: 11400000, guid: 8292abafb9513054a83bb0d56527eee2, type: 2}
-  _timeOfDay: 6.4
-  timeMultiplier: 0.1
+  _timeOfDay: 0
+  timeMultiplier: 0.2
 --- !u!4 &1580228710 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2041251758294895948, guid: 428584638e8d430479bc3d789c2dea6a, type: 3}

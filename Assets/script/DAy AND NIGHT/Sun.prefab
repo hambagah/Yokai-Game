@@ -144,7 +144,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97d36fbee7529644e9e2bb25036d7551, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _directionalLight: {fileID: 2538583973304928470}
-  _preset: {fileID: 11400000, guid: 8292abafb9513054a83bb0d56527eee2, type: 2}
-  _timeOfDay: 12.3
-  timeMultiplier: 0.1
