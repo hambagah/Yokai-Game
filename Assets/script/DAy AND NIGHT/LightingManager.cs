@@ -32,11 +32,11 @@ public class LightingManager : MonoBehaviour
         }
 
         // Automatic time progression when in Play mode
-        if (UnityEngine.Application.isPlaying)
+        /*if (UnityEngine.Application.isPlaying)
         {
             _timeOfDay += Time.deltaTime * timeMultiplier;
             _timeOfDay %= 24;  // Keep time within 0-24 range
-        }
+        }*/
 
         UpdateLighting(_timeOfDay / 24f);
     }
@@ -44,13 +44,13 @@ public class LightingManager : MonoBehaviour
     // Updates lighting settings based on the time of day percentage (0.0 - 1.0)
     private void UpdateLighting(float timePercent)
     {
-        RenderSettings.ambientLight = _preset.AmbientColor.Evaluate(timePercent);  // Set ambient light color
-        RenderSettings.fogColor = _preset.FogColor.Evaluate(timePercent);  // Set fog color
+        //RenderSettings.ambientLight = _preset.AmbientColor.Evaluate(timePercent);  // Set ambient light color
+        //RenderSettings.fogColor = _preset.FogColor.Evaluate(timePercent);  // Set fog color
 
         if (_directionalLight != null)
         {
             _directionalLight.color = _preset.DirectionalColor.Evaluate(timePercent);  // Set directional light color
-            _directionalLight.transform.localRotation = Quaternion.Euler(new Vector3((timePercent * 360f) - 90f, 90f, 0));  // Rotate the directional light to simulate sun movement
+            _directionalLight.transform.localRotation = Quaternion.Euler(new Vector3((timePercent * 360f) - 90f, 80f, 0));  // Rotate the directional light to simulate sun movement
         }
     }
 
