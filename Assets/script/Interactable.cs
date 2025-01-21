@@ -9,6 +9,7 @@ public class Interactable : MonoBehaviour
     private bool active; //If active = true then if you get close it automatically triggers else you have to manually interact
     private GameObject player;
     public GameObject interactable;
+    public GameObject dialog;
     void Start()
     {
         player = GameObject.Find("Player");
@@ -21,7 +22,8 @@ public class Interactable : MonoBehaviour
             interactable.SetActive(true);
             if (Input.GetKey(KeyCode.E)) 
             {
-                SceneManager.LoadScene(1);
+                //SceneManager.LoadScene(1);
+                dialog.SetActive(true);
             }
         }
         else interactable.SetActive(false);
