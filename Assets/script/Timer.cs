@@ -12,7 +12,7 @@ public class Timer : MonoBehaviour
     public int time; 
     private TMP_Text timerText;
     private GameObject sun, moon;
-    //Player wakes up at 7:00AM 
+    //Player wakes up at 6:00AM 
     //Player should be asleep by 12:00PM
 
     void Start()
@@ -20,11 +20,16 @@ public class Timer : MonoBehaviour
         timerText = GameObject.Find("Timer").GetComponent<TMP_Text>();
         sun = GameObject.Find("Sun");
         moon = GameObject.Find("Moon");
+        sun.transform.eulerAngles = new Vector3(0, sun.transform.eulerAngles.y, 0);
+        moon.transform.eulerAngles = new Vector3(0, moon.transform.eulerAngles.y, 0);
     }
 
     void Update()
     {
-        timerText.text = (7 + time).ToString("#.");
+        if (time <= 5) timerText.text = (6 + time).ToString() + ":00AM";
+        else if (time == 6) timerText.text = (6 + time).ToString() + ":00PM";
+        else if (time >= 18) timerText.text = ("12:00AM");
+        else timerText.text = (time - 6).ToString() + ":00PM";
         //
         //sun and moon are rotating based on time; 
         //
@@ -35,8 +40,12 @@ public class Timer : MonoBehaviour
 
     public void UpdateTime(int update) { 
         time += update;
-        if (time >= 17) {
-            //If it's 17 it should be 12:00PM force the state of the game to enter limbo, player must sleep. 
+        if (time >= 18) {
+            time = 18;
+            //If it's 18 it should be 12:00PM force the state of the game to enter limbo, player must sleep. 
         }
+        sun.transform.eulerAngles = new Vector3(time * 15, sun.transform.eulerAngles.y, 0);
+        moon.transform.eulerAngles = new Vector3(time * 8, moon.transform.eulerAngles.y, 0);
+        //should the angle gradually adjust to the new time?
     }
 }

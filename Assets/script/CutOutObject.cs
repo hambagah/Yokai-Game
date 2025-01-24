@@ -38,7 +38,7 @@ public class CutOutObject : MonoBehaviour
             
             for (int m = 0; m < materials.Length; m++)
             {
-                materials[m].SetFloat("_Cutout_Size", 0.2f);
+                materials[m].SetFloat("_Cutout_Size", 0.1f + (0.1f * 9/mainCamera.orthographicSize));
                 materials[m].SetFloat("_Falloff_Size", 0.05f);
             }
         }
