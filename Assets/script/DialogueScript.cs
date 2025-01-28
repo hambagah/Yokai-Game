@@ -20,12 +20,15 @@ public class DialogueScript : MonoBehaviour
 
     bool optionSelected = false;
     private int id;
+    private bool trigger = false;
+
+    private Interactable interact; 
 
     void Start()
     {
         //textComponent.text = string.Empty;
-        gameState = GameObject.Find("GameState");
-        time = gameState.GetComponent<Timer>();
+        gameState = gameObject.GetComponent<Interactable>().gameStatus;
+        time = gameObject.GetComponent<Interactable>().timer;
         id = gameObject.GetComponent<Interactable>().id;
     }
 
@@ -58,6 +61,7 @@ public class DialogueScript : MonoBehaviour
     public void StartDialogue(DialogueObject _dialogueObject)
     {
         StartCoroutine(TypeLine(_dialogueObject));
+        trigger = true;
     }
     
     public void OptionSelected(DialogueObject selectedOption)
@@ -101,9 +105,21 @@ public class DialogueScript : MonoBehaviour
         dialogueCanvas.enabled = false;
         optionSelected = false;
         if (id == 0) { //One time interact objects have ID of 0
-            time.UpdateTime(3);
+            gameObject.GetComponent<Interactable>().timer.UpdateTime(3);
             Destroy(gameObject); 
         }
+
+        if (id == 1) {
+            SceneManager.LoadScene(1, LoadSceneMode.Single);
+        }
+
+        if (id == 2 && trigger) {
+            gameObject.GetComponent<Interactable>().timer.ResetDay();
+        }
+        
+        /*if (interact.GetComponent<Interactable>().id == 2) { //Conditional objects EX: Bed can only be interacted during
+            interact.GetComponent<Timer>().ResetDay();
+        }*/
 
         spawnedButtons.ForEach(x => Destroy(x));
     }

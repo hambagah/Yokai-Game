@@ -11,13 +11,20 @@ public class Interactable : MonoBehaviour
     private GameObject player;
     [SerializeField] Canvas buttonCanvas;
     [SerializeField] DialogueScript dialogue;
+    [SerializeField] DialogueObject dialogueObject;
     [SerializeField] Canvas dialogueCanvas;
+
+    public GameObject gameStatus;
+    public Timer timer;
+
     public int state;
     public int id;
     void Start()
     {
         player = GameObject.Find("Player");
         dialogue = gameObject.GetComponent<DialogueScript>();
+        gameStatus = GameObject.Find("GameState");
+        timer = gameStatus.GetComponent<Timer>();
     }
 
     void Update()
@@ -26,7 +33,12 @@ public class Interactable : MonoBehaviour
             buttonCanvas.enabled = true;
             if (Input.GetKeyDown(KeyCode.E) && !(dialogueCanvas.enabled))
             {
-                dialogue.StartDialogue();
+                if (id == 2 && timer.time == 18) //BED/Conditional objects 
+                {
+                    dialogue.StartDialogue(dialogueObject);
+                }
+                else dialogue.StartDialogue();
+                
                 /*
                 if (gameObject.tag == "Object") {
                     switch (state)

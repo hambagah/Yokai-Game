@@ -55,5 +55,7 @@ public class Timer : MonoBehaviour
     {
         time = 0;
         gameState.day += 1;
+        gameState.Spawn();
+        UpdateTime(0);
     }
 }

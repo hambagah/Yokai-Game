@@ -32,7 +32,7 @@ namespace At0m1c.DialogueSystem {
             //Debug.Log(zAxis + " " + xAxis);
             
             //rb.velocity = movement * (speed + (shift * 5f));
-            rb.velocity = new Vector3(xAxis * (speed + (shift * 5f)), rb.velocity.y, zAxis * (speed + (shift * 5f)));
+            rb.velocity = new Vector3(xAxis * (speed + (shift * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), zAxis * (speed + (shift * 5f)));
             
             //rb.AddForce(movement*speed, ForceMode.VelocityChange);
             //rb.AddForce(transform.position + movement * speed, ForceMode.Impulse);

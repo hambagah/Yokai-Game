@@ -22,4 +22,8 @@ namespace At0m1c.DialogueSystem {
         public string dialogueChoice;
         public DialogueObject followOnDialogue;
     }
+
+    public struct DialogueTrigger {
+        
+    }
 }
