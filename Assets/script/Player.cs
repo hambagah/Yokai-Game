@@ -20,7 +20,7 @@ namespace At0m1c.DialogueSystem {
         // Update is called once per frame
         void Update()
         {
-            zAxis = (Input.GetKey(KeyCode.X) ? -1 : 0) + (Input.GetKey(KeyCode.W) ? 1 : 0);
+            zAxis = (Input.GetKey(KeyCode.S) ? -1 : 0) + (Input.GetKey(KeyCode.W) ? 1 : 0);
             xAxis = (Input.GetKey(KeyCode.A) ? -1 : 0) + (Input.GetKey(KeyCode.D) ? 1 : 0);
             shift = (Input.GetKey(KeyCode.LeftShift) ? 1 : 0);
         }

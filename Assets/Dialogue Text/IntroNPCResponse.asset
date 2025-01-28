@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e79dc9f749df5f04bb5df57075ade975, type: 3}
+  m_Name: IntroNPCResponse
+  m_EditorClassIdentifier: 
+  dialogueSegments:
+  - dialogueText: "The tour of the house took longer than expected\u2026 the sun
+      is already setting it seems."
+    dialogueDisplayTime: 2
+    dialogueChoices: []
+  - dialogueText: I must be going soon.
+    dialogueDisplayTime: 1
+    dialogueChoices: []
+  - dialogueText: You remember where your room is correct?
+    dialogueDisplayTime: 2
+    dialogueChoices: []
+  - dialogueText: How about you go clean up the house a bit and then rest.
+    dialogueDisplayTime: 2
+    dialogueChoices: []
+  - dialogueText: WASD to move, E to interact
+    dialogueDisplayTime: 2
+    dialogueChoices: []
+  - dialogueText: This demo should last about 4 minutes
+    dialogueDisplayTime: 2
+    dialogueChoices: []

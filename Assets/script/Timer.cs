@@ -35,8 +35,8 @@ public class Timer : MonoBehaviour
         //
         //sun and moon are rotating based on time; 
         //
-        if (Input.GetKeyDown(KeyCode.R)) UpdateTime(1);
-        else if (Input.GetKeyDown(KeyCode.T)) UpdateTime(-1);
+        //if (Input.GetKeyDown(KeyCode.R)) UpdateTime(1);
+        //else if (Input.GetKeyDown(KeyCode.T)) UpdateTime(-1);
         
     }
 
