@@ -15,6 +15,8 @@ public class Timer : MonoBehaviour
     //Player wakes up at 6:00AM 
     //Player should be asleep by 12:00PM
 
+    [SerializeField] GameState gameState;
+
     void Start()
     {
         timerText = GameObject.Find("Timer").GetComponent<TMP_Text>();
@@ -47,5 +49,11 @@ public class Timer : MonoBehaviour
         sun.transform.eulerAngles = new Vector3(time * 15, sun.transform.eulerAngles.y, 0);
         moon.transform.eulerAngles = new Vector3(time * 8, moon.transform.eulerAngles.y, 0);
         //should the angle gradually adjust to the new time?
+    }
+
+    public void ResetDay() 
+    {
+        time = 0;
+        gameState.day += 1;
     }
 }

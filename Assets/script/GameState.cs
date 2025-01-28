@@ -5,11 +5,13 @@ using UnityEngine;
 public class GameState : MonoBehaviour
 {
     public int progress;
+    public int day;
     public Timer time; 
     public Vector3 playerPos; 
     void Start()
     {
         progress = 0;
+        day = 1;
     }
 
     // Update is called once per frame

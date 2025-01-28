@@ -14,6 +14,9 @@ public class DialogueScript : MonoBehaviour
     [SerializeField] Transform dialogueOptionsParent;
     [SerializeField] GameObject dialogueOptionsButtonPrefab;
     [SerializeField] DialogueObject startDialogueObject;
+    
+    private GameObject gameState;
+    private Timer time;
 
     bool optionSelected = false;
     private int id;
@@ -21,6 +24,8 @@ public class DialogueScript : MonoBehaviour
     void Start()
     {
         //textComponent.text = string.Empty;
+        gameState = GameObject.Find("GameState");
+        time = gameState.GetComponent<Timer>();
         id = gameObject.GetComponent<Interactable>().id;
     }
 
@@ -95,7 +100,10 @@ public class DialogueScript : MonoBehaviour
         dialogueOptionsContainer.SetActive(false);
         dialogueCanvas.enabled = false;
         optionSelected = false;
-        if (gameObject.name == "Box") Destroy(gameObject);
+        if (id == 0) { //One time interact objects have ID of 0
+            time.UpdateTime(3);
+            Destroy(gameObject); 
+        }
 
         spawnedButtons.ForEach(x => Destroy(x));
     }

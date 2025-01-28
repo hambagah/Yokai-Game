@@ -6,10 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/PlayingScene.unity
+    path: Assets/Scenes/PlayingScene.unity
     guid: 490700c4606819b4a9679abf8dfdc70a
   - enabled: 1
-    path: Assets/Mixing.unity
+    path: Assets/Scenes/Mixing.unity
     guid: 41bf5d6735360144e91f88228be904b2
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 0325d9722b6ded946b53740487dd8fe5, type: 2}
