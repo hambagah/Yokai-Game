@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e79dc9f749df5f04bb5df57075ade975, type: 3}
+  m_Name: NPC Dialogue
+  m_EditorClassIdentifier: 
+  dialogueSegments:
+  - dialogueText: Testing
+    dialogueDisplayTime: 1
+    dialogueChoices: []
+  - dialogueText: Working
+    dialogueDisplayTime: 1
+    dialogueChoices: []
+  - dialogueText: Yeah
+    dialogueDisplayTime: 2
+    dialogueChoices:
+    - dialogueChoice: Yeah
+      followOnDialogue: {fileID: 11400000, guid: 61405f5001f166f45b258beb081a54bd, type: 2}
+    - dialogueChoice: No
+      followOnDialogue: {fileID: 11400000, guid: b781a441be74ed549855f6ef7f3cf9e4, type: 2}
+    - dialogueChoice: Maybe?
+      followOnDialogue: {fileID: 11400000, guid: f983b17c0eaf6fb428e9335ab6a07e45, type: 2}
+  endDialogue: {fileID: 0}

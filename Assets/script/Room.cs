@@ -5,7 +5,6 @@ using UnityEngine;
 public class Room : MonoBehaviour
 {
     public GameObject[] walls;
-    public Player player;
     int cameraAngle;
     void Start()
     {

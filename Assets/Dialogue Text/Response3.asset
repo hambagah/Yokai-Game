@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e79dc9f749df5f04bb5df57075ade975, type: 3}
+  m_Name: Response3
+  m_EditorClassIdentifier: 
+  dialogueSegments:
+  - dialogueText: Huh?
+    dialogueDisplayTime: 2
+    dialogueChoices:
+    - dialogueChoice: I mean ERM what the SIGMA
+      followOnDialogue: {fileID: 11400000, guid: 5b56c7685d316ab468fdc92685f41bb4, type: 2}
+    - dialogueChoice: Die
+      followOnDialogue: {fileID: 11400000, guid: 61405f5001f166f45b258beb081a54bd, type: 2}
