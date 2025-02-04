@@ -1,9 +1,16 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
+//
+//This script is outdated
+//Probably remove it.
+//
+//
+//
 
 namespace At0m1c.DialogueSystem {
 public class DialogueScript : MonoBehaviour
@@ -16,7 +23,7 @@ public class DialogueScript : MonoBehaviour
     [SerializeField] DialogueObject startDialogueObject;
     
     private GameObject gameState;
-    private Timer time;
+    //private Timer time;
 
     bool optionSelected = false;
     private int id;
@@ -28,7 +35,7 @@ public class DialogueScript : MonoBehaviour
     {
         //textComponent.text = string.Empty;
         gameState = gameObject.GetComponent<Interactable>().gameStatus;
-        time = gameObject.GetComponent<Interactable>().timer;
+        //time = gameObject.GetComponent<Interactable>().timer;
         id = gameObject.GetComponent<Interactable>().id;
     }
 
@@ -50,7 +57,7 @@ public class DialogueScript : MonoBehaviour
         if (textComponent.text == lines[index])
         {
             //Button.SetActive(true); for any confirm buttons
-        }*/
+        }*
     }
 
     public void StartDialogue()
@@ -76,7 +83,7 @@ public class DialogueScript : MonoBehaviour
         {
             textComponent.text += c;
             yield return new WaitForSeconds(textSpeed);
-        }*/
+        }*
         yield return null;
         List<GameObject> spawnedButtons = new List<GameObject> ();
 
@@ -105,7 +112,7 @@ public class DialogueScript : MonoBehaviour
         dialogueCanvas.enabled = false;
         optionSelected = false;
         if (id == 0) { //One time interact objects have ID of 0
-            gameObject.GetComponent<Interactable>().timer.UpdateTime(3);
+            TimeManager.GetInstance().UpdateTime(3);
             Destroy(gameObject); 
         }
 
@@ -114,12 +121,12 @@ public class DialogueScript : MonoBehaviour
         }
 
         if (id == 2 && trigger) {
-            gameObject.GetComponent<Interactable>().timer.ResetDay();
+            TimeManager.GetInstance().ResetDay();
         }
         
         /*if (interact.GetComponent<Interactable>().id == 2) { //Conditional objects EX: Bed can only be interacted during
             interact.GetComponent<Timer>().ResetDay();
-        }*/
+        }*
 
         spawnedButtons.ForEach(x => Destroy(x));
     }
@@ -137,7 +144,7 @@ public class DialogueScript : MonoBehaviour
             gameObject.SetActive(false);
             //if (needs to open scene) {} else ignore
             //SceneManager.LoadScene(1);
-        }*/
+        }*
     }
 }
-}
+}*/

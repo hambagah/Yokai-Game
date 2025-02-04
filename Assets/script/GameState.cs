@@ -6,7 +6,6 @@ public class GameState : MonoBehaviour
 {
     public int progress;
     public int day;
-    public Timer time; 
     public Vector3 playerPos; 
     [SerializeField] GameObject NPC;
     void Start()
@@ -37,6 +36,6 @@ public class GameState : MonoBehaviour
 
     public void Time(int tUpdate)
     {
-        time.UpdateTime(tUpdate);
+        TimeManager.GetInstance().UpdateTime(tUpdate);
     }
 }

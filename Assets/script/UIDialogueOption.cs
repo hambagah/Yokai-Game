@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,4 +23,4 @@ namespace At0m1c.DialogueSystem {
         }
     }
 
-}
+}*/

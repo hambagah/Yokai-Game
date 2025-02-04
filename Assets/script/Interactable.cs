@@ -6,31 +6,51 @@ using At0m1c.DialogueSystem;
 
 public class Interactable : MonoBehaviour
 {
-    public float radius;
-    private bool active; //If active = true then if you get close it automatically triggers else you have to manually interact
-    private GameObject player;
-    [SerializeField] Canvas buttonCanvas;
-    [SerializeField] DialogueScript dialogue;
+    //private bool active; //If active = true then if you get close it automatically triggers else you have to manually interact
+    //private GameObject player;
+    /*[SerializeField] DialogueScript dialogue;
     [SerializeField] DialogueObject dialogueObject;
     [SerializeField] Canvas dialogueCanvas;
 
     public GameObject gameStatus;
-    public Timer timer;
 
     public int state;
-    public int id;
-    void Start()
+    public int id;*/
+
+    //[SerializeField] private GameObject visualCue;
+    [SerializeField] private GameObject visualCue;
+    private bool playerInRange;
+
+    [SerializeField] private TextAsset inkJSON;
+    /*void Start()
     {
         player = GameObject.Find("Player");
         dialogue = gameObject.GetComponent<DialogueScript>();
         gameStatus = GameObject.Find("GameState");
-        timer = gameStatus.GetComponent<Timer>();
+    }*/
+
+    private void Awake()
+    {
+        playerInRange = false;
+        visualCue.SetActive(false);
     }
 
     void Update()
     {
-        if (Vector3.Distance(player.transform.position, transform.position) < radius) {
-            buttonCanvas.enabled = true;
+        if (playerInRange && !DialogueManager.GetInstance().dialogueIsPlaying)
+        {
+            visualCue.SetActive(true);
+            if (InputManager.GetInstance().GetInteractPressed())
+            {
+                DialogueManager.GetInstance().EnterDialogueMode(inkJSON);
+            }
+        }
+        else {
+            visualCue.SetActive(false);
+        }
+
+        /*if (Vector3.Distance(player.transform.position, transform.position) < radius) {
+            //buttonCanvas.enabled = true;
             if (Input.GetKeyDown(KeyCode.E) && !(dialogueCanvas.enabled))
             {
                 if (id == 2 && timer.time == 18) //BED/Conditional objects 
@@ -39,7 +59,7 @@ public class Interactable : MonoBehaviour
                 }
                 else dialogue.StartDialogue();
                 
-                /*
+                
                 if (gameObject.tag == "Object") {
                     switch (state)
                     {
@@ -54,18 +74,23 @@ public class Interactable : MonoBehaviour
                             Debug.Log("Not a box");
                             break;
                     }
-                }*/
+                }*
             }
-        }
-        else buttonCanvas.enabled = false;
+        }*/
+        //else buttonCanvas.enabled = false;
     }
 
-    /*void Dialogue()
-    {
-        switch (state)
+    private void OnTriggerEnter(Collider collider) {
+        if (collider.gameObject.tag == "Player")
         {
-            case 1:
-
+            playerInRange = true;
         }
-    }*/
+    }
+
+    private void OnTriggerExit(Collider collider) {
+        if (collider.gameObject.tag == "Player")
+        {
+            playerInRange = false;
+        }
+    }
 }
