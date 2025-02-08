@@ -68,7 +68,7 @@ public class InputManager : MonoBehaviour
         } 
     }
 
-    public void SubmitPressed(InputAction.CallbackContext context)
+    /*public void SubmitPressed(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
@@ -78,7 +78,7 @@ public class InputManager : MonoBehaviour
         {
             submitPressed = false;
         } 
-    }
+    }*/
 
     public Vector2 GetMoveDirection() 
     {
@@ -103,16 +103,21 @@ public class InputManager : MonoBehaviour
         return result;
     }
 
-    public bool GetSubmitPressed() 
+    /*public bool GetSubmitPressed() 
     {
         bool result = submitPressed;
         submitPressed = false;
         return result;
-    }
+    }*/
 
-    public void RegisterSubmitPressed() 
+    /*public void RegisterSubmitPressed() 
     {
         submitPressed = false;
+    }*/
+
+    public void RegisterInteractPressed() 
+    {
+        interactPressed = false;
     }
 
 }

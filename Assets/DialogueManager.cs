@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using Ink.Runtime;
 using UnityEngine.EventSystems;
+using Ink.UnityIntegration;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private GameObject continueIcon; 
     [SerializeField] private float typingSpeed = 0.04f;
+    [SerializeField] private InkFile globalsInkFile;
     private Coroutine displayLineCoroutine;
 
     [SerializeField] private TextMeshProUGUI dialogueText;
@@ -37,6 +39,8 @@ public class DialogueManager : MonoBehaviour
     private const string PORTRAIT_TAG = "portrait";
     private const string LAYOUT_TAG = "layout";
 
+    private DialogueVariables dialogueVariables;
+
     private void Awake()
     {
         if (instance != null)
@@ -44,6 +48,8 @@ public class DialogueManager : MonoBehaviour
             Debug.LogWarning("More than one Dialogue Manager in scene.");
         }
         instance = this;
+
+        dialogueVariables = new DialogueVariables(globalsInkFile.filePath);
     }
 
     public static DialogueManager GetInstance()
@@ -74,7 +80,7 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        if (canContinueToNextLine && currentStory.currentChoices.Count == 0 && InputManager.GetInstance().GetSubmitPressed())
+        if (canContinueToNextLine && currentStory.currentChoices.Count == 0 && InputManager.GetInstance().GetInteractPressed())
         {
             ContinueStory();
         }
@@ -85,6 +91,8 @@ public class DialogueManager : MonoBehaviour
         currentStory = new Story(inkJSON.text);
         dialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
+
+        dialogueVariables.StartListening(currentStory);
 
         //Reset UI
         displayNameText.text = "";
@@ -97,6 +105,8 @@ public class DialogueManager : MonoBehaviour
     private IEnumerator ExitDialogueMode()
     {
         yield return new WaitForSeconds(0.2f);
+
+        dialogueVariables.StopListening(currentStory);
 
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
@@ -135,7 +145,7 @@ public class DialogueManager : MonoBehaviour
 
         foreach (char letter in line.ToCharArray())
         {
-            if (InputManager.GetInstance().GetSubmitPressed())
+            if (InputManager.GetInstance().GetInteractPressed())
             {
                 dialogueText.text = line;
                 break;
@@ -237,8 +247,19 @@ public class DialogueManager : MonoBehaviour
         if (canContinueToNextLine) {
             currentStory.ChooseChoiceIndex(choiceIndex);
             //Fix for their bug Idk if this affects the current one but better safe than sorry
-            InputManager.GetInstance().RegisterSubmitPressed();
+            InputManager.GetInstance().RegisterInteractPressed();
             ContinueStory();
         }
+    }
+
+    public Ink.Runtime.Object GetVariableState(string variableName)
+    {
+        Ink.Runtime.Object variableValue = null;
+        dialogueVariables.variables.TryGetValue(variableName, out variableValue);
+        if (variableValue == null)
+        {
+            Debug.LogWarning("Ink Var null " + variableName);
+        }
+        return variableValue;
     }
 }

@@ -1,0 +1,2 @@
+VAR global_var = ""
+
