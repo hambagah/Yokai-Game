@@ -4,7 +4,6 @@ using UnityEngine;
 using TMPro;
 using Ink.Runtime;
 using UnityEngine.EventSystems;
-using Ink.UnityIntegration;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -12,7 +11,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private GameObject continueIcon; 
     [SerializeField] private float typingSpeed = 0.04f;
-    [SerializeField] private InkFile globalsInkFile;
+    [SerializeField] private TextAsset loadGlobalsJSON;
     private Coroutine displayLineCoroutine;
 
     [SerializeField] private TextMeshProUGUI dialogueText;
@@ -41,6 +40,8 @@ public class DialogueManager : MonoBehaviour
 
     private DialogueVariables dialogueVariables;
 
+    private InkExternalFunctions inkExternalFunctions;
+
     private void Awake()
     {
         if (instance != null)
@@ -49,7 +50,8 @@ public class DialogueManager : MonoBehaviour
         }
         instance = this;
 
-        dialogueVariables = new DialogueVariables(globalsInkFile.filePath);
+        dialogueVariables = new DialogueVariables(loadGlobalsJSON);
+        inkExternalFunctions = new InkExternalFunctions();
     }
 
     public static DialogueManager GetInstance()
@@ -94,6 +96,10 @@ public class DialogueManager : MonoBehaviour
 
         dialogueVariables.StartListening(currentStory);
 
+        currentStory.BindExternalFunction("playEmote", (string emoteName) => {
+            Debug.Log(emoteName);
+        });
+
         //Reset UI
         displayNameText.text = "";
         portraitAnimator.Play("default");
@@ -107,6 +113,7 @@ public class DialogueManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         dialogueVariables.StopListening(currentStory);
+        currentStory.UnbindExternalFunction("playEmote");
 
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
@@ -134,7 +141,8 @@ public class DialogueManager : MonoBehaviour
 
     private IEnumerator DisplayLine(string line)
     {
-        dialogueText.text = "";
+        dialogueText.text = line;
+        dialogueText.maxVisibleCharacters = 0;
 
         continueIcon.SetActive(false);
         HideChoices();
@@ -147,21 +155,20 @@ public class DialogueManager : MonoBehaviour
         {
             if (InputManager.GetInstance().GetInteractPressed())
             {
-                dialogueText.text = line;
+                dialogueText.maxVisibleCharacters = line.Length;
                 break;
             }
 
             if (letter == '<' || isAddingRichTextTag)
             {
                 isAddingRichTextTag = true;
-                dialogueText.text += letter;
                 if (letter == '>')
                 {
                     isAddingRichTextTag = false;
                 }
             }
             else {
-                dialogueText.text += letter;
+                dialogueText.maxVisibleCharacters++;
                 yield return new WaitForSeconds(typingSpeed);
             }
 
@@ -261,5 +268,13 @@ public class DialogueManager : MonoBehaviour
             Debug.LogWarning("Ink Var null " + variableName);
         }
         return variableValue;
+    }
+
+    //save on exit might need to change
+    public void OnApplicationQuit()
+    {
+        if (dialogueVariables != null) {
+            dialogueVariables.SaveVariables();
+        }
     }
 }

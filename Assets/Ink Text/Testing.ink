@@ -1,3 +1,7 @@
+EXTERNAL playEmote(emoteName)
+
+~ playEmote("exclamation")
+
 -> main
 
 === main ===
@@ -22,5 +26,4 @@ What does that mean?
     + [I wanna try again] 
         Ok then. #portrait:DemoNPC_default
         -> main
-
 -> END
