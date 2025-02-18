@@ -20,6 +20,11 @@ public class DemoWinCheck : MonoBehaviour
         }
     }
 
+    public void CheckWinCondition()
+    {
+        CheckRequirements(); // Call the existing CheckRequirements method
+    }
+
     private void CheckRequirements()
     {
         // Check if ice cube is in the bowl and it's filled with sake
