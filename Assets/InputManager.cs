@@ -12,7 +12,8 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     private Vector2 moveDirection = Vector2.zero;
-    private bool shiftPressed = false;
+    //private bool shiftPressed = false;
+    private Vector2 shiftPressed = Vector2.zero;
     private bool interactPressed = false;
     private bool submitPressed = false;
 
@@ -48,11 +49,13 @@ public class InputManager : MonoBehaviour
     {
         if (context.performed)
         {
-            shiftPressed = true;
+            //shiftPressed = true;
+            shiftPressed = context.ReadValue<Vector2>();
         }
         else if (context.canceled)
         {
-            shiftPressed = false;
+            //shiftPressed = false;
+            shiftPressed = context.ReadValue<Vector2>();
         }
     }
 
@@ -89,12 +92,17 @@ public class InputManager : MonoBehaviour
     // which means we should set it to false so that it can't be used again until actually
     // pressed again.
 
-    public bool GetShiftPressed() 
+    public Vector2 GetShiftPressed()
+    {
+        return shiftPressed;
+    }
+
+    /*public bool GetShiftPressed() 
     {
         bool result = shiftPressed;
         shiftPressed = false;
         return result;
-    }
+    }*/
 
     public bool GetInteractPressed() 
     {

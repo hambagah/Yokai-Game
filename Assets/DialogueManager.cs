@@ -88,17 +88,14 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void EnterDialogueMode(TextAsset inkJSON)
+    public void EnterDialogueMode(TextAsset inkJSON, Animator emoteAnimator)
     {
         currentStory = new Story(inkJSON.text);
         dialogueIsPlaying = true;
         dialoguePanel.SetActive(true);
 
         dialogueVariables.StartListening(currentStory);
-
-        currentStory.BindExternalFunction("playEmote", (string emoteName) => {
-            Debug.Log(emoteName);
-        });
+        inkExternalFunctions.Bind(currentStory, emoteAnimator);
 
         //Reset UI
         displayNameText.text = "";
@@ -113,7 +110,7 @@ public class DialogueManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         dialogueVariables.StopListening(currentStory);
-        currentStory.UnbindExternalFunction("playEmote");
+        inkExternalFunctions.Unbind(currentStory);
 
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
@@ -129,9 +126,17 @@ public class DialogueManager : MonoBehaviour
                 StopCoroutine(displayLineCoroutine);
             }
             //dialogueText.text = currentStory.Continue();
-            displayLineCoroutine = StartCoroutine(DisplayLine(currentStory.Continue()));
-            
-            HandleTags(currentStory.currentTags);
+            string nextLine = currentStory.Continue();
+
+            if (nextLine.Equals("") && !currentStory.canContinue)
+            {
+                StartCoroutine(ExitDialogueMode());
+            }
+            else
+            {
+                HandleTags(currentStory.currentTags);
+                displayLineCoroutine = StartCoroutine(DisplayLine(nextLine));
+            }
         }
         else
         {

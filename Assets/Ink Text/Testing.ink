@@ -1,7 +1,4 @@
-EXTERNAL playEmote(emoteName)
-
-~ playEmote("exclamation")
-
+INCLUDE globals.ink
 -> main
 
 === main ===
@@ -13,6 +10,7 @@ Do you want to try it?
         -> main
     + [Maybe]
         Pardon? Can you repeat that? #portrait:DemoNPC_sad
+        ~ playEmote("question")
         -> maybe
     + [No]
         Ok then. #portrait:DemoNPC_sad
@@ -22,6 +20,7 @@ Do you want to try it?
 What does that mean?
     + [It means I will destroy you]
         Zomg #portrait:DemoNPC_surprised #layout:right
+        ~ playEmote("exclamation")
         -> END
     + [I wanna try again] 
         Ok then. #portrait:DemoNPC_default

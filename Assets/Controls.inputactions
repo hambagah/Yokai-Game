@@ -25,12 +25,12 @@
                 },
                 {
                     "name": "Run",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "0c1ea1d7-f4c9-458b-a149-86a2a2a483df",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Submit",
@@ -110,15 +110,26 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "849c6c30-5141-49db-a8e0-c51edfe30434",
+                    "name": "2D Vector",
+                    "id": "4c748934-8ad6-4cfc-975f-e52f7d0a2795",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Run",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "518a6a47-8450-47b7-bfc3-967e7a937133",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Run",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "",

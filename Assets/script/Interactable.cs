@@ -21,6 +21,8 @@ public class Interactable : MonoBehaviour
     [SerializeField] private GameObject visualCue;
     private bool playerInRange;
 
+    [SerializeField] private Animator emoteAnimator;
+
     [SerializeField] private TextAsset inkJSON;
     /*void Start()
     {
@@ -42,7 +44,7 @@ public class Interactable : MonoBehaviour
             visualCue.SetActive(true);
             if (InputManager.GetInstance().GetInteractPressed())
             {
-                DialogueManager.GetInstance().EnterDialogueMode(inkJSON);
+                DialogueManager.GetInstance().EnterDialogueMode(inkJSON, emoteAnimator);
             }
         }
         else {

@@ -45,9 +45,9 @@ namespace At0m1c.DialogueSystem {
                 Debug.Log("Running");
             }
             else 
-                shift = 0;
+                shift = 0;*/
 
-            if (InputManager.GetInstance().GetInteractPressed())
+            /*if (InputManager.GetInstance().GetInteractPressed())
                 Debug.Log("Interact");*/
             //zAxis = (Input.GetKey(KeyCode.S) ? -1 : 0) + (Input.GetKey(KeyCode.W) ? 1 : 0);
             //xAxis = (Input.GetKey(KeyCode.A) ? -1 : 0) + (Input.GetKey(KeyCode.D) ? 1 : 0);
@@ -76,7 +76,14 @@ namespace At0m1c.DialogueSystem {
         private void HandleMovement()
         {
             Vector2 moving = InputManager.GetInstance().GetMoveDirection();
-            rb.velocity = new Vector3(moving.x * (speed + (shift * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), moving.y * (speed + (shift * 5f)));
+            Vector2 running = InputManager.GetInstance().GetShiftPressed();
+            //Debug.Log(running);
+            
+            rb.velocity = new Vector3(moving.x * (speed + (running.y * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), moving.y * (speed + (running.y * 5f)));
+            
+            //rb.velocity = new Vector3(moving.x * (speed + (shift * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), moving.y * (speed + (shift * 5f)));
+
+            
 
         }
 
