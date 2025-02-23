@@ -24,6 +24,9 @@ public class Interactable : MonoBehaviour
     [SerializeField] private Animator emoteAnimator;
 
     [SerializeField] private TextAsset inkJSON;
+
+    [SerializeField] private int objectType;
+    
     /*void Start()
     {
         player = GameObject.Find("Player");
@@ -44,42 +47,18 @@ public class Interactable : MonoBehaviour
             visualCue.SetActive(true);
             if (InputManager.GetInstance().GetInteractPressed())
             {
-                DialogueManager.GetInstance().EnterDialogueMode(inkJSON, emoteAnimator);
+                DialogueManager.GetInstance().EnterDialogueMode(inkJSON, emoteAnimator, objectType, gameObject);
             }
         }
         else {
             visualCue.SetActive(false);
         }
+    }
 
-        /*if (Vector3.Distance(player.transform.position, transform.position) < radius) {
-            //buttonCanvas.enabled = true;
-            if (Input.GetKeyDown(KeyCode.E) && !(dialogueCanvas.enabled))
-            {
-                if (id == 2 && timer.time == 18) //BED/Conditional objects 
-                {
-                    dialogue.StartDialogue(dialogueObject);
-                }
-                else dialogue.StartDialogue();
-                
-                
-                if (gameObject.tag == "Object") {
-                    switch (state)
-                    {
-                        case 0: //default
-                            Debug.Log("Erm");
-                            break;
-                        case 1:
-                            Debug.Log("Box"); 
-                            //dialogue.StartDialogue(day, gameObject.name, line);
-                            break;
-                        case 2:
-                            Debug.Log("Not a box");
-                            break;
-                    }
-                }*
-            }
-        }*/
-        //else buttonCanvas.enabled = false;
+    public void Cleaned()
+    {
+        GameEventsManager.instance.miscEvents.ObjectCleaned();
+        Destroy(transform.parent.gameObject);
     }
 
     private void OnTriggerEnter(Collider collider) {

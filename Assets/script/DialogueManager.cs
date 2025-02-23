@@ -42,6 +42,9 @@ public class DialogueManager : MonoBehaviour
 
     private InkExternalFunctions inkExternalFunctions;
 
+    private GameObject passedObject;
+    private int objectId;
+
     private void Awake()
     {
         if (instance != null)
@@ -88,7 +91,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void EnterDialogueMode(TextAsset inkJSON, Animator emoteAnimator)
+    public void EnterDialogueMode(TextAsset inkJSON, Animator emoteAnimator, int objectType, GameObject objectPass)
     {
         currentStory = new Story(inkJSON.text);
         dialogueIsPlaying = true;
@@ -96,6 +99,8 @@ public class DialogueManager : MonoBehaviour
 
         dialogueVariables.StartListening(currentStory);
         inkExternalFunctions.Bind(currentStory, emoteAnimator);
+        passedObject = objectPass;
+        objectId = objectType;
 
         //Reset UI
         displayNameText.text = "";
@@ -115,6 +120,10 @@ public class DialogueManager : MonoBehaviour
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
+        if (objectId == 1) //Destroy object after use 
+        {
+            passedObject.GetComponent<Interactable>().Cleaned();
+        }
     }
 
     private void ContinueStory()

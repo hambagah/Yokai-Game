@@ -11,9 +11,8 @@ public class InkExternalFunctions
             (string emoteName) => PlayEmote(emoteName, emoteAnimator));
 
 
-        story.BindExternalFunction("startQuest", (string questID) => {
-            Debug.Log(questID);
-        });
+        story.BindExternalFunction("startQuest", 
+            (string questId) => StartQuest(questId));
     }
 
     public void Unbind(Story story)
@@ -21,7 +20,7 @@ public class InkExternalFunctions
         story.UnbindExternalFunction("playEmote");
     }
 
-     public void PlayEmote(string emoteName, Animator emoteAnimator)
+    public void PlayEmote(string emoteName, Animator emoteAnimator)
     {
         if (emoteAnimator != null) 
         {
@@ -32,5 +31,11 @@ public class InkExternalFunctions
             Debug.LogWarning("Tried to play emote, but emote animator was "
                 + "not initialized when entering dialogue mode.");
         }
+    }
+
+    public void StartQuest(string questId)
+    {
+        Debug.Log(questId);
+        if (questId == "sleeping") TimeManager.GetInstance().ResetDay(); 
     }
 }

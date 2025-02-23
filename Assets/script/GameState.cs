@@ -7,7 +7,6 @@ public class GameState : MonoBehaviour
     public int progress;
     public int day;
     public Vector3 playerPos; 
-    [SerializeField] GameObject NPC;
     void Start()
     {
         progress = 0;
@@ -24,9 +23,6 @@ public class GameState : MonoBehaviour
     }
 
     public void Spawn() {
-        if (day == 2) {
-            NPC.SetActive(true);
-        }
     }
 
     public void Progress(int update)
