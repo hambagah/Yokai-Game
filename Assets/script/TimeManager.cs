@@ -9,6 +9,7 @@ public class TimeManager : MonoBehaviour
     //Player wakes up at 6:00AM 
     //Player should be asleep by 12:00PM
     private int time; 
+    private int day;
     [SerializeField] private GameObject sun, moon;
 
     [SerializeField] GameState gameState;

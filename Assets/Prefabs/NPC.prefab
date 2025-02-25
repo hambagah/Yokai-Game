@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 966691753506262951}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 25.995094, y: 0.5, z: -33}
+  m_LocalPosition: {x: 0, y: 0.5, z: -33}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -104,6 +104,7 @@ MonoBehaviour:
   visualCue: {fileID: 5885991732005914122}
   emoteAnimator: {fileID: 1299598383109035737}
   inkJSON: {fileID: 4900000, guid: 94bbfb4614654d24cb01e5b04b65a5b3, type: 3}
+  objectType: 0
 --- !u!1 &5885991732005914122
 GameObject:
   m_ObjectHideFlags: 0

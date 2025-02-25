@@ -15,5 +15,6 @@ MonoBehaviour:
   <id>k__BackingField: CleanBoxes
   displayName: Clear Up The House
   questPrerequisites: []
-  questStepPrefabs: []
+  questStepPrefabs:
+  - {fileID: 4659035923668843079, guid: e6430e51a48b26b43b5d172e434ef53e, type: 3}
   goldReward: 100
