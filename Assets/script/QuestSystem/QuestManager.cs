@@ -10,11 +10,48 @@ public class QuestManager : MonoBehaviour
     {
         questMap = CreateQuestMap();
 
-        Quest quest = GetQuestById("CleanBoxes");
+        /*Quest quest = GetQuestById("CleanBoxes");
         Debug.Log(quest.info.displayName);
         Debug.Log(quest.state);
-        Debug.Log(quest.CurrentStepExists());
+        Debug.Log(quest.CurrentStepExists());*/
 
+    }
+
+    private void OnEnable()
+    {
+        GameEventsManager.instance.questEvents.onStartQuest += StartQuest;
+        GameEventsManager.instance.questEvents.onAdvanceQuest += AdvanceQuest;
+        GameEventsManager.instance.questEvents.onFinishQuest += FinishQuest;
+    }
+
+    private void OnDisable()
+    {
+        GameEventsManager.instance.questEvents.onStartQuest -= StartQuest;
+        GameEventsManager.instance.questEvents.onAdvanceQuest -= AdvanceQuest;
+        GameEventsManager.instance.questEvents.onFinishQuest -= FinishQuest;
+    }
+
+    private void Start()
+    {
+        foreach (Quest quest in questMap.Values)
+        {
+            GameEventsManager.instance.questEvents.QuestStateChange(quest);
+        }
+    }
+
+    private void StartQuest(string id)
+    {
+        Debug.Log("Start Quest: " + id);
+    }
+
+    private void AdvanceQuest(string id)
+    {
+        Debug.Log("Advance Quest: " + id);
+    }
+
+    private void FinishQuest(string id)
+    {
+        Debug.Log("Finish Quest: " + id);
     }
 
     private Dictionary<string, Quest> CreateQuestMap() 
@@ -26,8 +63,8 @@ public class QuestManager : MonoBehaviour
             if (idToQuestMap.ContainsKey(questInfo.id))
             {
                 Debug.LogWarning("Duplicate ID found when creating quest map: " + questInfo.id);
-                idToQuestMap.Add(questInfo.id, new Quest(questInfo));
             }
+            idToQuestMap.Add(questInfo.id, new Quest(questInfo));
         }
         return idToQuestMap;
     }

@@ -19,6 +19,15 @@ public class InputEvents
         }
     }
 
+    public event Action<Vector2> onShiftPressed;
+    public void ShiftPressed(Vector2 moveDir) 
+    {
+        if (onShiftPressed != null) 
+        {
+            onShiftPressed(moveDir);
+        }
+    }
+
     public event Action<InputEventContext> onSubmitPressed;
     public void SubmitPressed()
     {

@@ -15,7 +15,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Interact",
+                    "name": "Submit",
                     "type": "Button",
                     "id": "99561731-1a36-4917-87c3-66c15cda4687",
                     "expectedControlType": "Button",
@@ -105,7 +105,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Interact",
+                    "action": "Submit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

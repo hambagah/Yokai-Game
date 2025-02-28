@@ -3,30 +3,67 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace At0m1c.DialogueSystem {
     public class Player : MonoBehaviour
     {
 
         public float speed = 2f;
+        private Vector2 running = Vector2.zero;
+        private Vector2 velocity = Vector2.zero;
         //private PlayerControls playerControls;
-        private Vector2 move;
-        private float shift;
         private Rigidbody rb;
+
+        private bool movementDisabled = false;
         
         private void Awake() {
             //playerControls = new PlayerControls();
-            rb = gameObject.GetComponent<Rigidbody>();   
+            rb = GetComponent<Rigidbody>();   
         }
 
-        /*private void OnEnable() {
-            playerControls.Enable();
+        private void Start()
+        {
+            GameEventsManager.instance.inputEvents.onMovePressed += MovePressed;
+            GameEventsManager.instance.playerEvents.onDisablePlayerMovement += DisablePlayerMovement;
+            GameEventsManager.instance.playerEvents.onEnablePlayerMovement += EnablePlayerMovement;
         }
 
-        private void OnDisable() {
-            playerControls.Disable();
-        }*/
+        private void OnDestroy()
+        {
+            GameEventsManager.instance.inputEvents.onMovePressed -= MovePressed;
+            GameEventsManager.instance.playerEvents.onDisablePlayerMovement -= DisablePlayerMovement;
+            GameEventsManager.instance.playerEvents.onEnablePlayerMovement -= EnablePlayerMovement;
+        }
 
-        // Update is called once per frame
+        private void DisablePlayerMovement()
+        {
+            movementDisabled = true;
+            velocity = Vector2.zero;
+        }
+
+        private void EnablePlayerMovement()
+        {
+            movementDisabled = false;
+        }
+
+        private void MovePressed(Vector2 moveDir)
+        {
+            velocity = moveDir.normalized * 1;
+
+            if (movementDisabled)
+            {
+                velocity = Vector2.zero;
+            }
+        }
+
+        private void ShiftPressed(Vector2 moveDir)
+        {
+            running = moveDir.normalized * 1;
+
+            if (movementDisabled)
+            {
+                running = Vector2.zero;
+            }
+        }
+
         void Update()
         {
             //move = playerControls.Player.WASD.ReadValue<Vector2>();
@@ -61,7 +98,10 @@ namespace At0m1c.DialogueSystem {
                 return;
             }
             
-            HandleMovement();
+            //HandleMovement();            
+            rb.velocity = new Vector3(velocity.x * (speed + (running.y * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), velocity.y * (speed + (running.y * 5f)));
+
+
             //Vector3 movement = new Vector3(xAxis, rb.velocity.y, zAxis);
             //rb.MovePosition(transform.position + movement * Time.deltaTime * speed);   
             //Debug.Log(zAxis + " " + xAxis);
@@ -99,4 +139,3 @@ namespace At0m1c.DialogueSystem {
             }
         }*/
     }
-}

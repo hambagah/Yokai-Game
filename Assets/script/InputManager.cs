@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,11 +9,42 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerInput))]
 public class InputManager : MonoBehaviour
 {
+    public void MovePressed(InputAction.CallbackContext context)
+    {
+        if (context.performed || context.canceled)
+        {
+            GameEventsManager.instance.inputEvents.MovePressed(context.ReadValue<Vector2>());
+        }
+    }
+
+    public void ShiftPressed(InputAction.CallbackContext context)
+    {
+        if (context.performed || context.canceled)
+        {
+            GameEventsManager.instance.inputEvents.ShiftPressed(context.ReadValue<Vector2>());
+        }
+    }
+
+    public void SubmitPressed(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            GameEventsManager.instance.inputEvents.SubmitPressed();
+        }
+    }
+
+    public void QuestLogTogglePressed(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            GameEventsManager.instance.inputEvents.QuestLogTogglePressed();
+        }
+    }
+
+    /*
     private Vector2 moveDirection = Vector2.zero;
-    //private bool shiftPressed = false;
     private Vector2 shiftPressed = Vector2.zero;
     private bool interactPressed = false;
-    private bool submitPressed = false;
 
     private static InputManager instance;
 
@@ -71,18 +100,6 @@ public class InputManager : MonoBehaviour
         } 
     }
 
-    /*public void SubmitPressed(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            submitPressed = true;
-        }
-        else if (context.canceled)
-        {
-            submitPressed = false;
-        } 
-    }*/
-
     public Vector2 GetMoveDirection() 
     {
         return moveDirection;
@@ -97,13 +114,6 @@ public class InputManager : MonoBehaviour
         return shiftPressed;
     }
 
-    /*public bool GetShiftPressed() 
-    {
-        bool result = shiftPressed;
-        shiftPressed = false;
-        return result;
-    }*/
-
     public bool GetInteractPressed() 
     {
         bool result = interactPressed;
@@ -111,21 +121,9 @@ public class InputManager : MonoBehaviour
         return result;
     }
 
-    /*public bool GetSubmitPressed() 
-    {
-        bool result = submitPressed;
-        submitPressed = false;
-        return result;
-    }*/
-
-    /*public void RegisterSubmitPressed() 
-    {
-        submitPressed = false;
-    }*/
-
     public void RegisterInteractPressed() 
     {
         interactPressed = false;
-    }
+    }*/
 
 }
