@@ -33,7 +33,7 @@ public class InputEvents
     {
         if (onSubmitPressed != null) 
         {
-            onSubmitPressed(this.inputEventContext);
+            onSubmitPressed?.Invoke(this.inputEventContext);
         }
     }
 

@@ -85,10 +85,10 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        if (canContinueToNextLine && currentStory.currentChoices.Count == 0 && InputManager.GetInstance().GetInteractPressed())
+        /*if (canContinueToNextLine && currentStory.currentChoices.Count == 0 && InputManager.GetInstance().GetInteractPressed())
         {
             ContinueStory();
-        }
+        }*/
     }
 
     public void EnterDialogueMode(TextAsset inkJSON, Animator emoteAnimator, int objectType, GameObject objectPass)
@@ -167,11 +167,11 @@ public class DialogueManager : MonoBehaviour
 
         foreach (char letter in line.ToCharArray())
         {
-            if (InputManager.GetInstance().GetInteractPressed())
+            /*if (InputManager.GetInstance().GetInteractPressed())
             {
                 dialogueText.maxVisibleCharacters = line.Length;
                 break;
-            }
+            }*/
 
             if (letter == '<' || isAddingRichTextTag)
             {
@@ -268,7 +268,7 @@ public class DialogueManager : MonoBehaviour
         if (canContinueToNextLine) {
             currentStory.ChooseChoiceIndex(choiceIndex);
             //Fix for their bug Idk if this affects the current one but better safe than sorry
-            InputManager.GetInstance().RegisterInteractPressed();
+            //InputManager.GetInstance().RegisterInteractPressed();
             ContinueStory();
         }
     }

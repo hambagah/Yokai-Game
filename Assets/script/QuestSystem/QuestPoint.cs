@@ -8,15 +8,21 @@ public class QuestPoint : MonoBehaviour //Can potentially migrate to Interactabl
     [Header("Quest")]
     [SerializeField] private QuestInfoSO questInfoForPoint;
 
+    [Header("Config")]
+    [SerializeField] private bool startPoint = true;
+    [SerializeField] private bool finishPoint = true;
+
     private bool oops;
     private bool playerIsNear = false;
     private string questId;
 
     private QuestState currentQuestState;
+    private QuestIcon questIcon;
 
     private void Awake()
     {
         questId = questInfoForPoint.id;
+        questIcon = GetComponentInChildren<QuestIcon>();
     }
 
     private void OnEnable()
@@ -31,16 +37,23 @@ public class QuestPoint : MonoBehaviour //Can potentially migrate to Interactabl
         GameEventsManager.instance.inputEvents.onSubmitPressed -= SubmitPressed;
     }
 
-    private void SubmitPressed()
+    private void SubmitPressed(InputEventContext inputEventContext)
     {
         if (!playerIsNear)
         {
             return;
         }
-
-        GameEventsManager.instance.questEvents.StartQuest(questId);
-        GameEventsManager.instance.questEvents.AdvanceQuest(questId);
-        GameEventsManager.instance.questEvents.FinishQuest(questId);
+        Debug.Log("Entering");
+        if (currentQuestState.Equals(QuestState.CAN_START) && startPoint)
+        {
+            GameEventsManager.instance.questEvents.StartQuest(questId);
+            Debug.Log("Starting");
+        }
+        else if (currentQuestState.Equals(QuestState.CAN_FINISH) && finishPoint)
+        {
+            GameEventsManager.instance.questEvents.FinishQuest(questId);
+            Debug.Log("Finishing");
+        }
     }
 
     private void QuestStateChange(Quest quest) 
@@ -49,6 +62,7 @@ public class QuestPoint : MonoBehaviour //Can potentially migrate to Interactabl
         {
             currentQuestState = quest.state;
             Debug.Log("Quest with id: " + questId + " updated to state: " + currentQuestState);
+            questIcon.SetState(currentQuestState, startPoint, finishPoint);
         }
     }
 

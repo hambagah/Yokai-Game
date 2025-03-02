@@ -45,10 +45,10 @@ public class Interactable : MonoBehaviour
         if (playerInRange && !DialogueManager.GetInstance().dialogueIsPlaying)
         {
             visualCue.SetActive(true);
-            if (InputManager.GetInstance().GetInteractPressed())
+            /*if (InputManager.GetInstance().GetInteractPressed())
             {
                 DialogueManager.GetInstance().EnterDialogueMode(inkJSON, emoteAnimator, objectType, gameObject);
-            }
+            }*/
         }
         else {
             visualCue.SetActive(false);

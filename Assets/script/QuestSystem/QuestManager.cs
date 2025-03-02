@@ -10,11 +10,6 @@ public class QuestManager : MonoBehaviour
     {
         questMap = CreateQuestMap();
 
-        /*Quest quest = GetQuestById("CleanBoxes");
-        Debug.Log(quest.info.displayName);
-        Debug.Log(quest.state);
-        Debug.Log(quest.CurrentStepExists());*/
-
     }
 
     private void OnEnable()

@@ -46,7 +46,7 @@ using UnityEngine.InputSystem;
 
         private void MovePressed(Vector2 moveDir)
         {
-            velocity = moveDir.normalized * 1;
+            velocity = moveDir.normalized * 4;
 
             if (movementDisabled)
             {
@@ -56,7 +56,7 @@ using UnityEngine.InputSystem;
 
         private void ShiftPressed(Vector2 moveDir)
         {
-            running = moveDir.normalized * 1;
+            running = moveDir.normalized * 4;
 
             if (movementDisabled)
             {
@@ -93,14 +93,14 @@ using UnityEngine.InputSystem;
 
         private void FixedUpdate()
         {
-            if (DialogueManager.GetInstance().dialogueIsPlaying)
+            /*if (DialogueManager.GetInstance().dialogueIsPlaying)
             {
                 return;
-            }
+            }*/
             
             //HandleMovement();            
-            rb.velocity = new Vector3(velocity.x * (speed + (running.y * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), velocity.y * (speed + (running.y * 5f)));
-
+            //rb.velocity = new Vector3(velocity.x * (speed + (running.y * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), velocity.y * (speed + (running.y * 5f)));
+            rb.velocity = new Vector3 (velocity.x, Mathf.Min(rb.velocity.y *1.25f, 0), velocity.y);
 
             //Vector3 movement = new Vector3(xAxis, rb.velocity.y, zAxis);
             //rb.MovePosition(transform.position + movement * Time.deltaTime * speed);   
@@ -115,12 +115,12 @@ using UnityEngine.InputSystem;
 
         private void HandleMovement()
         {
-            Vector2 moving = InputManager.GetInstance().GetMoveDirection();
+            /*Vector2 moving = InputManager.GetInstance().GetMoveDirection();
             Vector2 running = InputManager.GetInstance().GetShiftPressed();
             //Debug.Log(running);
             
             rb.velocity = new Vector3(moving.x * (speed + (running.y * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), moving.y * (speed + (running.y * 5f)));
-            
+            */
             //rb.velocity = new Vector3(moving.x * (speed + (shift * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), moving.y * (speed + (shift * 5f)));
 
             

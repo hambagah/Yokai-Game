@@ -7,7 +7,7 @@ public class CameraScript : MonoBehaviour
     float zoomAmount = 0; //With Positive and negative values
     float maxToClamp = 7;
     float minToClamp = 0;
-    float rotSpeed = 10;
+    //float rotSpeed = 10;
     Camera cam;
     float cameraSize;
 
