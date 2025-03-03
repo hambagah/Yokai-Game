@@ -7,16 +7,11 @@ using UnityEngine;
 public class Stream : MonoBehaviour
 {
     private LineRenderer lineRenderer = null;
-    private ParticleSystem splashparticale = null;
+    private ParticleSystem splashParticle = null;
 
     private Coroutine pourRoutine = null;
     private Vector3 targetPosition = Vector3.zero;
 
-    private void Awake()
-    {
-        lineRenderer = GetComponent<LineRenderer>();
-        splashparticale = GetComponentInChildren<ParticleSystem>();
-    }
 
     private void Start()
     {
@@ -29,6 +24,18 @@ public class Stream : MonoBehaviour
         StartCoroutine(UpdateParticale());
         pourRoutine = StartCoroutine(BeginPour());
     }
+
+    private void Awake()
+    {
+        lineRenderer = GetComponent<LineRenderer>();
+        splashParticle = GetComponentInChildren<ParticleSystem>();
+
+        if (splashParticle == null)
+        {
+            Debug.LogError("Stream.cs: Missing Particle System on Stream object!");
+        }
+    }
+
 
     private IEnumerator BeginPour()
     {
@@ -96,10 +103,10 @@ public class Stream : MonoBehaviour
     {
         while (gameObject.activeSelf)
         {
-            splashparticale.gameObject.transform.position = targetPosition;
+            splashParticle.gameObject.transform.position = targetPosition;
 
             bool isHitting = HasReachPosition(1, targetPosition);
-            splashparticale.gameObject.SetActive(isHitting);
+            splashParticle.gameObject.SetActive(isHitting);
 
             yield return null;
         }

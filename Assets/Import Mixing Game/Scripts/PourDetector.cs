@@ -35,12 +35,18 @@ public class PourDetector : MonoBehaviour
     private void StartPour()
     {
         Debug.Log("Pouring started");
+
         currentStream = CreateStream();
         if (currentStream != null)
         {
             currentStream.Begin();
         }
+        else
+        {
+            Debug.LogError("PourDetector: Failed to create stream. Check if StreamPrefab is assigned.");
+        }
     }
+
 
     private void EndPour()
     {
@@ -60,9 +66,14 @@ public class PourDetector : MonoBehaviour
 
     private Stream CreateStream()
     {
+        if (StreamPrefab == null)
+        {
+            Debug.LogError("PourDetector: StreamPrefab is not assigned!");
+            return null;
+        }
+
         GameObject streamObject = Instantiate(StreamPrefab, origin.position, Quaternion.identity, transform);
-
         return streamObject.GetComponent<Stream>();
-
     }
+
 }

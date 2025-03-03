@@ -28,9 +28,10 @@ public class BowlDetector : MonoBehaviour
         fillBar.setMinValue();
         fillBar.setMaxValue((int)maxFill);
 
-        // Initialize toggle states
-        UpdateIngredientToggles();
+        UpdateIngredientToggles();  // Ensure UI is updated on start
     }
+
+
 
     // This method is called when an object first collides with the bowl
     private void OnCollisionEnter(Collision collision)

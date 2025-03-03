@@ -10,18 +10,21 @@ public class CubeSpawner : MonoBehaviour
     {
         if (cubePrefab != null)
         {
-            // Instantiate the cube prefab at the spawner's position and rotation
             GameObject spawnedCube = Instantiate(cubePrefab, transform.position, transform.rotation);
 
-            // Set the parent of the spawned cube, if a parent is specified
             if (parentTransform != null)
             {
                 spawnedCube.transform.SetParent(parentTransform);
             }
+            else
+            {
+                Debug.LogWarning("CubeSpawner: Parent transform is NULL. The cube is spawned without a parent.");
+            }
         }
         else
         {
-            Debug.LogWarning("Cube prefab is not assigned. Please assign a prefab in the inspector.");
+            Debug.LogError("CubeSpawner: Cube prefab is not assigned!");
         }
     }
+
 }

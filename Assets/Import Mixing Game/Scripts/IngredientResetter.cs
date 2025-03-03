@@ -14,27 +14,27 @@ public class IngredientResetter : MonoBehaviour
         StoreOriginalPositions();
     }
 
-private void Update()
-{
-    for (int i = 0; i < ingredientObjects.Count; i++)
+    private void Update()
     {
-        if (ingredientObjects[i] != null)
+        for (int i = 0; i < ingredientObjects.Count; i++)
         {
-            float distance = Vector3.Distance(ingredientObjects[i].transform.position, originalPositions[i]);
-            if (distance > resetThreshold)
+            if (ingredientObjects[i] != null)
             {
-                ResetIngredientAtIndex(i);
+                float distance = Vector3.Distance(ingredientObjects[i].transform.position, originalPositions[i]);
+                if (distance > resetThreshold)
+                {
+                    ResetIngredientAtIndex(i);
+                }
             }
         }
     }
-}
 
-private void ResetIngredientAtIndex(int index)
-{
-    ingredientObjects[index].transform.position = originalPositions[index];
-    ingredientObjects[index].transform.rotation = originalRotations[index];
-    Debug.Log($"Ingredient {ingredientObjects[index].name} reset due to out-of-bounds movement.");
-}
+    private void ResetIngredientAtIndex(int index)
+    {
+        ingredientObjects[index].transform.position = originalPositions[index];
+        ingredientObjects[index].transform.rotation = originalRotations[index];
+        Debug.Log($"Ingredient {ingredientObjects[index].name} reset due to out-of-bounds movement.");
+    }
 
 
     private void StoreOriginalPositions()
@@ -74,16 +74,13 @@ private void ResetIngredientAtIndex(int index)
             {
                 ingredientObjects[i].transform.position = originalPositions[i];
                 ingredientObjects[i].transform.rotation = originalRotations[i];
-
-                // Debug log to show that the ingredient's position and rotation are being reset
-                Debug.Log($"Reset ingredient position: {ingredientObjects[i].name} - Position: {ingredientObjects[i].transform.position}, Rotation: {ingredientObjects[i].transform.rotation}");
             }
             else
             {
                 Debug.LogWarning($"Ingredient {i} is null, skipping reset.");
             }
         }
-
-        Debug.Log("All ingredients have been reset to their original positions!");
     }
+
+
 }

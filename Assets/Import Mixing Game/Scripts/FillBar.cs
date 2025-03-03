@@ -22,14 +22,17 @@ public class FillBar : MonoBehaviour
         slider.value = value;
     }
 
+    private Coroutine fillCoroutine = null;
+
     public void SetFillValueSmooth(int targetValue, float duration)
     {
-        // Stop any existing smooth transitions
-        StopAllCoroutines();
-
-        // Start the new smooth transition
-        StartCoroutine(SmoothTransition(targetValue, duration));
+        if (fillCoroutine != null)
+        {
+            StopCoroutine(fillCoroutine);
+        }
+        fillCoroutine = StartCoroutine(SmoothTransition(targetValue, duration));
     }
+
 
     private IEnumerator SmoothTransition(int targetValue, float duration)
     {

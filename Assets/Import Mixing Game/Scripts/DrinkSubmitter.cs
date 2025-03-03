@@ -12,8 +12,7 @@ public class DrinkSubmitter : MonoBehaviour
     {
         if (submitButton != null)
         {
-            // Use a lambda expression to handle the button press event
-            submitButton.OnButtonPressed.AddListener(() => SubmitDrink());
+            submitButton.OnButtonPressed.AddListener(SubmitDrink);
         }
     }
 
@@ -21,16 +20,23 @@ public class DrinkSubmitter : MonoBehaviour
     {
         if (submitButton != null)
         {
-            submitButton.OnButtonPressed.RemoveListener(() => SubmitDrink());
+            submitButton.OnButtonPressed.RemoveListener(SubmitDrink);
         }
     }
+
 
     private void SubmitDrink()
     {
         Debug.Log("Drink submitted!");
-        if (demoWinCheck != null)
+
+        if (demoWinCheck == null)
         {
-            demoWinCheck.CheckWinCondition();
+            Debug.LogError("DrinkSubmitter: demoWinCheck reference is missing!");
+            return;
         }
+
+        demoWinCheck.CheckWinCondition();
     }
+
+
 }
