@@ -21,7 +21,6 @@ public class FillBar : MonoBehaviour
     {
         slider.value = value;
     }
-
     private Coroutine fillCoroutine = null;
 
     public void SetFillValueSmooth(int targetValue, float duration)
@@ -32,6 +31,7 @@ public class FillBar : MonoBehaviour
         }
         fillCoroutine = StartCoroutine(SmoothTransition(targetValue, duration));
     }
+
 
 
     private IEnumerator SmoothTransition(int targetValue, float duration)
