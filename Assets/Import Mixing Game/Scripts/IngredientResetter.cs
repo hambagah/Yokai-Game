@@ -3,68 +3,44 @@ using UnityEngine;
 
 public class IngredientResetter : MonoBehaviour
 {
-    public List<GameObject> ingredientObjects;  // List of ingredient objects to reset
-    private List<Vector3> originalPositions = new List<Vector3>(); // List to store original positions
-    private List<Quaternion> originalRotations = new List<Quaternion>(); // List to store original rotations
+    public Transform movableObjectsParent; // Parent object that contains all moveable objects
+    private List<Vector3> originalPositions = new List<Vector3>(); // Stores original positions
+    private List<Quaternion> originalRotations = new List<Quaternion>(); // Stores original rotations
+    private List<Transform> ingredientObjects = new List<Transform>(); // List of ingredients
 
-    public float resetThreshold = 10f;  // Distance threshold for resetting
     private void Start()
     {
-        // Store the initial positions and rotations of the ingredients
+        if (movableObjectsParent == null)
+        {
+            Debug.LogError("IngredientResetter: movableObjectsParent is NOT assigned!");
+            return;
+        }
+
         StoreOriginalPositions();
     }
 
-    private void Update()
-    {
-        for (int i = 0; i < ingredientObjects.Count; i++)
-        {
-            if (ingredientObjects[i] != null)
-            {
-                float distance = Vector3.Distance(ingredientObjects[i].transform.position, originalPositions[i]);
-                if (distance > resetThreshold)
-                {
-                    ResetIngredientAtIndex(i);
-                }
-            }
-        }
-    }
-
-    private void ResetIngredientAtIndex(int index)
-    {
-        ingredientObjects[index].transform.position = originalPositions[index];
-        ingredientObjects[index].transform.rotation = originalRotations[index];
-        Debug.Log($"Ingredient {ingredientObjects[index].name} reset due to out-of-bounds movement.");
-    }
-
-
     private void StoreOriginalPositions()
     {
-        originalPositions.Clear();  // Clear the list to avoid any old data
-        originalRotations.Clear();  // Clear the list to avoid any old data
+        originalPositions.Clear();
+        originalRotations.Clear();
+        ingredientObjects.Clear();
 
-        foreach (var ingredient in ingredientObjects)
+        // Get all child objects inside the parent
+        foreach (Transform child in movableObjectsParent)
         {
-            if (ingredient != null)
-            {
-                originalPositions.Add(ingredient.transform.position);
-                originalRotations.Add(ingredient.transform.rotation);
-
-                // Debug log to confirm the ingredient's position and rotation are stored
-                Debug.Log($"Stored ingredient position: {ingredient.name} - Position: {ingredient.transform.position}, Rotation: {ingredient.transform.rotation}");
-            }
-            else
-            {
-                Debug.LogWarning("Null ingredient object found in the ingredient list.");
-            }
+            ingredientObjects.Add(child);
+            originalPositions.Add(child.position);
+            originalRotations.Add(child.rotation);
         }
+
+        Debug.Log($"IngredientResetter: Stored positions for {ingredientObjects.Count} ingredients.");
     }
 
-    // Reset the positions and rotations of the ingredients to their original states
     public void ResetIngredientPositions()
     {
         if (ingredientObjects.Count != originalPositions.Count || ingredientObjects.Count != originalRotations.Count)
         {
-            Debug.LogError("Mismatch in the number of ingredients or stored positions/rotations. Reset failed.");
+            Debug.LogError("IngredientResetter: Mismatch in stored positions/rotations. Reset failed.");
             return;
         }
 
@@ -72,15 +48,21 @@ public class IngredientResetter : MonoBehaviour
         {
             if (ingredientObjects[i] != null)
             {
-                ingredientObjects[i].transform.position = originalPositions[i];
-                ingredientObjects[i].transform.rotation = originalRotations[i];
+                ingredientObjects[i].position = originalPositions[i];
+                ingredientObjects[i].rotation = originalRotations[i];
             }
             else
             {
-                Debug.LogWarning($"Ingredient {i} is null, skipping reset.");
+                Debug.LogWarning($"IngredientResetter: Ingredient {i} is null, skipping reset.");
             }
         }
+
+        Debug.Log("IngredientResetter: All ingredients have been reset!");
     }
 
-
+    public void RecalibrateOriginalPositions()
+    {
+        StoreOriginalPositions();
+        Debug.Log("IngredientResetter: Original positions and rotations recalibrated.");
+    }
 }

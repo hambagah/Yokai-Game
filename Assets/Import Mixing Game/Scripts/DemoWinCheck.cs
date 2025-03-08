@@ -1,53 +1,26 @@
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.UI;
 using TMPro;
-using System;
 
 public class DemoWinCheck : MonoBehaviour
 {
-    public MixingGameTimer timer; // Reference to the timer
-    public BowlDetector bowlDetector; // Reference to the bowl detection script
+    public BowlDetector bowlDetector; // Reference to BowlDetector for checking ingredients
+    public TextMeshProUGUI FinishText; // UI Text to display the result
 
-    public TextMeshProUGUI FinishText;
-
-    private void Start()
-    {
-        if (timer != null)
-        {
-            timer.onTimerEnd.AddListener(CheckRequirements);
-        }
-
-        if (bowlDetector == null)
-        {
-            bowlDetector = FindObjectOfType<BowlDetector>();
-            if (bowlDetector == null)
-            {
-                Debug.LogError("DemoWinCheck: bowlDetector is NULL! Ensure it is assigned in the Inspector.");
-            }
-        }
-
-        if (FinishText == null)
-        {
-            Debug.LogError("DemoWinCheck: FinishText is NULL! Assign a UI text element in the Inspector.");
-        }
-    }
-
-
-    private void CheckRequirements()
+    public void CheckWinCondition()
     {
         if (bowlDetector == null)
         {
             Debug.LogError("DemoWinCheck: bowlDetector is NULL!");
             return;
         }
+
         if (FinishText == null)
         {
             Debug.LogError("DemoWinCheck: FinishText is NULL!");
             return;
         }
 
-        // Check if the required ingredients are in the bowl
+        // Check if ingredients are correct
         if (bowlDetector.IsIceCubeInBowl() && bowlDetector.IsSakeInBowl() && bowlDetector.IsJuiceInBowl())
         {
             if (bowlDetector.GetFillLevel() >= bowlDetector.maxFill)
@@ -74,11 +47,4 @@ public class DemoWinCheck : MonoBehaviour
             Debug.Log(FinishText.text);
         }
     }
-
-
-    public void CheckWinCondition()
-    {
-        CheckRequirements(); // Call the existing CheckRequirements method
-    }
-
 }
