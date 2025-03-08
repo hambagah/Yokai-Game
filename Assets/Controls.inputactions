@@ -77,6 +77,17 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "down",
+                    "id": "8f8a7d78-96c9-42c7-97cc-fa993295bddd",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "WASD",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "left",
                     "id": "5ebac74a-64a9-4807-84f5-2eca1e468722",
                     "path": "<Keyboard>/a",

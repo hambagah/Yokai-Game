@@ -23,11 +23,18 @@ public class CleanHouseQuestStep : QuestStep
         if (boxesCleared < boxesToClear)
         {
             boxesCleared++;
+            UpdateState();
         }
 
         if (boxesCleared >= boxesToClear)
         {
             FinishQuestStep();
         }
+    }
+
+    private void UpdateState()
+    {
+        string state = boxesCleared.ToString();
+        ChangeState(state);
     }
 }
