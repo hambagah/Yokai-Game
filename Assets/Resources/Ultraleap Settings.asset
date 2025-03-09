@@ -18,5 +18,5 @@ MonoBehaviour:
   startupHints: []
   showAndroidBuildArchitectureWarning: 1
   showPhysicalHandsPhysicsSettingsWarning: 1
-  pluginVersion: Unknown
-  pluginSource: Unknown
+  pluginVersion: 7.1.0
+  pluginSource: UPM OpenUPM
