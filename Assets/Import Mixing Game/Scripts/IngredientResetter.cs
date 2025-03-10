@@ -4,9 +4,7 @@ using UnityEngine;
 public class IngredientResetter : MonoBehaviour
 {
     public Transform movableObjectsParent; // Parent object that contains all moveable objects
-    private List<Vector3> originalPositions = new List<Vector3>(); // Stores original positions
-    private List<Quaternion> originalRotations = new List<Quaternion>(); // Stores original rotations
-    private List<Transform> ingredientObjects = new List<Transform>(); // List of ingredients
+    private Dictionary<Transform, (Vector3, Quaternion)> originalTransforms = new Dictionary<Transform, (Vector3, Quaternion)>();
 
     private void Start()
     {
@@ -21,39 +19,28 @@ public class IngredientResetter : MonoBehaviour
 
     private void StoreOriginalPositions()
     {
-        originalPositions.Clear();
-        originalRotations.Clear();
-        ingredientObjects.Clear();
+        originalTransforms.Clear();
 
-        // Get all child objects inside the parent
         foreach (Transform child in movableObjectsParent)
         {
-            ingredientObjects.Add(child);
-            originalPositions.Add(child.position);
-            originalRotations.Add(child.rotation);
+            originalTransforms[child] = (child.position, child.rotation);
         }
 
-        Debug.Log($"IngredientResetter: Stored positions for {ingredientObjects.Count} ingredients.");
+        Debug.Log($"IngredientResetter: Stored positions for {originalTransforms.Count} ingredients.");
     }
 
     public void ResetIngredientPositions()
     {
-        if (ingredientObjects.Count != originalPositions.Count || ingredientObjects.Count != originalRotations.Count)
+        foreach (var kvp in originalTransforms)
         {
-            Debug.LogError("IngredientResetter: Mismatch in stored positions/rotations. Reset failed.");
-            return;
-        }
-
-        for (int i = 0; i < ingredientObjects.Count; i++)
-        {
-            if (ingredientObjects[i] != null)
+            if (kvp.Key != null)
             {
-                ingredientObjects[i].position = originalPositions[i];
-                ingredientObjects[i].rotation = originalRotations[i];
+                kvp.Key.position = kvp.Value.Item1;
+                kvp.Key.rotation = kvp.Value.Item2;
             }
             else
             {
-                Debug.LogWarning($"IngredientResetter: Ingredient {i} is null, skipping reset.");
+                Debug.LogWarning($"IngredientResetter: Missing reference to an ingredient.");
             }
         }
 
