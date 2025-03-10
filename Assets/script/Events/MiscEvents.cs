@@ -12,7 +12,6 @@ public class MiscEvents
         if (objectCleaned != null)
         {
             objectCleaned();
-            Debug.Log("Cleaned");
         }
     }
 }

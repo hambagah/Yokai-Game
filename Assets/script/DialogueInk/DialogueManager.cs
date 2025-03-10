@@ -1,13 +1,259 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
+//using TMPro;
 using Ink.Runtime;
-using UnityEngine.EventSystems;
+//using UnityEngine.EventSystems;
 
 public class DialogueManager : MonoBehaviour
 {
-    //Dialogue UI
+    [Header("Ink Story")]
+    [SerializeField] private TextAsset inkJson;
+    
+    private Story story;
+
+    private int currentChoiceIndex = -1;
+
+    private bool dialoguePlaying = false;
+
+    GameObject temp;
+
+    private InkExternalFunctions inkExternalFunctions;
+    private InkDialogueVariables inkDialogueVariables;
+
+    private void Awake()
+    {
+        story = new Story(inkJson.text);
+        inkExternalFunctions = new InkExternalFunctions();
+        inkExternalFunctions.Bind(story);
+        inkDialogueVariables = new InkDialogueVariables(story);
+    }
+
+    private void OnDestroy()
+    {
+        inkExternalFunctions.Unbind(story);
+    }
+
+    private void OnEnable()
+    {
+        GameEventsManager.instance.dialogueEvents.onEnterDialogue += EnterDialogue;
+        GameEventsManager.instance.dialogueEvents.onObjectDialogue += ObjectDialogue;
+        GameEventsManager.instance.inputEvents.onSubmitPressed += SubmitPressed;
+        GameEventsManager.instance.dialogueEvents.onUpdateChoiceIndex += UpdateChoiceIndex;
+        GameEventsManager.instance.dialogueEvents.onUpdateInkDialogueVariable += UpdateInkDialogueVariable;
+        GameEventsManager.instance.questEvents.onQuestStateChange += QuestStateChange;
+    }
+
+    private void OnDisable()
+    {
+        GameEventsManager.instance.dialogueEvents.onEnterDialogue -= EnterDialogue;
+        GameEventsManager.instance.dialogueEvents.onObjectDialogue -= ObjectDialogue;
+        GameEventsManager.instance.inputEvents.onSubmitPressed -= SubmitPressed;
+        GameEventsManager.instance.dialogueEvents.onUpdateChoiceIndex -= UpdateChoiceIndex;
+        GameEventsManager.instance.dialogueEvents.onUpdateInkDialogueVariable -= UpdateInkDialogueVariable;
+        GameEventsManager.instance.questEvents.onQuestStateChange -= QuestStateChange;
+    }
+
+    private void QuestStateChange(Quest quest)
+    {
+        GameEventsManager.instance.dialogueEvents.UpdateInkDialogueVariable(
+            quest.info.id + "State",
+            (Ink.Runtime.Object) new StringValue(quest.state.ToString())
+        );
+    }
+
+    private void UpdateInkDialogueVariable(string name, Ink.Runtime.Object value)
+    {
+        inkDialogueVariables.UpdateVariableState(name, value);
+    }
+
+    private void UpdateChoiceIndex(int choiceIndex)
+    {
+        this.currentChoiceIndex = choiceIndex;
+    }
+
+    private void SubmitPressed(InputEventContext inputEventContext)
+    {
+        if (!inputEventContext.Equals(InputEventContext.DIALOGUE))
+        {
+            return;
+        }
+        
+        ContinueOrExitStory();
+    }
+
+    private void EnterDialogue(string knotName)
+    {
+        temp = null;
+        if (dialoguePlaying)
+        {
+            return;
+        }
+
+        dialoguePlaying = true;
+
+        GameEventsManager.instance.dialogueEvents.DialogueStarted();
+        GameEventsManager.instance.playerEvents.DisablePlayerMovement();
+        GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DIALOGUE);
+        
+        if (!knotName.Equals(""))
+        {
+            story.ChoosePathString(knotName);
+        }
+        else
+        {
+            Debug.LogWarning("Knot name was an empty string.");
+        }
+        inkDialogueVariables.SyncVariablesAndStartListening(story);
+
+        ContinueOrExitStory();
+    }
+    
+    //Object's EnterDialogue will trigger events
+    private void ObjectDialogue(string knotName, GameObject gameObject)
+    {
+        temp = gameObject;
+        if (dialoguePlaying)
+        {
+            return;
+        }
+
+        dialoguePlaying = true;
+
+        GameEventsManager.instance.dialogueEvents.DialogueStarted();
+        GameEventsManager.instance.playerEvents.DisablePlayerMovement();
+        GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DIALOGUE);
+        
+        if (!knotName.Equals(""))
+        {
+            story.ChoosePathString(knotName);
+        }
+        else
+        {
+            Debug.LogWarning("Knot name was an empty string.");
+        }
+        inkDialogueVariables.SyncVariablesAndStartListening(story);
+
+        //ObjectContinueOrExitStory(gameObject);
+        ContinueOrExitStory();
+    }
+
+    //Still Object
+    /*private void ObjectContinueOrExitStory(GameObject gameObject)
+    {
+        if (story.currentChoices.Count > 0 && currentChoiceIndex != -1)
+        {
+            story.ChooseChoiceIndex(currentChoiceIndex);
+            currentChoiceIndex = -1;
+        }
+
+        if (story.canContinue)
+        {
+            string dialogueLine = story.Continue();
+            while (IsLineBlank(dialogueLine) && story.canContinue)
+            {
+                dialogueLine = story.Continue();
+            }
+            
+            if (IsLineBlank(dialogueLine) && !story.canContinue)
+            {
+                ObjectExitDialogue(gameObject);
+            }
+            else
+            {
+                GameEventsManager.instance.dialogueEvents.DisplayDialogue(dialogueLine, story.currentChoices);
+                Debug.Log("8");
+            }
+        }
+        else if (story.currentChoices.Count == 0)
+        {
+            ObjectExitDialogue(gameObject);
+        }
+    }
+
+    //Object Exit
+    private void ObjectExitDialogue(GameObject gameObject)
+    {
+        ObjectPoint comp = gameObject.GetComponent<ObjectPoint>();
+        if (comp.objectType == 1) //Boxes
+        {
+            comp.Cleaned();
+        }
+
+        dialoguePlaying = false;
+        GameEventsManager.instance.dialogueEvents.DialogueFinished();
+        GameEventsManager.instance.playerEvents.EnablePlayerMovement();
+        GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DEFAULT);
+        inkDialogueVariables.StopListening(story);
+        story.ResetState();
+    }*/
+
+    /*//Grabs Object Component
+    private bool ObjectGetComponent<ObjectPoint>(this GameObject obj, ObjectPoint result) where ObjectPoint : Component
+    {
+        return (result = obj.GetComponent<ObjectPoint>()) != null;
+    }*/
+
+    private void ContinueOrExitStory()
+    {
+        if (story.currentChoices.Count > 0 && currentChoiceIndex != -1)
+        {
+            story.ChooseChoiceIndex(currentChoiceIndex);
+            currentChoiceIndex = -1;
+        }
+
+        if (story.canContinue)
+        {
+            string dialogueLine = story.Continue();
+
+            while (IsLineBlank(dialogueLine) && story.canContinue)
+            {
+                dialogueLine = story.Continue();
+            }
+
+            if (IsLineBlank(dialogueLine) && !story.canContinue)
+            {
+                ExitDialogue();
+                Debug.Log("1");
+            }
+            else
+            {
+                GameEventsManager.instance.dialogueEvents.DisplayDialogue(dialogueLine, story.currentChoices);
+                Debug.Log("2");
+            }
+        }
+        else if (story.currentChoices.Count == 0)
+        {
+            ExitDialogue();
+            Debug.Log("3");
+        }
+    }
+
+    private void ExitDialogue()
+    {
+        if (temp != null)
+        {
+            ObjectPoint comp = temp.GetComponent<ObjectPoint>();
+            if (comp.objectType == 1) //Boxes
+            {
+                comp.Cleaned();
+            }
+        }
+
+        dialoguePlaying = false;
+        GameEventsManager.instance.dialogueEvents.DialogueFinished();
+        GameEventsManager.instance.playerEvents.EnablePlayerMovement();
+        GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DEFAULT);
+        inkDialogueVariables.StopListening(story);
+        story.ResetState();
+    }
+
+    private bool IsLineBlank(string dialogueLine)
+    {
+        return dialogueLine.Trim().Equals("") || dialogueLine.Trim().Equals("\n");
+    }
+
+    /*//Dialogue UI
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private GameObject continueIcon; 
     [SerializeField] private float typingSpeed = 0.04f;
@@ -88,7 +334,7 @@ public class DialogueManager : MonoBehaviour
         /*if (canContinueToNextLine && currentStory.currentChoices.Count == 0 && InputManager.GetInstance().GetInteractPressed())
         {
             ContinueStory();
-        }*/
+        }/
     }
 
     public void EnterDialogueMode(TextAsset inkJSON, Animator emoteAnimator, int objectType, GameObject objectPass)
@@ -171,7 +417,7 @@ public class DialogueManager : MonoBehaviour
             {
                 dialogueText.maxVisibleCharacters = line.Length;
                 break;
-            }*/
+            }/
 
             if (letter == '<' || isAddingRichTextTag)
             {
@@ -290,5 +536,5 @@ public class DialogueManager : MonoBehaviour
         if (dialogueVariables != null) {
             dialogueVariables.SaveVariables();
         }
-    }
+    }*/
 }

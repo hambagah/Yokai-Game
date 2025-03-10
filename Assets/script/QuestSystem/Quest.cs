@@ -21,6 +21,20 @@ public class Quest
         }
     }
 
+    public Quest(QuestInfoSO questInfo, QuestState questState, int currentQuestStepIndex, QuestStepState[] questStepStates)
+    {
+        this.info = questInfo;
+        this.state = questState;
+        this.currentQuestStepIndex = currentQuestStepIndex;
+        this.questStepStates = questStepStates;
+
+        if (this.questStepStates.Length != this.info.questStepPrefabs.Length)
+        {
+            Debug.LogWarning("Quest Step Prefabs and Quest Step States are of different lenghts. This indicates something changed with the QuestInfo "
+            + "and the saved data is now out of sync. Reset your data - as this might cause issues. QuestId: " + this.info.id);
+        }
+    }
+
     public void MoveToNextStep()
     {
         currentQuestStepIndex++;
@@ -37,7 +51,7 @@ public class Quest
         if (questStepPrefab != null)
         {
             QuestStep questStep = Object.Instantiate<GameObject>(questStepPrefab, parentTransform).GetComponent<QuestStep>();
-            questStep.InitializeQuestStep(info.id, currentQuestStepIndex);
+            questStep.InitializeQuestStep(info.id, currentQuestStepIndex, questStepStates[currentQuestStepIndex].state);
         }
     }
 

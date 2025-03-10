@@ -5,48 +5,48 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider))]
 public class ObjectPoint : MonoBehaviour //Can potentially migrate to Interactable
 {
-    /*[Header("Quest")]
+    [Header("Dialogue")]
+    [SerializeField] private string dialogueKnotName;
+    
+    [Header("Quest")]
     [SerializeField] private QuestInfoSO questInfoForPoint;
 
-    [Header("Config")]
-    [SerializeField] private bool startPoint = true;
-    [SerializeField] private bool finishPoint = true;*/
+    [SerializeField] private GameObject questIcon;
 
-    //private bool oops;
     private bool playerIsNear = false;
-    //private string questId;
-
-    //private QuestState currentQuestState;
-    private QuestIcon questIcon;
     public int objectType;
 
     private void Awake()
     {
-        //questId = questInfoForPoint.id;
-        questIcon = GetComponentInChildren<QuestIcon>();
+        questIcon.SetActive(false);
     }
 
     private void OnEnable()
     {
-        //GameEventsManager.instance.questEvents.onQuestStateChange += QuestStateChange;
         GameEventsManager.instance.inputEvents.onSubmitPressed += SubmitPressed;
     }
 
     private void OnDisable()
     {
-        //GameEventsManager.instance.questEvents.onQuestStateChange -= QuestStateChange;
         GameEventsManager.instance.inputEvents.onSubmitPressed -= SubmitPressed;
     }
 
     private void SubmitPressed(InputEventContext inputEventContext)
     {
-        if (!playerIsNear)
+        if (!playerIsNear || !inputEventContext.Equals(InputEventContext.DEFAULT))
         {
             return;
         }
 
-        if (objectType == 0) { //Cleaning and destroying boxes
-            Cleaned();
+        if (!dialogueKnotName.Equals(""))
+        {
+            if (objectType == 1) { //Cleaning and destroying boxes
+                //Debug.Log("Yes");
+                GameEventsManager.instance.dialogueEvents.ObjectDialogue(dialogueKnotName, this.gameObject);
+                //GameEventsManager.instance.dialogueEvents.ObjectDialogue(dialogueKnotName, this.gameObject);
+                //Cleaned();
+                //Day1CleanBoxes(Clone);
+            }
         }
     }
     
@@ -56,20 +56,11 @@ public class ObjectPoint : MonoBehaviour //Can potentially migrate to Interactab
         Destroy(gameObject);
     }
 
-    /*private void QuestStateChange(Quest quest) 
-    {
-        if (quest.info.id.Equals(questId))
-        {
-            currentQuestState = quest.state;
-            Debug.Log("Quest with id: " + questId + " updated to state: " + currentQuestState);
-            questIcon.SetState(currentQuestState, startPoint, finishPoint);
-        }
-    }*/
-
     private void OnTriggerEnter(Collider collider)
     {
         if (collider.CompareTag("Player"))
         {
+            questIcon.SetActive(true);
             playerIsNear = true;
         }
     }
@@ -78,6 +69,7 @@ public class ObjectPoint : MonoBehaviour //Can potentially migrate to Interactab
     {
         if (collider.CompareTag("Player"))
         {
+            questIcon.SetActive(false);
             playerIsNear = false;
         }
     }

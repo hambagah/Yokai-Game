@@ -37,4 +37,10 @@ public class CleanHouseQuestStep : QuestStep
         string state = boxesCleared.ToString();
         ChangeState(state);
     }
+
+    protected override void SetQuestStepState(string state)
+    {
+        this.boxesCleared = System.Int32.Parse(state);
+        UpdateState();
+    }
 }

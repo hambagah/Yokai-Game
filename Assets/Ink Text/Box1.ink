@@ -1,2 +1,6 @@
-You clean up the box.
-You catch some dust in your mouth.
+=== box1 ===
+It's a dirt box.
+* [You clean it up.]
+    You catch some dust in your mouth.
+    
+- -> END

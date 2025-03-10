@@ -10,11 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23a8799ced5008c48b2d279a3f2976be, type: 3}
-  m_Name: CleanBoxes
+  m_Name: CleanBox
   m_EditorClassIdentifier: 
-  <id>k__BackingField: CleanBoxes
-  displayName: Clear Up The House
+  <id>k__BackingField: CleanBox
+  displayName: Clean the Boxes.
   questPrerequisites: []
   questStepPrefabs:
-  - {fileID: 4659035923668843079, guid: e6430e51a48b26b43b5d172e434ef53e, type: 3}
-  goldReward: 50
+  - {fileID: 3977256046289428081, guid: 38da12e1b341d534087b9c610847e444, type: 3}
+  - {fileID: 5702175745021294499, guid: c768153334e9d5540b8a23a05db6e7a3, type: 3}
+  - {fileID: 6893537785722302214, guid: 5c4293c26d899724fb3b99a52e429454, type: 3}
+  goldReward: 20
