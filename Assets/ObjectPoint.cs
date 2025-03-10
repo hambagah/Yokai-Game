@@ -58,7 +58,7 @@ public class ObjectPoint : MonoBehaviour //Can potentially migrate to Interactab
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.CompareTag("Player"))
+        if (collider.CompareTag("Player") && GameObject.Find("Day1CleanBoxes(Clone)"))
         {
             questIcon.SetActive(true);
             playerIsNear = true;
