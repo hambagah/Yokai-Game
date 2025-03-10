@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf870742f26b18b49850c5330ca056a7, type: 3}
   m_Name: Ultraleap Settings
   m_EditorClassIdentifier: 
-  leapSubsystemEnabled: 0
+  leapSubsystemEnabled: 1
   updateLeapInputSystem: 0
   updateMetaInputSystem: 0
   startupHints: []

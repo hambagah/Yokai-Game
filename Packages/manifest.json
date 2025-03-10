@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "com.ultraleap.dependencytoolkit": "1.0.0-pre.2",
     "com.ultraleap.tracking": "7.1.0",
+    "com.ultraleap.tracking.preview": "7.1.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.2d.tilemap.extras": "3.1.2",
     "com.unity.ai.navigation": "1.1.5",
