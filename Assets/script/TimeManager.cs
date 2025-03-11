@@ -62,12 +62,20 @@ public class TimeManager : MonoBehaviour
 
     public void SleepingEvent(int value)
     {
-        time = 0;
-        day += 1;
-        sun.transform.eulerAngles = new Vector3(0, 15, 0);
-        moon.transform.eulerAngles = new Vector3(0, -45, 0);
-        UpdateEvents();
-        ChangeTime(0);
+        Debug.Log(value);
+        if (value == 1)
+        {
+            spawnShuten = true;
+            UpdateEvents();
+        }
+        else {
+            time = 0;
+            day += 1;
+            sun.transform.eulerAngles = new Vector3(0, 15, 0);
+            moon.transform.eulerAngles = new Vector3(0, -45, 0);
+            UpdateEvents();
+            ChangeTime(0);
+        }
     }
 
     public void SceneEvent(string sceneId)

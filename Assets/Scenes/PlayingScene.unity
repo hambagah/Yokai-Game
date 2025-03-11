@@ -16495,6 +16495,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2707133208565131797, guid: b61173ea43d8f2748b3e19c15b6df767, type: 3}
+      propertyPath: dialogueKnotName
+      value: bedShuten
+      objectReference: {fileID: 0}
     - target: {fileID: 4463855768621887754, guid: b61173ea43d8f2748b3e19c15b6df767, type: 3}
       propertyPath: m_Name
       value: Bed
