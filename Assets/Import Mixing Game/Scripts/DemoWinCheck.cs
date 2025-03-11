@@ -1,13 +1,29 @@
+/**
+ * DemoWinCheck.cs
+ * 
+ * Summary: Evaluates the win conditions for the drink mixing game.
+ * Checks if the bowl contains all required ingredients (ice cube, sake, juice)
+ * and if it has reached the required fill level, then updates UI text to show
+ * success or failure.
+ */
 using UnityEngine;
 using TMPro;
 
 public class DemoWinCheck : MonoBehaviour
 {
-    public BowlDetector bowlDetector; // Reference to BowlDetector for checking ingredients
-    public TextMeshProUGUI FinishText; // UI Text to display the result
+    [Tooltip("Reference to the bowl detector script")]
+    public BowlDetector bowlDetector;
+    
+    [Tooltip("UI text that displays the result")]
+    public TextMeshProUGUI FinishText;
 
+    /**
+     * Checks if all winning conditions are met and updates UI text accordingly
+     * Called when the player submits their drink
+     */
     public void CheckWinCondition()
     {
+        // Safety checks for missing references
         if (bowlDetector == null)
         {
             Debug.LogError("DemoWinCheck: bowlDetector is NULL!");
@@ -20,17 +36,20 @@ public class DemoWinCheck : MonoBehaviour
             return;
         }
 
-        // Check if ingredients are correct
+        // Check if all ingredients are present
         if (bowlDetector.IsIceCubeInBowl() && bowlDetector.IsSakeInBowl() && bowlDetector.IsJuiceInBowl())
         {
+            // Check if fill level requirement is met
             if (bowlDetector.GetFillLevel() >= bowlDetector.maxFill)
             {
+                // Perfect success
                 FinishText.text = "Great success!\n The bowl is full with the correct ingredients!";
                 FinishText.color = Color.green;
                 Debug.Log(FinishText.text);
             }
             else
             {
+                // Partial success - ingredients correct but not full
                 FinishText.text = $"Requirements met!\n The bowl is {bowlDetector.GetFillLevel()}% full.";
                 FinishText.color = Color.gray;
                 Debug.Log(FinishText.text);
@@ -38,6 +57,7 @@ public class DemoWinCheck : MonoBehaviour
         }
         else
         {
+            // Failure - missing ingredients
             string failMessage = "Fail!";
             if (!bowlDetector.IsIceCubeInBowl()) failMessage += "\nMissing Ice cube.";
             if (!bowlDetector.IsSakeInBowl()) failMessage += "\nMissing sake.";

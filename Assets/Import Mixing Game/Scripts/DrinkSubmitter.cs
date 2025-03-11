@@ -1,13 +1,27 @@
+/**
+ * DrinkSubmitter.cs
+ * 
+ * Summary: Handles the submission of the drink, either manually or
+ * automatically when the timer ends. Controls the game flow by initiating
+ * the timer and evaluating the results when submitted.
+ */
 using UnityEngine;
 using UnityEngine.UI;
 
 public class DrinkSubmitter : MonoBehaviour
 {
+    [Tooltip("Reference to the win condition checker")]
     public DemoWinCheck demoWinCheck;
-    public MixingGameTimer timer; // Reference to your timer script
+    
+    [Tooltip("Reference to the game timer")]
+    public MixingGameTimer timer;
 
-    private bool isSubmitted = false; // Prevent multiple submissions
+    // Track if the drink has been submitted to prevent multiple submissions
+    private bool isSubmitted = false;
 
+    /**
+     * Initializes event listeners for timer end
+     */
     private void Start()
     {
         if (timer != null)
@@ -16,6 +30,10 @@ public class DrinkSubmitter : MonoBehaviour
         }
     }
 
+    /**
+     * Begins the timer for the mixing game
+     * Called when the player begins the challenge
+     */
     public void StartTimer()
     {
         if (timer != null)
@@ -25,6 +43,10 @@ public class DrinkSubmitter : MonoBehaviour
         }
     }
 
+    /**
+     * Manually submits the drink for evaluation
+     * Called by UI button press or other game events
+     */
     public void SubmitDrink()
     {
         if (isSubmitted) return; // Prevent multiple submissions
@@ -37,6 +59,10 @@ public class DrinkSubmitter : MonoBehaviour
         }
     }
 
+    /**
+     * Automatically submits the drink when time runs out
+     * Called by timer event
+     */
     public void AutoSubmitDrink()
     {
         if (!isSubmitted)
@@ -46,13 +72,25 @@ public class DrinkSubmitter : MonoBehaviour
         }
     }
 
+    /**
+     * Adds timer event listener when script is enabled
+     */
     private void OnEnable()
     {
-        timer.onTimerEnd.AddListener(AutoSubmitDrink);
+        if (timer != null)
+        {
+            timer.onTimerEnd.AddListener(AutoSubmitDrink);
+        }
     }
 
+    /**
+     * Removes timer event listener when script is disabled
+     */
     private void OnDisable()
     {
-        timer.onTimerEnd.RemoveListener(AutoSubmitDrink);
+        if (timer != null)
+        {
+            timer.onTimerEnd.RemoveListener(AutoSubmitDrink);
+        }
     }
 }

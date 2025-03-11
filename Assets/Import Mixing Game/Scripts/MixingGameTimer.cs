@@ -1,4 +1,11 @@
-﻿using System;
+﻿/**
+ * MixingGameTimer.cs
+ * 
+ * Summary: A flexible timer system for the mixing game.
+ * Supports counting up or down with various display options (text, slider, dial),
+ * and triggers events when the timer ends.
+ */
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,18 +13,27 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
 
-
 public class MixingGameTimer : MonoBehaviour
 {
+    // Event triggered when timer ends
+    [Tooltip("Event invoked when timer reaches its end")]
     public UnityEvent onTimerEnd;
 
+    // Timer duration settings
+    [Header("Timer Duration")]
     [Range(0, 23)]
+    [Tooltip("Hours component of timer")]
     public int hours;
+    
     [Range(0, 59)]
+    [Tooltip("Minutes component of timer")]
     public int minutes;
+    
     [Range(0, 59)]
+    [Tooltip("Seconds component of timer")]
     public int seconds;
     
+    // Enum definitions for timer configuration
     public enum CountMethod
     {
         CountDown,
@@ -30,6 +46,7 @@ public class MixingGameTimer : MonoBehaviour
         Bullet,
         Slash
     };
+    
     public enum OutputType
     {
         None,
@@ -39,19 +56,21 @@ public class MixingGameTimer : MonoBehaviour
         Dial
     };
 
+    // Timer configuration
+    [Header("Timer Configuration")]
     [Tooltip("If checked, runs the timer on play")]
     public bool startAtRuntime = true;
 
-    [Tooltip("Select what to display")]
+    [Tooltip("Select what time units to display")]
     public bool hoursDisplay = false;
     public bool minutesDisplay = true;
     public bool secondsDisplay = true;
-
-    [Space]
     
     [Tooltip("Select to count up or down")]
     public CountMethod countMethod;
 
+    // Display options
+    [Header("Display Options")]
     [Tooltip("Select the output type")]
     public OutputType outputType;
     public Text standardText;
@@ -59,33 +78,35 @@ public class MixingGameTimer : MonoBehaviour
     public Slider standardSlider;
     public Image dialSlider;
 
-    bool timerRunning = false;
-    bool timerPaused = false;
+    // Internal state
+    private bool timerRunning = false;
+    private bool timerPaused = false;
     public double timeRemaining;
     
-
+    /**
+     * Initialize component references and UI elements
+     */
     private void Awake()
     {
-        if(!standardText)
-        if(GetComponent<Text>())
+        // Auto-detect components if not assigned
+        if(!standardText && GetComponent<Text>())
         {
             standardText = GetComponent<Text>();
         }
-        if(!textMeshProText)
-        if(GetComponent<TextMeshProUGUI>())
+        if(!textMeshProText && GetComponent<TextMeshProUGUI>())
         {
             textMeshProText = GetComponent<TextMeshProUGUI>();
         }
-        if(!standardSlider)
-        if(GetComponent<Slider>())
+        if(!standardSlider && GetComponent<Slider>())
         {
             standardSlider = GetComponent<Slider>();
         }
-        if(!dialSlider)
-        if(GetComponent<Image>())
+        if(!dialSlider && GetComponent<Image>())
         {
             dialSlider = GetComponent<Image>();
         }
+        
+        // Configure slider if present
         if(standardSlider)
         {
             standardSlider.maxValue = ReturnTotalSeconds();
@@ -98,6 +119,8 @@ public class MixingGameTimer : MonoBehaviour
                 standardSlider.value = standardSlider.minValue;
             }
         }
+        
+        // Configure dial if present
         if(dialSlider)
         {
             if (countMethod == CountMethod.CountDown)
@@ -110,6 +133,10 @@ public class MixingGameTimer : MonoBehaviour
             }
         }
     }
+
+    /**
+     * Start the timer if configured to start at runtime
+     */
     void Start()
     {
         if(startAtRuntime)
@@ -118,6 +145,7 @@ public class MixingGameTimer : MonoBehaviour
         }
         else
         {
+            // Initialize display without starting
             if(countMethod == CountMethod.CountDown)
             {
                 if(standardText)
@@ -142,6 +170,10 @@ public class MixingGameTimer : MonoBehaviour
             }
         }
     }
+
+    /**
+     * Update timer and display elements every frame when running
+     */
     void Update()
     {
         if(timerRunning)
@@ -173,11 +205,13 @@ public class MixingGameTimer : MonoBehaviour
         }
     }
 
+    /**
+     * Updates time for countdown timer
+     * Triggers end event when time reaches zero
+     */
     private void CountDown()
     {
-        /*If you choose to edit this back to 0 for 100% accuracy,
-        1 frame at the end of the timer will display maximum numbers as it takes time to switch to the else statement
-        which sets the time remaining to 0. This is accurate up to 20 milliseconds or 0.02 of a second.*/  
+        // Use 0.02 threshold to prevent visual flickering at the end
         if (timeRemaining > 0.02)
         {
             timeRemaining -= Time.deltaTime;
@@ -185,7 +219,7 @@ public class MixingGameTimer : MonoBehaviour
         }
         else
         {
-            //Timer has ended from counting downwards
+            // Timer has ended
             timeRemaining = 0;
             timerRunning = false;
             onTimerEnd.Invoke();
@@ -193,6 +227,10 @@ public class MixingGameTimer : MonoBehaviour
         }
     }
 
+    /**
+     * Updates time for count-up timer
+     * Triggers end event when target time is reached
+     */
     private void CountUp()
     {
         if (timeRemaining < ReturnTotalSeconds())
@@ -202,13 +240,17 @@ public class MixingGameTimer : MonoBehaviour
         }
         else
         {
-            //Timer has ended from counting upwards
+            // Timer has ended
             onTimerEnd.Invoke();
             timeRemaining = ReturnTotalSeconds();
             DisplayInTextObject();
             timerRunning = false;
         }
     }
+
+    /**
+     * Updates standard slider value when counting down
+     */
     private void StandardSliderDown()
     {
         if(standardSlider.value > standardSlider.minValue)
@@ -216,6 +258,10 @@ public class MixingGameTimer : MonoBehaviour
             standardSlider.value -= Time.deltaTime;
         }
     }
+
+    /**
+     * Updates standard slider value when counting up
+     */
     private void StandardSliderUp()
     {
         if (standardSlider.value < standardSlider.maxValue)
@@ -223,16 +269,22 @@ public class MixingGameTimer : MonoBehaviour
             standardSlider.value += Time.deltaTime;
         }
     }
+
+    /**
+     * Updates dial fill amount when counting down
+     */
     private void DialSliderDown()
     {
         float timeRangeClamped = Mathf.InverseLerp(ReturnTotalSeconds(), 0, (float)timeRemaining);
         dialSlider.fillAmount = Mathf.Lerp(1, 0, timeRangeClamped);
     }
+
     private void DialSliderUp()
     {
         float timeRangeClamped = Mathf.InverseLerp(0, ReturnTotalSeconds(), (float)timeRemaining);
         dialSlider.fillAmount = Mathf.Lerp(0, 1, timeRangeClamped);
     }
+
     private void DisplayInTextObject()
     {
         if (standardText)
