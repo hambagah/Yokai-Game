@@ -15,6 +15,8 @@ public class DialogueManager : MonoBehaviour
     private int currentChoiceIndex = -1;
 
     private bool dialoguePlaying = false;
+    private bool claimRewards = false;
+    private string id;
 
     GameObject temp;
 
@@ -42,6 +44,7 @@ public class DialogueManager : MonoBehaviour
         GameEventsManager.instance.dialogueEvents.onUpdateChoiceIndex += UpdateChoiceIndex;
         GameEventsManager.instance.dialogueEvents.onUpdateInkDialogueVariable += UpdateInkDialogueVariable;
         GameEventsManager.instance.questEvents.onQuestStateChange += QuestStateChange;
+        GameEventsManager.instance.questEvents.onFinishQuest += onFinishQuest;
     }
 
     private void OnDisable()
@@ -52,6 +55,7 @@ public class DialogueManager : MonoBehaviour
         GameEventsManager.instance.dialogueEvents.onUpdateChoiceIndex -= UpdateChoiceIndex;
         GameEventsManager.instance.dialogueEvents.onUpdateInkDialogueVariable -= UpdateInkDialogueVariable;
         GameEventsManager.instance.questEvents.onQuestStateChange -= QuestStateChange;
+        GameEventsManager.instance.questEvents.onFinishQuest -= onFinishQuest;
     }
 
     private void QuestStateChange(Quest quest)
@@ -70,6 +74,12 @@ public class DialogueManager : MonoBehaviour
     private void UpdateChoiceIndex(int choiceIndex)
     {
         this.currentChoiceIndex = choiceIndex;
+    }
+
+    private void onFinishQuest(string id)
+    {
+        claimRewards = true;
+        this.id = id;
     }
 
     private void SubmitPressed(InputEventContext inputEventContext)
@@ -244,6 +254,9 @@ public class DialogueManager : MonoBehaviour
         GameEventsManager.instance.dialogueEvents.DialogueFinished();
         GameEventsManager.instance.playerEvents.EnablePlayerMovement();
         GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DEFAULT);
+        //GameEventsManager.instance.questEvents.FinishQuest(id);
+        //id = "";
+        //claimRewards = false;
         inkDialogueVariables.StopListening(story);
         story.ResetState();
     }

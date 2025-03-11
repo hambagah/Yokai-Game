@@ -37,6 +37,16 @@ public class InputEvents
         }
     }
 
+    /*
+    public event Action<InputEventContext> onSubmitPressed;
+    public void SubmitPressed()
+    {
+        if (onSubmitPressed != null) 
+        {
+            onSubmitPressed(this.inputEventContext);
+        }
+    }*/
+
     public event Action onQuestLogTogglePressed;
     public void QuestLogTogglePressed()
     {

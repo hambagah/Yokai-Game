@@ -68,4 +68,13 @@ public class DialogueEvents
             onUpdateInkDialogueVariable(name, value);
         }
     }
+
+    public event Action<string> onFinishQuest;
+    public void FinishQuest(string id)
+    {
+        if (onFinishQuest != null)
+        {
+            onFinishQuest(id);
+        }
+    }
 }

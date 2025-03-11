@@ -97,6 +97,7 @@ public class TimeManager : MonoBehaviour
         if (time >= 18 && day == 1)
         {
             //Instantiate Shuten
+            GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(true);
         }
     }
 

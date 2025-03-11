@@ -1,5 +1,6 @@
 EXTERNAL StartQuest (questId)
 EXTERNAL AdvanceQuest(questId)
+//EXTERNAL CallFinishQuest(questId)
 EXTERNAL FinishQuest(questId)
 EXTERNAL SleepingEvent(value)
 

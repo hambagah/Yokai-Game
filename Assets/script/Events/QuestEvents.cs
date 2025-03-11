@@ -20,6 +20,16 @@ public class QuestEvents
         }
     }
 
+    
+    public event Action<string> onCallFinishQuest;
+    public void CallFinishQuest(string id)
+    {
+        if (onCallFinishQuest != null)
+        {
+            onCallFinishQuest(id);
+        }
+    }
+    
     public event Action<string> onFinishQuest;
     public void FinishQuest(string id)
     {
