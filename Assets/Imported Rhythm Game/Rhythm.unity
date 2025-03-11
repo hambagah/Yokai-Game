@@ -5898,8 +5898,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   musicSource: {fileID: 348374377}
-  sensitivity: 3
-  minBeatInterval: 0.2
+  sensitivity: 10
+  minBeatInterval: 0.4
 --- !u!1 &1429348777
 GameObject:
   m_ObjectHideFlags: 0
