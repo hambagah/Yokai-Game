@@ -40,25 +40,36 @@ public class ObjectPoint : MonoBehaviour //Can potentially migrate to Interactab
 
         if (!dialogueKnotName.Equals(""))
         {
-            if (objectType == 1) { //Cleaning and destroying boxes
+            //if (objectType) { //Cleaning and destroying boxes
                 //Debug.Log("Yes");
                 GameEventsManager.instance.dialogueEvents.ObjectDialogue(dialogueKnotName, this.gameObject);
                 //GameEventsManager.instance.dialogueEvents.ObjectDialogue(dialogueKnotName, this.gameObject);
                 //Cleaned();
                 //Day1CleanBoxes(Clone);
-            }
+            //}
         }
     }
     
     public void Cleaned()
     {
         GameEventsManager.instance.miscEvents.ObjectCleaned();
+        GameEventsManager.instance.timeEvents.ChangeTime(2);
         Destroy(gameObject);
     }
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.CompareTag("Player") && GameObject.Find("Day1CleanBoxes(Clone)"))
+        if (collider.CompareTag("Player") && GameObject.Find("CleanBoxesQuest(Clone)") && objectType == 1)//Boxes
+        {
+            questIcon.SetActive(true);
+            playerIsNear = true;
+        }
+        if (collider.CompareTag("Player") && TimeManager.instance.ReturnTime() >= 10 && objectType == 2)//Bed
+        {
+            questIcon.SetActive(true);
+            playerIsNear = true;
+        }
+        if (collider.CompareTag("Player") && GameObject.Find("VisitSpotsQuest(Clone)") && objectType == 1)//Boxes
         {
             questIcon.SetActive(true);
             playerIsNear = true;

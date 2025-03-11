@@ -18,3 +18,5 @@ MonoBehaviour:
   questStepPrefabs:
   - {fileID: 4659035923668843079, guid: e6430e51a48b26b43b5d172e434ef53e, type: 3}
   goldReward: 50
+  progress: 1
+  time: 1

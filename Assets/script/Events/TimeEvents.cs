@@ -1,18 +1,43 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class NewBehaviourScript : MonoBehaviour
+public class TimeEvents
 {
-    // Start is called before the first frame update
-    void Start()
+    public event Action<int> onChangeTime;
+    public void ChangeTime(int time)
     {
-        
+        if (onChangeTime != null)
+        {
+            onChangeTime(time);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public event Action<int> onChangeProgress;
+    public void ChangeProgress(int progression)
     {
-        
+        if (onChangeProgress != null)
+        {
+            onChangeProgress(progression);
+        }
     }
+
+    public event Action onReturnTime;
+    public void ReturnTime()
+    {
+        if (onReturnTime != null)
+        {
+            onReturnTime();
+        }
+    }
+
+    /*public event Action onSleepingEvent;
+    public void SleepingEvent()
+    {
+        if (onSleepingEvent != null)
+        {
+            onSleepingEvent();
+        }
+    }*/
 }

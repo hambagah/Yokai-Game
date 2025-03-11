@@ -13,7 +13,7 @@ public class GameEventsManager : MonoBehaviour
     public QuestEvents questEvents;
     public GoldEvents goldEvents;
     public DialogueEvents dialogueEvents;
-    //public TimeEvents timeEvents;
+    public TimeEvents timeEvents;
 
     private void Awake()
     {
@@ -29,6 +29,6 @@ public class GameEventsManager : MonoBehaviour
         questEvents = new QuestEvents();
         goldEvents = new GoldEvents();
         dialogueEvents = new DialogueEvents();
-        //timeEvents = new TimeEvents();
+        timeEvents = new TimeEvents();
     }
 }

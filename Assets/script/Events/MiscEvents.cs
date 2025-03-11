@@ -6,7 +6,6 @@ using UnityEngine;
 public class MiscEvents 
 {
     public event Action objectCleaned;
-
     public void ObjectCleaned()
     {
         if (objectCleaned != null)

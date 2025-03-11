@@ -25,12 +25,12 @@
                 },
                 {
                     "name": "Run",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "0c1ea1d7-f4c9-458b-a149-86a2a2a483df",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": true
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Jump",
@@ -121,26 +121,15 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "2D Vector",
-                    "id": "4c748934-8ad6-4cfc-975f-e52f7d0a2795",
-                    "path": "2DVector",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Run",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "up",
-                    "id": "518a6a47-8450-47b7-bfc3-967e7a937133",
+                    "name": "",
+                    "id": "970027ed-24b1-4c46-bb48-8a3be08afd27",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Run",
                     "isComposite": false,
-                    "isPartOfComposite": true
+                    "isPartOfComposite": false
                 },
                 {
                     "name": "",

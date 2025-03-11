@@ -19,12 +19,12 @@ public class InputEvents
         }
     }
 
-    public event Action<Vector2> onShiftPressed;
-    public void ShiftPressed(Vector2 moveDir) 
+    public event Action onShiftPressed;
+    public void ShiftPressed() 
     {
         if (onShiftPressed != null) 
         {
-            onShiftPressed(moveDir);
+            onShiftPressed();
         }
     }
 

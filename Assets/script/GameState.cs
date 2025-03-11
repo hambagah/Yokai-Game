@@ -32,6 +32,6 @@ public class GameState : MonoBehaviour
 
     public void Time(int tUpdate)
     {
-        TimeManager.GetInstance().UpdateTime(tUpdate);
+        //TimeManager.GetInstance().UpdateTime(tUpdate);
     }
 }

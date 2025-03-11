@@ -21,7 +21,8 @@ public class InputManager : MonoBehaviour
     {
         if (context.performed || context.canceled)
         {
-            GameEventsManager.instance.inputEvents.ShiftPressed(context.ReadValue<Vector2>());
+            //GameEventsManager.instance.inputEvents.ShiftPressed(context.ReadValue<Vector2>());
+            GameEventsManager.instance.inputEvents.ShiftPressed();
         }
     }
 

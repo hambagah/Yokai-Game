@@ -1,9 +1,9 @@
-INCLUDE globals.ink
-
+=== bed ===
 Do you want to sleep?
-    * Yes
+    * [Yes]
+        ~ SleepingEvent(0)
         You fall asleep.
-        ~ startQuest("sleeping")
-    * No
+    * [No]
         You relinquish the option to slumber.
--> END
+
+- -> END

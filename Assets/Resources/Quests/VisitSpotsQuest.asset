@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23a8799ced5008c48b2d279a3f2976be, type: 3}
-  m_Name: CleanBox
+  m_Name: VisitSpotsQuest
   m_EditorClassIdentifier: 
-  <id>k__BackingField: CleanBox
-  displayName: Clean the Boxes.
-  questPrerequisites: []
+  <id>k__BackingField: VisitSpotsQuest
+  displayName: Visit the spots.
+  questPrerequisites:
+  - {fileID: 11400000, guid: b2152e597368d95419a8db409be4e487, type: 2}
   questStepPrefabs:
-  - {fileID: 3977256046289428081, guid: 38da12e1b341d534087b9c610847e444, type: 3}
-  - {fileID: 5702175745021294499, guid: c768153334e9d5540b8a23a05db6e7a3, type: 3}
-  - {fileID: 6893537785722302214, guid: 5c4293c26d899724fb3b99a52e429454, type: 3}
-  goldReward: 20
+  - {fileID: 5489553558355081848, guid: e5e70cdb89d906846863112611bc361f, type: 3}
+  goldReward: 50
+  progress: 1
+  time: 1

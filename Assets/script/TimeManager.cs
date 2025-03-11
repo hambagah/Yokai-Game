@@ -6,16 +6,16 @@ using TMPro;
 
 public class TimeManager : MonoBehaviour
 {
-    //Player wakes up at 6:00AM 
-    //Player should be asleep by 12:00PM
+    public static TimeManager instance {get; private set;}
     private int time; 
-    private int day;
+    private int day = 1;
+    private int progress = 0;
+
     [SerializeField] private GameObject sun, moon;
 
     [SerializeField] GameState gameState;
-    [SerializeField] private TextMeshProUGUI timerText;
 
-    private static TimeManager instance;
+    [SerializeField] private TextMeshProUGUI timerText;
 
     private void Awake()
     {
@@ -26,57 +26,95 @@ public class TimeManager : MonoBehaviour
         instance = this;
     }
 
-    public static TimeManager GetInstance()
+    private void OnEnable() 
     {
-        return instance;
+        GameEventsManager.instance.timeEvents.onChangeTime += ChangeTime;
+        GameEventsManager.instance.timeEvents.onChangeProgress += ChangeProgress;
+    }
+
+    private void OnDisable()
+    {
+        GameEventsManager.instance.timeEvents.onChangeTime -= ChangeTime;
+        GameEventsManager.instance.timeEvents.onChangeProgress -= ChangeProgress;
+    }
+
+    private void ChangeTime(int change)
+    {
+        time+=change;
+        UpdateText();
+        UpdateEvents();
+        if (time >= 18) {
+            time = 18;
+        }
+        else if (time <= 0) {
+            time = 0;
+        }
+    }
+
+    private void ChangeProgress(int progression)
+    {
+        progress+=progression;
+        UpdateEvents();
+    }
+
+    public void SleepingEvent(int value)
+    {
+        time = 0;
+        day += 1;
+        sun.transform.eulerAngles = new Vector3(0, 15, 0);
+        moon.transform.eulerAngles = new Vector3(0, -45, 0);
+        UpdateEvents();
+        ChangeTime(0);
     }
 
     void Start()
     {
         sun = GameObject.Find("Sun");
         moon = GameObject.Find("Moon");
-        sun.transform.eulerAngles = new Vector3(0, sun.transform.eulerAngles.y, 0);
-        moon.transform.eulerAngles = new Vector3(0, moon.transform.eulerAngles.y, 0);
-        UpdateTime(0);
+        sun.transform.eulerAngles = new Vector3(0, 15, 0);
+        moon.transform.eulerAngles = new Vector3(0, -45, 0);
+        ChangeTime(0);
     }
 
     void Update()
     {
-        //
-        //sun and moon are rotating based on time; 
-        //
-        if (Input.GetKeyDown(KeyCode.Y)) UpdateTime(1);
-        else if (Input.GetKeyDown(KeyCode.U)) UpdateTime(-1);
+        if (sun.transform.eulerAngles.y < (time*15))
+        {
+            sun.transform.Rotate(Vector3.up * (2+(time*15)/sun.transform.eulerAngles.y) * Time.deltaTime);
+            moon.transform.Rotate(Vector3.up * (2+(time*15)/moon.transform.eulerAngles.y) * Time.deltaTime);
+        }
     }
 
-    public void UpdateTime(int update) { 
-        time += update;
-        if (time >= 18) {
-            time = 18;
-            //If it's 18 it should be 12:00PM force the state of the game to enter limbo, player must sleep. 
+    private void UpdateEvents() 
+    {
+        if (time >= 11 && day == 1 && progress == 1)
+        {
+            //Replace intro NPC with new NPC inside the house
+            //GameObject.Find("Day1Tengu1").SetActive(false);
+            GameObject.Find("Day1Tengu2").transform.GetChild(0).gameObject.SetActive(true);
         }
-        else if (time <= 0) {
-            time = 0;
-        }
-        sun.transform.eulerAngles = new Vector3(time * 15, sun.transform.eulerAngles.y, 0);
-        moon.transform.eulerAngles = new Vector3(time * 8, moon.transform.eulerAngles.y, 0);
 
+        if (time >= 18 && day == 1)
+        {
+            //Instantiate Shuten
+        }
+    }
+
+    private void UpdateText() 
+    { 
         if (time <= 5) timerText.text = (6 + time).ToString() + ":00AM";
         else if (time == 6) timerText.text = (6 + time).ToString() + ":00PM";
         else if (time >= 18) timerText.text = ("12:00AM");
         else timerText.text = (time - 6).ToString() + ":00PM";
     }
 
-    public int GetTime()
+    public int ReturnTime()
     {
         return time;
     }
 
-    public void ResetDay() 
+    public int ReturnProgress()
     {
-        time = 0;
-        gameState.day += 1;
-        gameState.Spawn();
-        UpdateTime(0);
+        return progress;
     }
 }

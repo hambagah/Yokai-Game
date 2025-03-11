@@ -139,6 +139,8 @@ public class QuestManager : MonoBehaviour
     private void ClaimRewards(Quest quest)
     {
         GameEventsManager.instance.goldEvents.GoldGained(quest.info.goldReward);
+        GameEventsManager.instance.timeEvents.ChangeProgress(quest.info.progress);
+        GameEventsManager.instance.timeEvents.ChangeTime(quest.info.time);
         //GameEventsManager.instance.playerEvents.ExperienceGained(quest.info.experienceReward);
     }
 

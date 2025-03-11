@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6731003598848191859}
   - component: {fileID: 6508358626812304959}
   m_Layer: 0
-  m_Name: Day1CleanBoxes
+  m_Name: CleanBoxesQuest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

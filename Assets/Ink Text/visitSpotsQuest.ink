@@ -1,6 +1,6 @@
 
-=== cleanBoxesStart ===
-{ CleanBoxesQuestState :
+=== visitSpotsQuest ===
+{ VisitSpotsQuestState :
     - "REQUIREMENTS_NOT_MET": -> requirementsNotMet
     - "CAN_START": -> canStart
     - "IN_PROGRESS": -> inProgress
@@ -14,9 +14,10 @@ Hmm you can't start.
 -> END
 
 = canStart
-Can you clean 5 boxes?
+Here's a little tour guide through the house. 
+
 * [Yes]
-    ~ StartQuest("CleanBoxesQuest")
+    ~ StartQuest("VisitSpotsQuest")
     Great!
 * [No]
     That's fine too.
@@ -27,8 +28,8 @@ How many boxes have you cleaned so far?
 -> END
 
 = canFinish
-~ FinishQuest("CleanBoxesQuest")
 Are you done now? Thanks here's your reward.
+~ FinishQuest("VisitSpotsQuest")
 -> END
 
 = finished 

@@ -7,7 +7,8 @@ using UnityEngine.InputSystem;
     {
 
         public float speed = 2f;
-        private Vector2 running = Vector2.zero;
+        //private Vector2 running = Vector2.zero;
+        private int running = 0;
         private Vector2 velocity = Vector2.zero;
         //private PlayerControls playerControls;
         private Rigidbody rb;
@@ -22,6 +23,7 @@ using UnityEngine.InputSystem;
         private void Start()
         {
             GameEventsManager.instance.inputEvents.onMovePressed += MovePressed;
+            GameEventsManager.instance.inputEvents.onShiftPressed += ShiftPressed;
             GameEventsManager.instance.playerEvents.onDisablePlayerMovement += DisablePlayerMovement;
             GameEventsManager.instance.playerEvents.onEnablePlayerMovement += EnablePlayerMovement;
         }
@@ -29,6 +31,7 @@ using UnityEngine.InputSystem;
         private void OnDestroy()
         {
             GameEventsManager.instance.inputEvents.onMovePressed -= MovePressed;
+            GameEventsManager.instance.inputEvents.onShiftPressed -= ShiftPressed;
             GameEventsManager.instance.playerEvents.onDisablePlayerMovement -= DisablePlayerMovement;
             GameEventsManager.instance.playerEvents.onEnablePlayerMovement -= EnablePlayerMovement;
         }
@@ -46,7 +49,7 @@ using UnityEngine.InputSystem;
 
         private void MovePressed(Vector2 moveDir)
         {
-            velocity = moveDir.normalized * 4;
+            velocity = moveDir.normalized * (4 + running);
 
             if (movementDisabled)
             {
@@ -54,14 +57,16 @@ using UnityEngine.InputSystem;
             }
         }
 
-        private void ShiftPressed(Vector2 moveDir)
+        private void ShiftPressed()
         {
-            running = moveDir.normalized * 4;
-
-            if (movementDisabled)
+            running = 4;
+            /*if (running == 0)
             {
-                running = Vector2.zero;
+                running = 4;
             }
+            else if (running == 4){
+                running = 0;
+            }*/
         }
 
         void Update()
@@ -101,6 +106,11 @@ using UnityEngine.InputSystem;
             //HandleMovement();            
             //rb.velocity = new Vector3(velocity.x * (speed + (running.y * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), velocity.y * (speed + (running.y * 5f)));
             rb.velocity = new Vector3 (velocity.x, Mathf.Min(rb.velocity.y *1.25f, 0), velocity.y);
+            if (velocity == Vector2.zero)
+            {
+                running = 0;
+            }
+            //Debug.Log(rb.velocity);
 
             //Vector3 movement = new Vector3(xAxis, rb.velocity.y, zAxis);
             //rb.MovePosition(transform.position + movement * Time.deltaTime * speed);   

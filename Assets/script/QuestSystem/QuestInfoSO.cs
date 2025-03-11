@@ -19,6 +19,12 @@ public class QuestInfoSO : ScriptableObject
     [Header("Rewards")]
     public int goldReward;
 
+    [Header("Progression")]
+    public int progress;
+
+    [Header("Time")]
+    public int time;
+
     private void OnValidate()
     {
         #if UNITY_EDITOR
