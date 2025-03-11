@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class TimeManager : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class TimeManager : MonoBehaviour
     [SerializeField] GameState gameState;
 
     [SerializeField] private TextMeshProUGUI timerText;
+
+    private bool spawnShuten = false;
 
     private void Awake()
     {
@@ -67,6 +70,15 @@ public class TimeManager : MonoBehaviour
         ChangeTime(0);
     }
 
+    public void SceneEvent(string sceneId)
+    {
+        if (sceneId.Equals("The Mixing Game Demo"))
+            SceneManager.LoadScene("The Mixing Game Demo");
+
+        if (sceneId.Equals("Spawn Shuten"))
+            spawnShuten = true;
+    }
+
     void Start()
     {
         sun = GameObject.Find("Sun");
@@ -94,7 +106,7 @@ public class TimeManager : MonoBehaviour
             GameObject.Find("Day1Tengu2").transform.GetChild(0).gameObject.SetActive(true);
         }
 
-        if (time >= 18 && day == 1)
+        if (time >= 18 && day == 1 && spawnShuten)
         {
             //Instantiate Shuten
             GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(true);

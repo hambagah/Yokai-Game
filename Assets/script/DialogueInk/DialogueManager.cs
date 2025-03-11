@@ -44,7 +44,7 @@ public class DialogueManager : MonoBehaviour
         GameEventsManager.instance.dialogueEvents.onUpdateChoiceIndex += UpdateChoiceIndex;
         GameEventsManager.instance.dialogueEvents.onUpdateInkDialogueVariable += UpdateInkDialogueVariable;
         GameEventsManager.instance.questEvents.onQuestStateChange += QuestStateChange;
-        GameEventsManager.instance.questEvents.onFinishQuest += onFinishQuest;
+        GameEventsManager.instance.dialogueEvents.onCallFinishQuest += CallFinishQuest;
     }
 
     private void OnDisable()
@@ -55,7 +55,8 @@ public class DialogueManager : MonoBehaviour
         GameEventsManager.instance.dialogueEvents.onUpdateChoiceIndex -= UpdateChoiceIndex;
         GameEventsManager.instance.dialogueEvents.onUpdateInkDialogueVariable -= UpdateInkDialogueVariable;
         GameEventsManager.instance.questEvents.onQuestStateChange -= QuestStateChange;
-        GameEventsManager.instance.questEvents.onFinishQuest -= onFinishQuest;
+        GameEventsManager.instance.dialogueEvents.onCallFinishQuest -= CallFinishQuest;
+        //GameEventsManager.instance.questEvents.onFinishQuest -= onFinishQuest;
     }
 
     private void QuestStateChange(Quest quest)
@@ -76,7 +77,7 @@ public class DialogueManager : MonoBehaviour
         this.currentChoiceIndex = choiceIndex;
     }
 
-    private void onFinishQuest(string id)
+    private void CallFinishQuest(string id)
     {
         claimRewards = true;
         this.id = id;
@@ -254,9 +255,12 @@ public class DialogueManager : MonoBehaviour
         GameEventsManager.instance.dialogueEvents.DialogueFinished();
         GameEventsManager.instance.playerEvents.EnablePlayerMovement();
         GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DEFAULT);
-        //GameEventsManager.instance.questEvents.FinishQuest(id);
-        //id = "";
-        //claimRewards = false;
+        if (claimRewards)
+            {
+            GameEventsManager.instance.questEvents.FinishQuest(id);
+            id = "";
+            claimRewards = false;
+        }
         inkDialogueVariables.StopListening(story);
         story.ResetState();
     }

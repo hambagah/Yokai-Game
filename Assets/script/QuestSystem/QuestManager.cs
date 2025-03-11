@@ -133,7 +133,7 @@ public class QuestManager : MonoBehaviour
 
     private void CallFinishQuest(string id)
     {
-        GameEventsManager.instance.dialogueEvents.FinishQuest(id);
+        GameEventsManager.instance.dialogueEvents.CallFinishQuest(id);
     }
 
     private void FinishQuest(string id)

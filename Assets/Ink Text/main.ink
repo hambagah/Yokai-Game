@@ -1,8 +1,9 @@
 EXTERNAL StartQuest (questId)
 EXTERNAL AdvanceQuest(questId)
-//EXTERNAL CallFinishQuest(questId)
+EXTERNAL CallFinishQuest(questId)
 EXTERNAL FinishQuest(questId)
 EXTERNAL SleepingEvent(value)
+EXTERNAL SceneEvent(sceneId)
 
 // quest names (questId + Id)
 VAR CleanBoxesQuestId = "CleanBoxesQuest"
@@ -24,3 +25,4 @@ INCLUDE bed.ink
 INCLUDE kitchen.ink
 INCLUDE lake.ink
 INCLUDE shed.ink
+INCLUDE shutenEvent.ink

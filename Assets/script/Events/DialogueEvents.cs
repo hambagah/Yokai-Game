@@ -69,12 +69,12 @@ public class DialogueEvents
         }
     }
 
-    public event Action<string> onFinishQuest;
-    public void FinishQuest(string id)
+    public event Action<string> onCallFinishQuest;
+    public void CallFinishQuest(string id)
     {
-        if (onFinishQuest != null)
+        if (onCallFinishQuest != null)
         {
-            onFinishQuest(id);
+            onCallFinishQuest(id);
         }
     }
 }

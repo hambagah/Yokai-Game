@@ -27,8 +27,8 @@ How many boxes have you cleaned so far?
 -> END
 
 = canFinish
-//~ CallFinishQuest("CleanBoxesQuest")
-~ FinishQuest("CleanBoxesQuest")
+~ CallFinishQuest("CleanBoxesQuest")
+//~ FinishQuest("CleanBoxesQuest")
 Are you done now? Thanks here's your reward.
 -> END
 
