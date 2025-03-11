@@ -4042,7 +4042,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4638838128491841186, guid: 551f2d6af48e64d4e81ffe49fcaf72c6, type: 3}
       propertyPath: objectType
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4638838128491841186, guid: 551f2d6af48e64d4e81ffe49fcaf72c6, type: 3}
       propertyPath: dialogueKnotName
@@ -5897,7 +5897,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4638838128491841186, guid: 551f2d6af48e64d4e81ffe49fcaf72c6, type: 3}
       propertyPath: objectType
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4638838128491841186, guid: 551f2d6af48e64d4e81ffe49fcaf72c6, type: 3}
       propertyPath: dialogueKnotName
@@ -15503,7 +15503,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4638838128491841186, guid: 551f2d6af48e64d4e81ffe49fcaf72c6, type: 3}
       propertyPath: objectType
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4638838128491841186, guid: 551f2d6af48e64d4e81ffe49fcaf72c6, type: 3}
       propertyPath: dialogueKnotName
