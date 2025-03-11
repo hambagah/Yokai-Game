@@ -1,39 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Leap.PhysicalHands;
+using UnityEngine.UI;
 
 public class DrinkSubmitter : MonoBehaviour
 {
-    public MixingGameTimer timer; // Timer reference
     public DemoWinCheck demoWinCheck;
-    public PhysicalHandsButton submitButton; // Leap Motion-controlled button
+    public MixingGameTimer timer; // Reference to your timer script
 
     private bool isSubmitted = false; // Prevent multiple submissions
 
     private void Start()
     {
-        if (submitButton != null)
-        {
-            submitButton.OnButtonPressed.AddListener(SubmitDrink);
-        }
-
         if (timer != null)
         {
-            timer.onTimerEnd.AddListener(AutoSubmitDrink); // ✅ Correctly adding event
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if (submitButton != null)
-        {
-            submitButton.OnButtonPressed.RemoveListener(SubmitDrink);
-        }
-
-        if (timer != null)
-        {
-            timer.onTimerEnd.RemoveListener(AutoSubmitDrink); // ✅ Fixed line 31!
+            timer.onTimerEnd.AddListener(AutoSubmitDrink);
         }
     }
 
@@ -51,25 +30,29 @@ public class DrinkSubmitter : MonoBehaviour
         if (isSubmitted) return; // Prevent multiple submissions
         isSubmitted = true;
 
-        if (timer != null)
-        {
-            timer.StopTimer(); // Stop the timer when submitting manually
-        }
-
+        Debug.Log("Drink submitted!");
         if (demoWinCheck != null)
         {
-            demoWinCheck.CheckWinCondition(); // Evaluate the drink
+            demoWinCheck.CheckWinCondition();
         }
-
-        Debug.Log("Drink submitted!");
     }
 
-    private void AutoSubmitDrink()
+    public void AutoSubmitDrink()
     {
         if (!isSubmitted)
         {
             Debug.Log("Time ran out! Auto-submitting drink...");
             SubmitDrink();
         }
+    }
+
+    private void OnEnable()
+    {
+        timer.onTimerEnd.AddListener(AutoSubmitDrink);
+    }
+
+    private void OnDisable()
+    {
+        timer.onTimerEnd.RemoveListener(AutoSubmitDrink);
     }
 }

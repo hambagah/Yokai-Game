@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -15,7 +15,7 @@ public class PourDetector : MonoBehaviour
 
     private void Update()
     {
-        bool pourCheck = CalculatePourAngel() > pourThreshold;
+        bool pourCheck = CalculatePourAngle() > pourThreshold;
 
         if (isPouring != pourCheck)
         {
@@ -58,11 +58,12 @@ public class PourDetector : MonoBehaviour
         }
     }
 
-    private float CalculatePourAngel()
+    private float CalculatePourAngle()
     {
-        Vector3 pourDirection = -transform.up; // Local downward direction
+        Vector3 pourDirection = transform.forward; // Use forward direction for accuracy
         return Vector3.Angle(Vector3.down, pourDirection);
     }
+
 
     private Stream CreateStream()
     {
