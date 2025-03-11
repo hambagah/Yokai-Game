@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
     public class Player : MonoBehaviour
     {
+        [Header("Config")]
+        [SerializeField] private bool loadPlayerState = true;
 
         public float speed = 2f;
         //private Vector2 running = Vector2.zero;
@@ -98,54 +100,58 @@ using UnityEngine.InputSystem;
 
         private void FixedUpdate()
         {
-            /*if (DialogueManager.GetInstance().dialogueIsPlaying)
-            {
-                return;
-            }*/
-            
-            //HandleMovement();            
-            //rb.velocity = new Vector3(velocity.x * (speed + (running.y * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), velocity.y * (speed + (running.y * 5f)));
             rb.velocity = new Vector3 (velocity.x, Mathf.Min(rb.velocity.y *1.25f, 0), velocity.y);
             if (velocity == Vector2.zero)
             {
                 running = 0;
             }
-            //Debug.Log(rb.velocity);
-
-            //Vector3 movement = new Vector3(xAxis, rb.velocity.y, zAxis);
-            //rb.MovePosition(transform.position + movement * Time.deltaTime * speed);   
-            //Debug.Log(zAxis + " " + xAxis);
-            
-            //rb.velocity = movement * (speed + (shift * 5f));
-            //rb.velocity = new Vector3(move.x * (speed + (shift * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), move.z * (speed + (shift * 5f)));
-            //Vector2 moving = playerControls.Player.WASD.ReadValue<Vector2>();
-            //Debug.Log(moving + "Player Script");
-            //rb.velocity = new Vector3(move.x * (speed + (shift * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), move.y * (speed + (shift * 5f)));
         }
 
-        private void HandleMovement()
-        {
-            /*Vector2 moving = InputManager.GetInstance().GetMoveDirection();
-            Vector2 running = InputManager.GetInstance().GetShiftPressed();
-            //Debug.Log(running);
-            
-            rb.velocity = new Vector3(moving.x * (speed + (running.y * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), moving.y * (speed + (running.y * 5f)));
-            */
-            //rb.velocity = new Vector3(moving.x * (speed + (shift * 5f)), Mathf.Min(rb.velocity.y*1.25f, 0), moving.y * (speed + (shift * 5f)));
-
-            
-
-        }
-
-        /*void OnTriggerEnter (Collider other) {
-            if (other.CompareTag ("Player")) {
-                if (OnEnterInteractable != null) OnEnterInteractable();
-            }
-        }
-
-        void OnTriggerExit (Collider other) {
-            if (other.CompareTag ("Player")) {
-                if (OnExitInteractable != null) OnExitInteractable();
-            }
-        }*/
+    /*private void OnApplicationQuit()
+    {
+        SavePlayer(player.transform.pos);
     }
+
+    private void SavePlayer(Vector3 playerPosition)
+    {
+        try 
+        {
+            PlayerPrefs.SetFloat("PlayerX", playerPosition.x);
+            PlayerPrefs.SetFloat("PlayerY", playerPosition.y);
+            PlayerPrefs.SetFloat("PlayerZ", playerPosition.z);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to save player position " + playerPosition);
+        }
+    }
+
+    private void LoadPlayer()
+    {
+        Quest quest = null;
+        try 
+        {
+            float Xpos = PlayerPrefs.GetFloat ("PlayerX");
+            float Ypos = PlayerPrefs.GetFloat ("PlayerY");
+            float Zpos = PlayerPrefs.GetFloat ("PlayerZ");
+            /*PlayerPrefsJTA.SetTransform("PlayerTransform", player.transform)
+            // load quest from saved data
+            if (PlayerPrefs.HasKey("0") && loadPlayerState)
+            {
+                string serializedData = PlayerPrefs.GetString(0);
+                Vector3 playerPosition = JsonUtility.FromJson<Vector3>(serializedData);
+                player.transform = playerPosition;
+            }
+            // otherwise, initialize a new quest
+            /*else 
+            {
+                quest = new Quest(questInfo);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to save player position " + playerPosition);
+        }
+        this.gameObject.transform.position*/
+    }
+    

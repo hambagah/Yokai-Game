@@ -199,11 +199,7 @@ public class QuestManager : MonoBehaviour
         try 
         {
             QuestData questData = quest.GetQuestData();
-            // serialize using JsonUtility, but use whatever you want here (like JSON.NET)
             string serializedData = JsonUtility.ToJson(questData);
-            // saving to PlayerPrefs is just a quick example for this tutorial video,
-            // you probably don't want to save this info there long-term.
-            // instead, use an actual Save & Load system and write to a file, the cloud, etc..
             PlayerPrefs.SetString(quest.info.id, serializedData);
         }
         catch (System.Exception e)
