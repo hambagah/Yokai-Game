@@ -1,11 +1,23 @@
+/**
+ * IngredientResetter.cs
+ * 
+ * Summary: Tracks and resets movable ingredients to their original positions.
+ * Helps maintain gameplay flow by allowing players to reset the setup.
+ */
 using System.Collections.Generic;
 using UnityEngine;
 
 public class IngredientResetter : MonoBehaviour
 {
-    public Transform movableObjectsParent; // Parent object that contains all moveable objects
+    [Tooltip("Parent object containing all movable ingredient objects")]
+    public Transform movableObjectsParent;
+    
+    // Dictionary to store original positions and rotations
     private Dictionary<Transform, (Vector3, Quaternion)> originalTransforms = new Dictionary<Transform, (Vector3, Quaternion)>();
 
+    /**
+     * Initialize by storing the original positions of all ingredients
+     */
     private void Start()
     {
         if (movableObjectsParent == null)
@@ -17,6 +29,10 @@ public class IngredientResetter : MonoBehaviour
         StoreOriginalPositions();
     }
 
+    /**
+     * Records the original position and rotation of each child under the parent
+     * Called at start and when recalibrating positions
+     */
     private void StoreOriginalPositions()
     {
         originalTransforms.Clear();
@@ -29,6 +45,10 @@ public class IngredientResetter : MonoBehaviour
         Debug.Log($"IngredientResetter: Stored positions for {originalTransforms.Count} ingredients.");
     }
 
+    /**
+     * Resets all ingredients to their original positions and rotations
+     * Called by UI button or other game events
+     */
     public void ResetIngredientPositions()
     {
         foreach (var kvp in originalTransforms)
@@ -47,6 +67,10 @@ public class IngredientResetter : MonoBehaviour
         Debug.Log("IngredientResetter: All ingredients have been reset!");
     }
 
+    /**
+     * Updates the stored original positions with current positions
+     * Useful after manual rearrangement or scene changes
+     */
     public void RecalibrateOriginalPositions()
     {
         StoreOriginalPositions();

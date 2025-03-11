@@ -1,95 +1,144 @@
+/**
+ * BowlDetector.cs
+ * 
+ * Summary: Detects and tracks ingredients added to a bowl in the mixing game.
+ * This script monitors collisions with ice cubes and particle collisions from
+ * liquid streams (sake, juice), updating UI elements to show current ingredients
+ * and fill level.
+ */
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
 public class BowlDetector : MonoBehaviour
 {
-    public float maxFill = 100f;  // Maximum fill level
-    public float fillRate = 0.0001f;  // Amount added per particle collision (adjust to a smaller value for slower filling)
-    public float timeToFill = 1f; // Time in seconds to add a fixed amount of fill (for slower filling)
-    public Transform liquidFill; // Reference to liquid fill object for visualization (can be ignored for now)
-    public bool hasIceCube = false; // To check if an ice cube is in contact with the bowl
+    // Configuration Parameters
+    [Header("Fill Settings")]
+    [Tooltip("Maximum fill level of the bowl")]
+    public float maxFill = 100f;
+    
+    [Tooltip("Amount added per particle collision")]
+    public float fillRate = 0.0001f;
+    
+    [Tooltip("Time in seconds between fill increments")]
+    public float timeToFill = 1f;
+    
+    [Tooltip("Reference to liquid visualization object")]
+    public Transform liquidFill;
+
+    // Ingredient State Tracking
+    [Header("Ingredient Tracking")]
+    [Tooltip("True when an ice cube is in the bowl")]
+    public bool hasIceCube = false;
+    
+    [Tooltip("True when sake has been added")]
     public bool hasSake = false;
+    
+    [Tooltip("True when juice has been added")]
     public bool hasJuice = false;
-    private float currentFill = 0f;
-    private float lastFillTime = 0f;
+
+    // UI References
+    [Header("UI References")]
+    [Tooltip("Text showing current fill level")]
     public TextMeshProUGUI fillLevelText;
+    
+    [Tooltip("Text showing what ingredient is being added")]
     public TextMeshProUGUI ingredientAddingText;
+    
+    [Tooltip("Fill bar visual indicator")]
     public FillBar fillBar;
 
     // UI Toggles for Ingredients
+    [Header("Ingredient UI Toggles")]
+    [Tooltip("Toggle showing ice cube status")]
     public Toggle iceCubeToggle;
+    
+    [Tooltip("Toggle showing sake status")]
     public Toggle sakeToggle;
+    
+    [Tooltip("Toggle showing juice status")]
     public Toggle juiceToggle;
 
+    // Internal state
+    private float currentFill = 0f;
+    private float lastFillTime = 0f;
+
+    /**
+     * Initialize bowl state and UI elements on start
+     */
     void Start()
     {
         currentFill = 0;
         fillBar.setMinValue();
         fillBar.setMaxValue((int)maxFill);
-
-        UpdateIngredientToggles();  // Ensure UI is updated on start
+        UpdateIngredientToggles();
     }
 
-
-
-    // This method is called when an object first collides with the bowl
+    /**
+     * Detects when objects first make contact with the bowl
+     * Used to track when an ice cube enters the bowl
+     */
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("IceCube"))
         {
-            hasIceCube = true; // Ice cube has touched the bowl
+            hasIceCube = true;
             Debug.Log("Ice cube has touched the bowl.");
         }
     }
 
-    // This method is called while the ice cube is still touching the bowl
+    /**
+     * Monitors continuous contact with objects
+     * Ensures ice cube state remains true while in contact
+     */
     private void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.CompareTag("IceCube"))
         {
-            hasIceCube = true; // Ice cube is still in contact with the bowl
+            hasIceCube = true;
         }
         UpdateIngredientToggles();
     }
 
-    // This method is called when the ice cube stops touching the bowl
+    /**
+     * Detects when objects stop making contact with the bowl
+     * Used to track when an ice cube leaves the bowl
+     */
     private void OnCollisionExit(Collision collision)
     {
         if (collision.gameObject.CompareTag("IceCube"))
         {
-            hasIceCube = false; // Ice cube has stopped touching the bowl
+            hasIceCube = false;
             Debug.Log("Ice cube has left the bowl.");
         }
         UpdateIngredientToggles();
-
     }
 
-    // This method is called when a particle collides with the bowl
+    /**
+     * Detects particle collisions from pouring liquids
+     * Updates fill level and ingredient tracking for sake and juice
+     */
     private void OnParticleCollision(GameObject other)
     {
-        if (other.CompareTag("Sake") || other.CompareTag("Juice")) // Ensure the pouring stream has the correct tag
+        if (other.CompareTag("Sake") || other.CompareTag("Juice"))
         {
-            // Check if enough time has passed to add fill to the bowl
+            // Check if enough time has passed to add fill
             if (Time.time - lastFillTime >= timeToFill)
             {
-                currentFill += fillRate; // Add fill based on the rate
-                currentFill = Mathf.Clamp(currentFill, 0, maxFill); // Clamp within the bowl's max fill level
+                currentFill += fillRate;
+                currentFill = Mathf.Clamp(currentFill, 0, maxFill);
 
-                // Update the fill bar smoothly
-                fillBar.SetFillValueSmooth((int)currentFill, 0.5f); // Smooth transition over 0.5 seconds
+                // Update UI
+                fillBar.SetFillValueSmooth((int)currentFill, 0.5f);
+                lastFillTime = Time.time;
 
-                lastFillTime = Time.time; // Update the last fill time
-
-                // Log the ingredient player is adding
+                // Log ingredient and update UI text
                 Debug.Log("You added: " + other.tag);
                 ingredientAddingText.text = "You added: " + other.tag;
-
-                // Log the current fill level
                 Debug.Log("Current fill level: " + currentFill);
                 fillLevelText.text = "Current fill level: " + currentFill;
 
-                // Check if the bowl is full
+                // Check if bowl is full
                 if (currentFill >= maxFill)
                 {
                     Debug.Log("Bowl is full!");
@@ -100,6 +149,7 @@ public class BowlDetector : MonoBehaviour
                     Debug.Log("Bowl is not full yet.");
                 }
 
+                // Update ingredient tracking
                 if (other.CompareTag("Sake"))
                 {
                     hasSake = true;
@@ -113,30 +163,48 @@ public class BowlDetector : MonoBehaviour
         }
     }
 
-    // This method is useful to get the current fill level externally
+    /**
+     * Returns the current fill level of the bowl
+     * Used by other scripts to check progress
+     */
     public float GetFillLevel()
     {
-        return currentFill; // Return current fill level for game logic
+        return currentFill;
     }
 
-    // You can also call this method to check if ice is in the bowl
+    /**
+     * Checks if an ice cube is currently in the bowl
+     * Used by other scripts to verify ingredients
+     */
     public bool IsIceCubeInBowl()
     {
-        return hasIceCube; // Return true if the ice cube is in contact with the bowl
+        return hasIceCube;
     }
 
+    /**
+     * Checks if sake has been added to the bowl
+     * Used by other scripts to verify ingredients
+     */
     public bool IsSakeInBowl()
     {
         return hasSake;
     }
+
+    /**
+     * Checks if juice has been added to the bowl
+     * Used by other scripts to verify ingredients
+     */
     public bool IsJuiceInBowl()
     {
         return hasJuice;
     }
 
+    /**
+     * Updates UI toggles to reflect current ingredient state
+     * Called whenever ingredient state changes
+     */
     private void UpdateIngredientToggles()
     {
-        // Update the state of each toggle based on ingredient flags
         if (iceCubeToggle) iceCubeToggle.isOn = hasIceCube;
         if (sakeToggle) sakeToggle.isOn = hasSake;
         if (juiceToggle) juiceToggle.isOn = hasJuice;
