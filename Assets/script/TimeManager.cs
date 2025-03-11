@@ -8,6 +8,8 @@ using UnityEngine.SceneManagement;
 public class TimeManager : MonoBehaviour
 {
     public static TimeManager instance {get; private set;}
+    /*[Header("Config")]
+    [SerializeField] private bool loadQuestState = true;*/
     private int time; 
     private int day = 1;
     private int progress = 0;
@@ -138,4 +140,56 @@ public class TimeManager : MonoBehaviour
     {
         return progress;
     }
+/*
+    private void OnApplicationQuit()
+    {
+        foreach (Quest quest in questMap.Values)
+        {
+            SaveTime(quest);
+        }
+    }
+
+    private void SaveTime(Quest quest)
+    {
+        try 
+        {
+            QuestData questData = quest.GetQuestData();
+            // serialize using JsonUtility, but use whatever you want here (like JSON.NET)
+            string serializedData = JsonUtility.ToJson(questData);
+            // saving to PlayerPrefs is just a quick example for this tutorial video,
+            // you probably don't want to save this info there long-term.
+            // instead, use an actual Save & Load system and write to a file, the cloud, etc..
+            PlayerPrefs.SetString(quest.info.id, serializedData);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to save quest with id " + quest.info.id + ": " + e);
+        }
+    }
+
+    private Quest LoadTime(QuestInfoSO questInfo)
+    {
+        Quest quest = null;
+        Debug.Log($"Load Quest call: {questInfo.id}");
+        try 
+        {
+            // load quest from saved data
+            if (PlayerPrefs.HasKey(questInfo.id) && loadQuestState)
+            {
+                string serializedData = PlayerPrefs.GetString(questInfo.id);
+                QuestData questData = JsonUtility.FromJson<QuestData>(serializedData);
+                quest = new Quest(questInfo, questData.state, questData.questStepIndex, questData.questStepStates);
+            }
+            // otherwise, initialize a new quest
+            else 
+            {
+                quest = new Quest(questInfo);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to load quest with id " + quest.info.id + ": " + e);
+        }
+        return quest;
+    }*/
 }

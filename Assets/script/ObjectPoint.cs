@@ -64,12 +64,12 @@ public class ObjectPoint : MonoBehaviour //Can potentially migrate to Interactab
             questIcon.SetActive(true);
             playerIsNear = true;
         }
-        if (collider.CompareTag("Player") && TimeManager.instance.ReturnTime() >= 10 && objectType == 2)//Bed
+        if (collider.CompareTag("Player") && TimeManager.instance.ReturnTime() >= 18 && objectType == 2)//Bed
         {
             questIcon.SetActive(true);
             playerIsNear = true;
         }
-        if (collider.CompareTag("Player") && GameObject.Find("VisitSpotsQuest(Clone)") && objectType == 3)//Boxes
+        if (collider.CompareTag("Player") && GameObject.Find("VisitSpotsQuest(Clone)") && objectType == 3)//Interact
         {
             questIcon.SetActive(true);
             playerIsNear = true;
