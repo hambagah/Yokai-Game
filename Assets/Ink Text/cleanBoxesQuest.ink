@@ -14,24 +14,33 @@ Hmm you can't start.
 -> END
 
 = canStart
+You're finally here.
+I'm Fujiwara welcome to my humble abode. 
+Since you're staying here for a long time I'll be expecting you to help with maintenance.
+Speaking of the house is a bit... messy.
+There's a couple of items that we need to relocate.
 Can you clean 5 boxes?
-* [Yes]
+* [Sure]
     ~ StartQuest("CleanBoxesQuest")
-    Great!
+    Good.
+    Come back to me when you're done.
 * [No]
-    That's fine too.
+    ?
 - -> END
 
 = inProgress
-How many boxes have you cleaned so far?
+What.
 -> END
 
 = canFinish
 ~ CallFinishQuest("CleanBoxesQuest")
 //~ FinishQuest("CleanBoxesQuest")
 Are you done now? Thanks here's your reward.
+It's getting late now. 
+You may go inside.
+Konoe will tour you through the house.
 -> END
 
 = finished 
-Good job. You sure showed those boxes.
+You may leave now.
 -> END

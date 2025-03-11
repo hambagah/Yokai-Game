@@ -69,7 +69,7 @@ public class ObjectPoint : MonoBehaviour //Can potentially migrate to Interactab
             questIcon.SetActive(true);
             playerIsNear = true;
         }
-        if (collider.CompareTag("Player") && GameObject.Find("VisitSpotsQuest(Clone)") && objectType == 1)//Boxes
+        if (collider.CompareTag("Player") && GameObject.Find("VisitSpotsQuest(Clone)") && objectType == 3)//Boxes
         {
             questIcon.SetActive(true);
             playerIsNear = true;

@@ -17,6 +17,8 @@ public class DialogueManager : MonoBehaviour
     private bool dialoguePlaying = false;
     private bool claimRewards = false;
     private string id;
+    private const string SPEAKER_TAG = "speaker";
+    private const string PORTRAIT_TAG = "portrait";
 
     GameObject temp;
 
@@ -149,62 +151,6 @@ public class DialogueManager : MonoBehaviour
         ContinueOrExitStory();
     }
 
-    //Still Object
-    /*private void ObjectContinueOrExitStory(GameObject gameObject)
-    {
-        if (story.currentChoices.Count > 0 && currentChoiceIndex != -1)
-        {
-            story.ChooseChoiceIndex(currentChoiceIndex);
-            currentChoiceIndex = -1;
-        }
-
-        if (story.canContinue)
-        {
-            string dialogueLine = story.Continue();
-            while (IsLineBlank(dialogueLine) && story.canContinue)
-            {
-                dialogueLine = story.Continue();
-            }
-            
-            if (IsLineBlank(dialogueLine) && !story.canContinue)
-            {
-                ObjectExitDialogue(gameObject);
-            }
-            else
-            {
-                GameEventsManager.instance.dialogueEvents.DisplayDialogue(dialogueLine, story.currentChoices);
-                Debug.Log("8");
-            }
-        }
-        else if (story.currentChoices.Count == 0)
-        {
-            ObjectExitDialogue(gameObject);
-        }
-    }
-
-    //Object Exit
-    private void ObjectExitDialogue(GameObject gameObject)
-    {
-        ObjectPoint comp = gameObject.GetComponent<ObjectPoint>();
-        if (comp.objectType == 1) //Boxes
-        {
-            comp.Cleaned();
-        }
-
-        dialoguePlaying = false;
-        GameEventsManager.instance.dialogueEvents.DialogueFinished();
-        GameEventsManager.instance.playerEvents.EnablePlayerMovement();
-        GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DEFAULT);
-        inkDialogueVariables.StopListening(story);
-        story.ResetState();
-    }*/
-
-    /*//Grabs Object Component
-    private bool ObjectGetComponent<ObjectPoint>(this GameObject obj, ObjectPoint result) where ObjectPoint : Component
-    {
-        return (result = obj.GetComponent<ObjectPoint>()) != null;
-    }*/
-
     private void ContinueOrExitStory()
     {
         if (story.currentChoices.Count > 0 && currentChoiceIndex != -1)
@@ -245,7 +191,7 @@ public class DialogueManager : MonoBehaviour
         if (temp != null)
         {
             ObjectPoint comp = temp.GetComponent<ObjectPoint>();
-            if (comp.objectType == 1) //Boxes
+            if (comp.objectType == 1 || comp.objectType == 3) //Boxes
             {
                 comp.Cleaned();
             }
@@ -269,6 +215,35 @@ public class DialogueManager : MonoBehaviour
     {
         return dialogueLine.Trim().Equals("") || dialogueLine.Trim().Equals("\n");
     }
+
+    /*private void HandleTags(List<string> currentTags)
+    {
+        foreach (string tag in currentTags)
+        {
+            string[] splitTag = tag.Split(':');
+            if (splitTag.Length != 2)
+            {
+                Debug.LogError("Error with tag: " + tag);
+            }
+            string tagKey = splitTag[0].Trim();
+            string tagValue = splitTag[1].Trim();
+
+            switch (tagKey)
+            {
+                case SPEAKER_TAG:
+                    displayNameText.text = tagValue;
+                    break;
+                case PORTRAIT_TAG:
+                    portraitAnimator.Play(tagValue);
+                    break;
+                case LAYOUT_TAG:
+                    layoutAnimator.Play(tagValue);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }*/
 
     /*//Dialogue UI
     [SerializeField] private GameObject dialoguePanel;
