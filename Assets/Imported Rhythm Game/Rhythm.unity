@@ -757,7 +757,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c9aa894f97ec8247b9b530f0437999b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tailPrefab: {fileID: 4447774248334486158, guid: dbd3c10eba35edd439d42fc3594877be, type: 3}
+  tailPrefab: {fileID: 6737321576313166203, guid: 6ea8f780168b982419e3b399fefb3b3e, type: 3}
   musicSource: {fileID: 348374377}
   minX: 0.2
   maxX: 0.8
