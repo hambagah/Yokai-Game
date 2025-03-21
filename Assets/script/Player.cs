@@ -18,12 +18,12 @@ using UnityEngine.InputSystem;
         private bool movementDisabled = false;
         
         private void Awake() {
-            //playerControls = new PlayerControls();
             rb = GetComponent<Rigidbody>();   
         }
 
         private void Start()
         {
+            
             GameEventsManager.instance.inputEvents.onMovePressed += MovePressed;
             GameEventsManager.instance.inputEvents.onShiftPressed += ShiftPressed;
             GameEventsManager.instance.playerEvents.onDisablePlayerMovement += DisablePlayerMovement;
@@ -62,40 +62,14 @@ using UnityEngine.InputSystem;
         private void ShiftPressed()
         {
             running = 4;
-            /*if (running == 0)
-            {
-                running = 4;
-            }
-            else if (running == 4){
-                running = 0;
-            }*/
         }
 
         void Update()
         {
-            //move = playerControls.Player.WASD.ReadValue<Vector2>();
-            //Debug.Log(move);
-            /*if (playerControls.Player.Run.triggered) {
-                shift = 1;
-                Debug.Log("Running");
+            if (loadPlayerState)
+            {
+                LoadPlayer();
             }
-            else 
-                shift = 0;
-            if (playerControls.Player.Interact.triggered) {
-                Debug.Log("Interact");
-            }*/
-            /*if (InputManager.GetInstance().GetShiftPressed()) {
-                shift = 1;
-                Debug.Log("Running");
-            }
-            else 
-                shift = 0;*/
-
-            /*if (InputManager.GetInstance().GetInteractPressed())
-                Debug.Log("Interact");*/
-            //zAxis = (Input.GetKey(KeyCode.S) ? -1 : 0) + (Input.GetKey(KeyCode.W) ? 1 : 0);
-            //xAxis = (Input.GetKey(KeyCode.A) ? -1 : 0) + (Input.GetKey(KeyCode.D) ? 1 : 0);
-            //shift = (Input.GetKey(KeyCode.LeftShift) ? 1 : 0);
         }
 
         private void FixedUpdate()
@@ -107,9 +81,9 @@ using UnityEngine.InputSystem;
             }
         }
 
-    /*private void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
-        SavePlayer(player.transform.pos);
+        SavePlayer(gameObject.transform.position);
     }
 
     private void SavePlayer(Vector3 playerPosition)
@@ -128,30 +102,23 @@ using UnityEngine.InputSystem;
 
     private void LoadPlayer()
     {
-        Quest quest = null;
         try 
         {
             float Xpos = PlayerPrefs.GetFloat ("PlayerX");
             float Ypos = PlayerPrefs.GetFloat ("PlayerY");
             float Zpos = PlayerPrefs.GetFloat ("PlayerZ");
-            /*PlayerPrefsJTA.SetTransform("PlayerTransform", player.transform)
-            // load quest from saved data
-            if (PlayerPrefs.HasKey("0") && loadPlayerState)
+            Vector3 relocation = new Vector3(Xpos, Ypos, Zpos);
+            this.gameObject.transform.position = relocation;
+            if (transform.position == relocation)
             {
-                string serializedData = PlayerPrefs.GetString(0);
-                Vector3 playerPosition = JsonUtility.FromJson<Vector3>(serializedData);
-                player.transform = playerPosition;
+                loadPlayerState = false;
             }
-            // otherwise, initialize a new quest
-            /*else 
-            {
-                quest = new Quest(questInfo);
-            }
+            Debug.Log("Loaded: " + relocation);
         }
         catch (System.Exception e)
         {
-            Debug.LogError("Failed to save player position " + playerPosition);
+            Debug.LogError("Failed to load player position ");
         }
-        this.gameObject.transform.position*/
     }
+}
     

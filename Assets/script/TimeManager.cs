@@ -8,8 +8,8 @@ using UnityEngine.SceneManagement;
 public class TimeManager : MonoBehaviour
 {
     public static TimeManager instance {get; private set;}
-    /*[Header("Config")]
-    [SerializeField] private bool loadQuestState = true;*/
+    [Header("Config")]
+    [SerializeField] private bool loadTimeState = true;
     private int time; 
     private int day = 1;
     private int progress = 0;
@@ -86,7 +86,10 @@ public class TimeManager : MonoBehaviour
             SceneManager.LoadScene("The Mixing Game Demo");
 
         if (sceneId.Equals("Spawn Shuten"))
+        {
             spawnShuten = true;
+            UpdateEvents();
+        }
     }
 
     void Start()
@@ -100,6 +103,11 @@ public class TimeManager : MonoBehaviour
 
     void Update()
     {
+        if (loadTimeState)
+        {
+            LoadTime();
+        }
+
         if (sun.transform.eulerAngles.y < (time*15))
         {
             sun.transform.Rotate(Vector3.up * (2+(time*15)/sun.transform.eulerAngles.y) * Time.deltaTime);
@@ -109,17 +117,43 @@ public class TimeManager : MonoBehaviour
 
     private void UpdateEvents() 
     {
-        if (time >= 11 && day == 1 && progress == 1)
+        if (time == 0 && day == 1 && progress == 1) //DAY 1
         {
-            //Replace intro NPC with new NPC inside the house
-            //GameObject.Find("Day1Tengu1").SetActive(false);
+            //Load 5 Boxes
+            //Load 3 Areas
+            //Load Tengu, Fox, and Shuten
+        }
+
+        if (time >= 11 && day == 1 && progress == 1) //After the player collects 5 boxes and interacts with Tengu. 
+        {
+            //Destroy(GameObject.Find("Day1Boxes"));
             GameObject.Find("Day1Tengu2").transform.GetChild(0).gameObject.SetActive(true);
         }
 
-        if (time >= 18 && day == 1 && spawnShuten)
+        if (time >= 12) //After the player interacts with Fox
+        {
+            GameObject.Find("Day1Tengu1").transform.GetChild(0).gameObject.SetActive(false);
+        }
+
+        if (time >= 18 && day == 1 && spawnShuten) //At night time.
         {
             //Instantiate Shuten
             GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(true);
+        }
+
+        if (time == 0 && day == 2)
+        {
+
+        }
+
+        if (time >= 0 && day ==2 && progress == 2)
+        {
+
+        }
+
+        if (time >= 0 && day == 3 && progress >= 3)
+        {
+
         }
     }
 
@@ -140,56 +174,42 @@ public class TimeManager : MonoBehaviour
     {
         return progress;
     }
-/*
+
     private void OnApplicationQuit()
     {
-        foreach (Quest quest in questMap.Values)
-        {
-            SaveTime(quest);
-        }
+        SaveTime(time, day, progress);
     }
 
-    private void SaveTime(Quest quest)
+    private void SaveTime(int time, int day, int progress)
     {
         try 
         {
-            QuestData questData = quest.GetQuestData();
-            // serialize using JsonUtility, but use whatever you want here (like JSON.NET)
-            string serializedData = JsonUtility.ToJson(questData);
-            // saving to PlayerPrefs is just a quick example for this tutorial video,
-            // you probably don't want to save this info there long-term.
-            // instead, use an actual Save & Load system and write to a file, the cloud, etc..
-            PlayerPrefs.SetString(quest.info.id, serializedData);
+            PlayerPrefs.SetInt("Time", time);
+            PlayerPrefs.SetInt("Day", day);
+            PlayerPrefs.SetInt("Progress", progress);
         }
         catch (System.Exception e)
         {
-            Debug.LogError("Failed to save quest with id " + quest.info.id + ": " + e);
+            Debug.LogError("Failed to save time progress");
         }
     }
 
-    private Quest LoadTime(QuestInfoSO questInfo)
+    private void LoadTime()
     {
-        Quest quest = null;
-        Debug.Log($"Load Quest call: {questInfo.id}");
         try 
         {
-            // load quest from saved data
-            if (PlayerPrefs.HasKey(questInfo.id) && loadQuestState)
-            {
-                string serializedData = PlayerPrefs.GetString(questInfo.id);
-                QuestData questData = JsonUtility.FromJson<QuestData>(serializedData);
-                quest = new Quest(questInfo, questData.state, questData.questStepIndex, questData.questStepStates);
-            }
-            // otherwise, initialize a new quest
-            else 
-            {
-                quest = new Quest(questInfo);
-            }
+            int savedTime = PlayerPrefs.GetInt ("Time");
+            int savedDay = PlayerPrefs.GetInt ("Day");
+            int savedProgress = PlayerPrefs.GetInt ("Progress");
+            time = savedTime;
+            day = savedDay;
+            progress = savedProgress;
+            loadTimeState = false;
+            Debug.Log("Loaded Time: " + savedTime + " Loaded Day: " + savedDay + " Loaded Progress: " + savedProgress);
         }
         catch (System.Exception e)
         {
-            Debug.LogError("Failed to load quest with id " + quest.info.id + ": " + e);
+            Debug.LogError("Time failed");
         }
-        return quest;
-    }*/
+    }
 }

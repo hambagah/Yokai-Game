@@ -1,6 +1,6 @@
 === shutenEvent ===
 Urhgg... who are you?
-Didn't know we had fresh meet.
+Didn't know we had fresh meat.
 * [Uhmm I'm new here]
   Oh? Oh? Ohhhh?
     So I'm guessing you know the rules then?
