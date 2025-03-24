@@ -10,6 +10,8 @@ public class Tail : MonoBehaviour
     public float holdTimeThreshold = 1f; // 长按时间阈值
     public float slideSpeedMultiplier = 1.5f; // 滑动音符速度倍率
 
+    public float speed = 3f;
+    public Vector3 moveDir;
     private bool isHit = false;
     private bool isHolding = false;
     private bool isSliding = false;
@@ -81,6 +83,8 @@ public class Tail : MonoBehaviour
             rb.velocity = handDelta * slideSpeedMultiplier / Time.fixedDeltaTime;
             lastHandPosition = handsManager.LeftHand.transform.position;
         }
+
+        rb.MovePosition(rb.position + moveDir * speed * Time.deltaTime);
     }
     void HandleTap()
     {

@@ -52,8 +52,29 @@ public class TailSpawner : MonoBehaviour
         }
     }
     public float distance = 2;
+
+    [ContextMenu("Spawn Random Object")]
     void SpawnTail()
     {
+        Vector3 spawnPos;
+        Quaternion rotation;
+
+        bool isLeft = Random.value < 0.5f;
+
+        if (isLeft)
+        {
+            // 使用 Transform 位置
+            spawnPos = GetRandomPosition(leftCenterTransform.position, leftSize);
+            rotation = Quaternion.LookRotation(Vector3.left); // 朝左
+        }
+        else
+        {
+            spawnPos = GetRandomPosition(rightCenterTransform.position, rightSize);
+            rotation = Quaternion.LookRotation(Vector3.right); // 朝右
+        }
+
+        Instantiate(tailPrefab, spawnPos, rotation);
+        /*
         // 计算随机位置，确保 Tail 在可触碰范围
         Vector3 spawnPosition = Camera.main.ViewportToWorldPoint(new Vector3(
             Random.Range(minX, maxX),
@@ -62,6 +83,40 @@ public class TailSpawner : MonoBehaviour
         ));
 
         GameObject newTail = Instantiate(tailPrefab, spawnPosition, Quaternion.identity);
-        Debug.Log($"Spawned Tail at {spawnPosition}");
+        Debug.Log($"Spawned Tail at {spawnPosition}");*/
+    }
+    [Header("Prefab to Spawn")]
+    public GameObject objectToSpawn;
+
+    [Header("Left Spawn Area")]
+    public Transform leftCenterTransform;
+    public Vector3 leftSize = new Vector3(2, 2, 2);
+
+    [Header("Right Spawn Area")]
+    public Transform rightCenterTransform;
+    public Vector3 rightSize = new Vector3(2, 2, 2);
+
+    private Vector3 GetRandomPosition(Vector3 center, Vector3 size)
+    {
+        return center + new Vector3(
+            Random.Range(-size.x / 2, size.x / 2),
+            Random.Range(-size.y / 2, size.y / 2),
+            Random.Range(-size.z / 2, size.z / 2)
+        );
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (leftCenterTransform != null)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireCube(leftCenterTransform.position, leftSize);
+        }
+
+        if (rightCenterTransform != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(rightCenterTransform.position, rightSize);
+        }
     }
 }
