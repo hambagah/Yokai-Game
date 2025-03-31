@@ -53,10 +53,18 @@ public class FillBar : MonoBehaviour
      */
     public void SetFillValueSmooth(int targetValue, float duration)
     {
+        // If the GameObject is inactive, update the value immediately without animation
+        if (!gameObject.activeInHierarchy)
+        {
+            setFillValue(targetValue);
+            return;
+        }
+        
         if (fillCoroutine != null)
         {
             StopCoroutine(fillCoroutine);
         }
+        
         fillCoroutine = StartCoroutine(SmoothTransition(targetValue, duration));
     }
 

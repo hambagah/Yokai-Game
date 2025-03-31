@@ -9,9 +9,13 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using System;
 
 public class BowlDetector : MonoBehaviour
 {
+    #region Inspector Fields
+
     // Configuration Parameters
     [Header("Fill Settings")]
     [Tooltip("Maximum fill level of the bowl")]
@@ -59,19 +63,48 @@ public class BowlDetector : MonoBehaviour
     [Tooltip("Toggle showing juice status")]
     public Toggle juiceToggle;
 
+    // Events
+    [Header("Events")]
+    [Tooltip("Event fired when an ingredient is added or removed")]
+    public UnityEvent onIngredientsChanged;
+
+    [Tooltip("Event fired when the bowl is filled to the maximum level")]
+    public UnityEvent onBowlFilled;
+
+    #endregion
+
+    #region Private Fields
+
     // Internal state
     private float currentFill = 0f;
     private float lastFillTime = 0f;
+    private bool wasBowlFull = false;
+    private int iceCubeCollisionCount = 0; // Track how many ice cubes are touching the bowl
+
+    #endregion
+
+    #region Unity Lifecycle Methods
 
     /**
      * Initialize bowl state and UI elements on start
      */
     void Start()
     {
-        currentFill = 0;
-        fillBar.setMinValue();
-        fillBar.setMaxValue((int)maxFill);
-        UpdateIngredientToggles();
+        if (liquidFill != null)
+        {
+            liquidFill.gameObject.SetActive(false);
+        }
+
+        // Initialize the fill bar with correct min/max values once at start
+        if (fillBar != null)
+        {
+            fillBar.setMinValue();
+            fillBar.setMaxValue((int)maxFill);
+            fillBar.setFillValue(0); // Start with zero fill
+        }
+
+        // Initialize other UI elements
+        UpdateUI();
     }
 
     /**
@@ -82,8 +115,9 @@ public class BowlDetector : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("IceCube"))
         {
-            hasIceCube = true;
-            Debug.Log("Ice cube has touched the bowl.");
+            iceCubeCollisionCount++;
+            UpdateIceCubeState(true);
+            Debug.Log("Ice cube has touched the bowl. Count: " + iceCubeCollisionCount);
         }
     }
 
@@ -93,11 +127,7 @@ public class BowlDetector : MonoBehaviour
      */
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.gameObject.CompareTag("IceCube"))
-        {
-            hasIceCube = true;
-        }
-        UpdateIngredientToggles();
+        // No need to update every frame - handled by collision enter/exit
     }
 
     /**
@@ -108,10 +138,18 @@ public class BowlDetector : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("IceCube"))
         {
-            hasIceCube = false;
-            Debug.Log("Ice cube has left the bowl.");
+            iceCubeCollisionCount = Mathf.Max(0, iceCubeCollisionCount - 1); // Ensure we don't go below 0
+            
+            if (iceCubeCollisionCount == 0)
+            {
+                UpdateIceCubeState(false);
+                Debug.Log("All ice cubes have left the bowl.");
+            }
+            else
+            {
+                Debug.Log("Ice cube has left the bowl. Remaining: " + iceCubeCollisionCount);
+            }
         }
-        UpdateIngredientToggles();
     }
 
     /**
@@ -125,43 +163,52 @@ public class BowlDetector : MonoBehaviour
             // Check if enough time has passed to add fill
             if (Time.time - lastFillTime >= timeToFill)
             {
+                // Update fill level
+                float previousFill = currentFill;
                 currentFill += fillRate;
                 currentFill = Mathf.Clamp(currentFill, 0, maxFill);
-
-                // Update UI
-                fillBar.SetFillValueSmooth((int)currentFill, 0.5f);
                 lastFillTime = Time.time;
 
+                // Update UI and track ingredient state
+                UpdateFillBar();
+                
                 // Log ingredient and update UI text
-                Debug.Log("You added: " + other.tag);
-                ingredientAddingText.text = "You added: " + other.tag;
-                Debug.Log("Current fill level: " + currentFill);
-                fillLevelText.text = "Current fill level: " + currentFill;
+                string ingredientName = other.tag;
+                Debug.Log("You added: " + ingredientName);
+                UpdateIngredientAddedText(ingredientName);
+                
+                // Update fill level text
+                UpdateFillLevelText();
 
-                // Check if bowl is full
-                if (currentFill >= maxFill)
-                {
-                    Debug.Log("Bowl is full!");
-                    fillLevelText.text = "The bowl is full!";
-                }
-                else
-                {
-                    Debug.Log("Bowl is not full yet.");
-                }
+                // Check if bowl is now full
+                CheckBowlFullStatus();
 
                 // Update ingredient tracking
-                if (other.CompareTag("Sake"))
+                bool ingredientAdded = false;
+                if (other.CompareTag("Sake") && !hasSake)
                 {
                     hasSake = true;
+                    ingredientAdded = true;
                 }
-                else if (other.CompareTag("Juice"))
+                else if (other.CompareTag("Juice") && !hasJuice)
                 {
                     hasJuice = true;
+                    ingredientAdded = true;
                 }
-                UpdateIngredientToggles();
+
+                // Update UI toggles and trigger events if needed
+                if (ingredientAdded || Mathf.Abs(currentFill - previousFill) > 0.01f)
+                {
+                    UpdateIngredientToggles();
+                    onIngredientsChanged?.Invoke();
+                }
             }
         }
     }
+
+    #endregion
+
+    #region Public Methods
 
     /**
      * Returns the current fill level of the bowl
@@ -200,6 +247,39 @@ public class BowlDetector : MonoBehaviour
     }
 
     /**
+     * Resets the bowl to its initial empty state
+     * Useful for restarting the game
+     */
+    public void ResetBowl()
+    {
+        currentFill = 0;
+        hasIceCube = false;
+        hasSake = false;
+        hasJuice = false;
+        iceCubeCollisionCount = 0;
+        wasBowlFull = false;
+        
+        UpdateFillBar();
+        UpdateIngredientToggles();
+        UpdateUI();
+        
+        onIngredientsChanged?.Invoke();
+    }
+
+    /**
+     * Checks if all required ingredients are present and bowl is full
+     * Returns true if all conditions are met for submitting the drink
+     */
+    public bool IsComplete()
+    {
+        return IsIceCubeInBowl() && IsSakeInBowl() && IsJuiceInBowl() && currentFill >= maxFill;
+    }
+
+    #endregion
+
+    #region Private Helper Methods
+
+    /**
      * Updates UI toggles to reflect current ingredient state
      * Called whenever ingredient state changes
      */
@@ -209,4 +289,95 @@ public class BowlDetector : MonoBehaviour
         if (sakeToggle) sakeToggle.isOn = hasSake;
         if (juiceToggle) juiceToggle.isOn = hasJuice;
     }
+
+    /**
+     * Updates the fill bar UI element
+     */
+    private void UpdateFillBar()
+    {
+        if (fillBar != null)
+        {
+            // Ensure the fill bar game object is active
+            if (!fillBar.gameObject.activeInHierarchy)
+            {
+                fillBar.gameObject.SetActive(true);
+                Debug.Log("Activating Fill Bar that was inactive");
+            }
+            
+            // Only initialize min/max values once, don't reset to zero each time
+            fillBar.setMaxValue((int)maxFill);
+            fillBar.SetFillValueSmooth((int)currentFill, 0.5f);
+        }
+    }
+
+    /**
+     * Updates the text showing the current fill level
+     */
+    private void UpdateFillLevelText()
+    {
+        if (fillLevelText != null)
+        {
+            if (currentFill >= maxFill)
+            {
+                fillLevelText.text = "The bowl is full!";
+                Debug.Log("Bowl is full!");
+            }
+            else
+            {
+                fillLevelText.text = "Current fill level: " + Mathf.Round(currentFill);
+                Debug.Log("Current fill level: " + currentFill);
+            }
+        }
+    }
+
+    /**
+     * Updates the text showing what ingredient was just added
+     */
+    private void UpdateIngredientAddedText(string ingredientName)
+    {
+        if (ingredientAddingText != null)
+        {
+            ingredientAddingText.text = "You added: " + ingredientName;
+        }
+    }
+
+    /**
+     * Fires the onBowlFilled event if the bowl just became full
+     */
+    private void CheckBowlFullStatus()
+    {
+        bool isNowFull = currentFill >= maxFill;
+        
+        // Only fire the event when the bowl transitions from not full to full
+        if (isNowFull && !wasBowlFull)
+        {
+            onBowlFilled?.Invoke();
+        }
+        
+        wasBowlFull = isNowFull;
+    }
+
+    /**
+     * Updates all UI elements
+     */
+    private void UpdateUI()
+    {
+        UpdateIngredientToggles();
+        UpdateFillLevelText();
+    }
+
+    /**
+     * Updates the ice cube state and triggers events if necessary
+     */
+    private void UpdateIceCubeState(bool newState)
+    {
+        if (hasIceCube != newState)
+        {
+            hasIceCube = newState;
+            UpdateIngredientToggles();
+            onIngredientsChanged?.Invoke();
+        }
+    }
+
+    #endregion
 }
