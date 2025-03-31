@@ -6,20 +6,36 @@
  * that follows physics and splashes when hitting surfaces.
  */
 using System.Collections;
-using System.Collections.Generic;
-//using System.Numerics;
-using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(LineRenderer))]
 public class Stream : MonoBehaviour
 {
+    [Header("Stream Settings")]
+    [Tooltip("How fast the stream moves in units per second")]
+    [Range(0.5f, 5f)]
+    public float streamSpeed = 1.75f;
+    
+    [Tooltip("Maximum distance the stream can reach")]
+    [Range(0.5f, 10f)]
+    public float maxStreamDistance = 2.0f;
+    
+    [Tooltip("Layers the stream can collide with")]
+    public LayerMask collisionLayers = ~0; // Default to all layers
+    
+    [Tooltip("Radius of the collision detection ray")]
+    [Range(0.01f, 0.5f)]
+    public float streamRadius = 0.05f;
+
     // Component references
     private LineRenderer lineRenderer = null;
     private ParticleSystem splashParticle = null;
 
     // Internal state
     private Coroutine pourRoutine = null;
+    private Coroutine particleRoutine = null;
     private Vector3 targetPosition = Vector3.zero;
+    private bool isPouring = false;
 
     /**
      * Initialize components and check for required parts
@@ -27,11 +43,17 @@ public class Stream : MonoBehaviour
     private void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
-        splashParticle = GetComponentInChildren<ParticleSystem>();
+        if (lineRenderer == null)
+        {
+            Debug.LogError("Stream.cs: Missing LineRenderer component!");
+            enabled = false;
+            return;
+        }
 
+        splashParticle = GetComponentInChildren<ParticleSystem>();
         if (splashParticle == null)
         {
-            Debug.LogError("Stream.cs: Missing Particle System on Stream object!");
+            Debug.LogWarning("Stream.cs: Missing Particle System on Stream object! No splash effects will be shown.");
         }
     }
 
@@ -40,8 +62,24 @@ public class Stream : MonoBehaviour
      */
     private void Start()
     {
-        MoveToPosition(0, transform.position);
-        MoveToPosition(1, transform.position);
+        InitializeLineRenderer();
+    }
+
+    /**
+     * Initialize the line renderer with proper settings
+     */
+    private void InitializeLineRenderer()
+    {
+        if (lineRenderer != null)
+        {
+            // Ensure we have at least two points for the line
+            if (lineRenderer.positionCount < 2)
+                lineRenderer.positionCount = 2;
+                
+            // Initialize both points at the same position (no stream yet)
+            MoveToPosition(0, transform.position);
+            MoveToPosition(1, transform.position);
+        }
     }
 
     /**
@@ -50,7 +88,19 @@ public class Stream : MonoBehaviour
      */
     public void Begin()
     {
-        StartCoroutine(UpdateParticale());
+        if (isPouring) return;
+        
+        isPouring = true;
+        
+        // Initialize the line renderer if needed
+        InitializeLineRenderer();
+        
+        // Start the animation and particle routines
+        if (splashParticle != null)
+        {
+            particleRoutine = StartCoroutine(UpdateParticle());
+        }
+        
         pourRoutine = StartCoroutine(BeginPour());
     }
 
@@ -60,12 +110,15 @@ public class Stream : MonoBehaviour
      */
     private IEnumerator BeginPour()
     {
-        while (gameObject.activeSelf)
+        while (isPouring && gameObject.activeSelf)
         {
             targetPosition = FindEndPoint();
 
+            // Keep the start point at the origin
             MoveToPosition(0, transform.position);
-            AnimateToposition(1, targetPosition);
+            
+            // Animate the end point to the target position
+            AnimateToPosition(1, targetPosition);
 
             yield return null;
         }
@@ -77,8 +130,23 @@ public class Stream : MonoBehaviour
      */
     public void End()
     {
-        StopCoroutine(pourRoutine);
-        pourRoutine = StartCoroutine(EndPour());
+        if (!isPouring) return;
+        
+        isPouring = false;
+        
+        // Stop the existing routines
+        if (pourRoutine != null)
+        {
+            StopCoroutine(pourRoutine);
+        }
+        
+        if (particleRoutine != null)
+        {
+            StopCoroutine(particleRoutine);
+        }
+        
+        // Start the ending animation
+        StartCoroutine(EndPour());
     }
 
     /**
@@ -87,13 +155,27 @@ public class Stream : MonoBehaviour
      */
     private IEnumerator EndPour()
     {
-        while (!HasReachPosition(0, targetPosition))
+        // Save the final target position
+        Vector3 finalPosition = targetPosition;
+        
+        // Animate start point to target position
+        while (!HasReachedPosition(0, finalPosition))
         {
-            AnimateToposition(0, targetPosition);
-            AnimateToposition(1, targetPosition);
+            AnimateToPosition(0, finalPosition);
+            AnimateToPosition(1, finalPosition);
 
             yield return null;
         }
+        
+        // Disable splash effects
+        if (splashParticle != null && splashParticle.gameObject.activeSelf)
+        {
+            splashParticle.gameObject.SetActive(false);
+        }
+        
+        // Small delay before destroying
+        yield return new WaitForSeconds(0.1f);
+        
         Destroy(gameObject);
     }
 
@@ -106,10 +188,14 @@ public class Stream : MonoBehaviour
         RaycastHit hit;
         Ray ray = new Ray(transform.position, Vector3.down);
 
-        Physics.Raycast(ray, out hit, 2.0f);
-        Vector3 endPoint = hit.collider ? hit.point : ray.GetPoint(2.0f);
-
-        return endPoint;
+        // Use SphereCast for better collision detection with small objects
+        if (Physics.SphereCast(ray, streamRadius, out hit, maxStreamDistance, collisionLayers))
+        {
+            return hit.point;
+        }
+        
+        // No collision, return point at maximum distance
+        return ray.GetPoint(maxStreamDistance);
     }
 
     /**
@@ -118,44 +204,75 @@ public class Stream : MonoBehaviour
      */
     private void MoveToPosition(int index, Vector3 targetPosition)
     {
-        lineRenderer.SetPosition(index, targetPosition);
+        if (lineRenderer != null && index < lineRenderer.positionCount)
+        {
+            lineRenderer.SetPosition(index, targetPosition);
+        }
     }
 
     /**
      * Smoothly animates a line renderer point towards a target
      * Creates fluid motion for the stream
      */
-    private void AnimateToposition(int index, Vector3 targetPosition)
+    private void AnimateToPosition(int index, Vector3 targetPosition)
     {
-        Vector3 currentPoint = lineRenderer.GetPosition(index);
-        Vector3 newPosition = Vector3.MoveTowards(currentPoint, targetPosition, Time.deltaTime * 1.75f);
-        lineRenderer.SetPosition(index, newPosition);
+        if (lineRenderer != null && index < lineRenderer.positionCount)
+        {
+            Vector3 currentPoint = lineRenderer.GetPosition(index);
+            Vector3 newPosition = Vector3.MoveTowards(currentPoint, targetPosition, Time.deltaTime * streamSpeed);
+            lineRenderer.SetPosition(index, newPosition);
+        }
     }
 
     /**
      * Checks if a line renderer point has reached its target
      * Used to determine when animations are complete
      */
-    private bool HasReachPosition(int index, Vector3 targetPosition)
+    private bool HasReachedPosition(int index, Vector3 targetPosition)
     {
-        Vector3 currentPosition = lineRenderer.GetPosition(index);
-        return currentPosition == targetPosition;
+        if (lineRenderer != null && index < lineRenderer.positionCount)
+        {
+            Vector3 currentPosition = lineRenderer.GetPosition(index);
+            return Vector3.Distance(currentPosition, targetPosition) < 0.01f;
+        }
+        return true;
     }
 
     /**
      * Updates the splash particle position and activation
      * Shows splash effect when stream hits a surface
      */
-    private IEnumerator UpdateParticale()
+    private IEnumerator UpdateParticle()
     {
-        while (gameObject.activeSelf)
+        if (splashParticle == null) yield break;
+        
+        while (isPouring && gameObject.activeSelf)
         {
-            splashParticle.gameObject.transform.position = targetPosition;
+            // Update particle position
+            splashParticle.transform.position = targetPosition;
 
-            bool isHitting = HasReachPosition(1, targetPosition);
+            // Only show particles when the stream is actually hitting something
+            bool isHitting = HasReachedPosition(1, targetPosition);
             splashParticle.gameObject.SetActive(isHitting);
 
             yield return null;
+        }
+    }
+
+    /**
+     * Force destruct the stream object
+     * Used for cleanup
+     */
+    private void OnDestroy()
+    {
+        if (pourRoutine != null)
+        {
+            StopCoroutine(pourRoutine);
+        }
+        
+        if (particleRoutine != null)
+        {
+            StopCoroutine(particleRoutine);
         }
     }
 }
