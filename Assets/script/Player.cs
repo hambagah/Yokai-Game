@@ -71,7 +71,16 @@ using UnityEngine.InputSystem;
         {
             if (loadPlayerState)
             {
-                LoadPlayer();
+                float Xpos = PlayerPrefs.GetFloat ("PlayerX");
+                float Ypos = PlayerPrefs.GetFloat ("PlayerY");
+                float Zpos = PlayerPrefs.GetFloat ("PlayerZ");
+                Vector3 relocation = new Vector3(Xpos, Ypos, Zpos);
+                if (transform.position == relocation)
+                {
+                    loadPlayerState = false;
+                }
+                this.gameObject.transform.position = relocation;
+                Debug.Log("Loaded: " + relocation);
             }
         }
 
@@ -157,11 +166,11 @@ using UnityEngine.InputSystem;
             float Ypos = PlayerPrefs.GetFloat ("PlayerY");
             float Zpos = PlayerPrefs.GetFloat ("PlayerZ");
             Vector3 relocation = new Vector3(Xpos, Ypos, Zpos);
-            this.gameObject.transform.position = relocation;
             if (transform.position == relocation)
             {
                 loadPlayerState = false;
             }
+            this.gameObject.transform.position = relocation;
             Debug.Log("Loaded: " + relocation);
         }
         catch (System.Exception e)

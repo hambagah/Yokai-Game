@@ -85,6 +85,9 @@ public class TimeManager : MonoBehaviour
         if (sceneId.Equals("The Mixing Game Demo"))
             SceneManager.LoadScene("The Mixing Game Demo");
 
+        if (sceneId.Equals("Rhythm"))
+            SceneManager.LoadScene("Rhythm");
+
         if (sceneId.Equals("Spawn Shuten"))
         {
             spawnShuten = true;

@@ -26,3 +26,4 @@ INCLUDE kitchen.ink
 INCLUDE lake.ink
 INCLUDE shed.ink
 INCLUDE shutenEvent.ink
+INCLUDE tamamoEvent.ink
