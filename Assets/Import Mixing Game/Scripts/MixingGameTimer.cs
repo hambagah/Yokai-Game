@@ -24,29 +24,29 @@ public class MixingGameTimer : MonoBehaviour
     [Range(0, 23)]
     [Tooltip("Hours component of timer")]
     public int hours;
-
+    
     [Range(0, 59)]
     [Tooltip("Minutes component of timer")]
     public int minutes;
-
+    
     [Range(0, 59)]
     [Tooltip("Seconds component of timer")]
     public int seconds;
-
+    
     // Enum definitions for timer configuration
     public enum CountMethod
     {
         CountDown,
         CountUp
     };
-
+    
     public enum SeperatorType
     {
         Colon,
         Bullet,
         Slash
     };
-
+    
     public enum OutputType
     {
         None,
@@ -65,13 +65,9 @@ public class MixingGameTimer : MonoBehaviour
     public bool hoursDisplay = false;
     public bool minutesDisplay = true;
     public bool secondsDisplay = true;
-
+    
     [Tooltip("Select to count up or down")]
     public CountMethod countMethod;
-
-    [Header("3D Display Options")]
-    [Tooltip("TextMeshPro for 3D objects")]
-    public TextMeshPro timerText3D;
 
     // Display options
     [Header("Display Options")]
@@ -82,41 +78,39 @@ public class MixingGameTimer : MonoBehaviour
     public Slider standardSlider;
     public Image dialSlider;
 
-
-
     // Internal state
     private bool timerRunning = false;
     private bool timerPaused = false;
     public double timeRemaining;
-
+    
     /**
      * Initialize component references and UI elements
      */
     private void Awake()
     {
         // Auto-detect components if not assigned
-        if (!standardText && GetComponent<Text>())
+        if(!standardText && GetComponent<Text>())
         {
             standardText = GetComponent<Text>();
         }
-        if (!textMeshProText && GetComponent<TextMeshProUGUI>())
+        if(!textMeshProText && GetComponent<TextMeshProUGUI>())
         {
             textMeshProText = GetComponent<TextMeshProUGUI>();
         }
-        if (!standardSlider && GetComponent<Slider>())
+        if(!standardSlider && GetComponent<Slider>())
         {
             standardSlider = GetComponent<Slider>();
         }
-        if (!dialSlider && GetComponent<Image>())
+        if(!dialSlider && GetComponent<Image>())
         {
             dialSlider = GetComponent<Image>();
         }
-
+        
         // Configure slider if present
-        if (standardSlider)
+        if(standardSlider)
         {
             standardSlider.maxValue = ReturnTotalSeconds();
-            if (countMethod == CountMethod.CountDown)
+            if(countMethod == CountMethod.CountDown)
             {
                 standardSlider.value = standardSlider.maxValue;
             }
@@ -125,9 +119,9 @@ public class MixingGameTimer : MonoBehaviour
                 standardSlider.value = standardSlider.minValue;
             }
         }
-
+        
         // Configure dial if present
-        if (dialSlider)
+        if(dialSlider)
         {
             if (countMethod == CountMethod.CountDown)
             {
@@ -145,20 +139,20 @@ public class MixingGameTimer : MonoBehaviour
      */
     void Start()
     {
-        if (startAtRuntime)
+        if(startAtRuntime)
         {
             StartTimer();
         }
         else
         {
             // Initialize display without starting
-            if (countMethod == CountMethod.CountDown)
+            if(countMethod == CountMethod.CountDown)
             {
-                if (standardText)
+                if(standardText)
                 {
                     standardText.text = DisplayFormattedTime(ReturnTotalSeconds());
                 }
-                if (textMeshProText)
+                if(textMeshProText)
                 {
                     textMeshProText.text = DisplayFormattedTime(ReturnTotalSeconds());
                 }
@@ -182,16 +176,16 @@ public class MixingGameTimer : MonoBehaviour
      */
     void Update()
     {
-        if (timerRunning)
+        if(timerRunning)
         {
-            if (countMethod == CountMethod.CountDown)
+            if(countMethod == CountMethod.CountDown)
             {
                 CountDown();
-                if (standardSlider)
+                if(standardSlider)
                 {
                     StandardSliderDown();
                 }
-                if (dialSlider)
+                if(dialSlider)
                 {
                     DialSliderDown();
                 }
@@ -203,7 +197,7 @@ public class MixingGameTimer : MonoBehaviour
                 {
                     StandardSliderUp();
                 }
-                if (dialSlider)
+                if(dialSlider)
                 {
                     DialSliderUp();
                 }
@@ -259,7 +253,7 @@ public class MixingGameTimer : MonoBehaviour
      */
     private void StandardSliderDown()
     {
-        if (standardSlider.value > standardSlider.minValue)
+        if(standardSlider.value > standardSlider.minValue)
         {
             standardSlider.value -= Time.deltaTime;
         }
@@ -290,19 +284,18 @@ public class MixingGameTimer : MonoBehaviour
         float timeRangeClamped = Mathf.InverseLerp(0, ReturnTotalSeconds(), (float)timeRemaining);
         dialSlider.fillAmount = Mathf.Lerp(0, 1, timeRangeClamped);
     }
+
     private void DisplayInTextObject()
     {
         if (standardText)
+        {
             standardText.text = DisplayFormattedTime(timeRemaining);
-
+        }
         if (textMeshProText)
+        {
             textMeshProText.text = DisplayFormattedTime(timeRemaining);
-
-        // Add this for 3D text display
-        if (timerText3D)
-            timerText3D.text = DisplayFormattedTime(timeRemaining);
+        }
     }
-
 
     public double GetRemainingSeconds()
     {
@@ -326,7 +319,7 @@ public class MixingGameTimer : MonoBehaviour
     }
     private void StartTimerCustom(double timeToSet)
     {
-        if (!timerRunning && !timerPaused)
+        if(!timerRunning && !timerPaused)
         {
             timeRemaining = timeToSet;
             timerRunning = true;
@@ -341,17 +334,17 @@ public class MixingGameTimer : MonoBehaviour
     private void ResetTimer()
     {
         timerPaused = false;
-
+        
         if (countMethod == CountMethod.CountDown)
         {
             timeRemaining = ReturnTotalSeconds();
             DisplayInTextObject();
-            if (standardSlider)
+            if(standardSlider)
             {
                 standardSlider.maxValue = ReturnTotalSeconds();
                 standardSlider.value = standardSlider.maxValue;
             }
-            if (dialSlider)
+            if(dialSlider)
             {
                 dialSlider.fillAmount = 1f;
             }
@@ -380,7 +373,7 @@ public class MixingGameTimer : MonoBehaviour
         totalTimeSet += seconds;
         return totalTimeSet;
     }
-
+   
     public double ConvertToTotalSeconds(float hours, float minutes, float seconds)
     {
         timeRemaining = hours * 60 * 60;
@@ -424,13 +417,13 @@ public class MixingGameTimer : MonoBehaviour
         {
             if (secondsDisplay)
             {
-                string secondsFormatted;
-                secondsFormatted = string.Format("{0:00}", seconds);
+                string secondsFormatted; 
+                secondsFormatted = string.Format("{0:00}", seconds);              
                 return secondsFormatted;
             }
             return null;
         }
-
+        
 
         convertedNumber = HoursFormat() + MinutesFormat() + SecondsFormat();
 

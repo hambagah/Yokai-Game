@@ -11,60 +11,60 @@ using TMPro;
 
 public class DemoWinCheck : MonoBehaviour
 {
+    [Tooltip("Reference to the bowl detector script")]
     public BowlDetector bowlDetector;
+    
+    [Tooltip("UI text that displays the result")]
     public TextMeshProUGUI FinishText;
-    public GameObject FinishPanel; // UI panel to show/hide along with finish text
 
-    private void Start()
-    {
-        if (FinishPanel != null)
-        {
-            FinishPanel.SetActive(false); // Make sure it's initially off
-        }
-    }
-
+    /**
+     * Checks if all winning conditions are met and updates UI text accordingly
+     * Called when the player submits their drink
+     */
     public void CheckWinCondition()
     {
-        if (bowlDetector == null || FinishText == null || FinishPanel == null)
+        // Safety checks for missing references
+        if (bowlDetector == null)
         {
-            Debug.LogError("DemoWinCheck: Missing references!");
+            Debug.LogError("DemoWinCheck: bowlDetector is NULL!");
             return;
         }
 
-        FinishPanel.SetActive(true);
+        if (FinishText == null)
+        {
+            Debug.LogError("DemoWinCheck: FinishText is NULL!");
+            return;
+        }
 
+        // Check if all ingredients are present
         if (bowlDetector.IsIceCubeInBowl() && bowlDetector.IsSakeInBowl() && bowlDetector.IsJuiceInBowl())
         {
+            // Check if fill level requirement is met
             if (bowlDetector.GetFillLevel() >= bowlDetector.maxFill)
             {
+                // Perfect success
                 FinishText.text = "Great success!\n The bowl is full with the correct ingredients!";
                 FinishText.color = Color.green;
+                Debug.Log(FinishText.text);
             }
             else
             {
+                // Partial success - ingredients correct but not full
                 FinishText.text = $"Requirements met!\n The bowl is {bowlDetector.GetFillLevel()}% full.";
-                FinishText.color = Color.black;
+                FinishText.color = Color.gray;
+                Debug.Log(FinishText.text);
             }
         }
         else
         {
+            // Failure - missing ingredients
             string failMessage = "Fail!";
             if (!bowlDetector.IsIceCubeInBowl()) failMessage += "\nMissing Ice cube.";
             if (!bowlDetector.IsSakeInBowl()) failMessage += "\nMissing sake.";
             if (!bowlDetector.IsJuiceInBowl()) failMessage += "\nMissing juice.";
-
             FinishText.text = failMessage;
             FinishText.color = Color.red;
-        }
-
-        Debug.Log(FinishText.text);
-    }
-
-    public void HideFinishPanel()
-    {
-        if (FinishPanel != null)
-        {
-            FinishPanel.SetActive(false);
+            Debug.Log(FinishText.text);
         }
     }
 }

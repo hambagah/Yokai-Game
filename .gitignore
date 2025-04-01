@@ -70,6 +70,3 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
-Assets/Ink Text/tamamoEvent.ink
-Assets/Ink Text/tamamoEvent.ink.meta
-Assets/Ink Text/main.json
