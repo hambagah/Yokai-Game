@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
     {
         [Header("Config")]
         [SerializeField] private bool loadPlayerState = true;
+        [SerializeField] private Animator animator;
 
         public float speed = 2f;
         //private Vector2 running = Vector2.zero;
@@ -14,8 +15,10 @@ using UnityEngine.InputSystem;
         private Vector2 velocity = Vector2.zero;
         //private PlayerControls playerControls;
         private Rigidbody rb;
+        [SerializeField] private GameObject rig;
 
         private bool movementDisabled = false;
+
         
         private void Awake() {
             rb = GetComponent<Rigidbody>();   
@@ -75,6 +78,52 @@ using UnityEngine.InputSystem;
         private void FixedUpdate()
         {
             rb.velocity = new Vector3 (velocity.x, Mathf.Min(rb.velocity.y *1.25f, 0), velocity.y);
+            
+            if (rb.velocity.x > 0 && rb.velocity.z > 0)
+            {
+                rig.transform.eulerAngles = new Vector3(0, 45, 0);
+                animator.SetFloat("forward", 1);
+            }
+            else if (rb.velocity.x < 0 && rb.velocity.z > 0)
+            {
+                rig.transform.eulerAngles = new Vector3(0, 315, 0);
+                animator.SetFloat("forward", 1);
+            }
+            else if (rb.velocity.x < 0 && rb.velocity.z < 0)
+            {
+                rig.transform.eulerAngles = new Vector3(0, 225, 0);
+                animator.SetFloat("forward", 1);
+            }
+            else if (rb.velocity.x > 0 && rb.velocity.z < 0)
+            {
+                rig.transform.eulerAngles = new Vector3(0, 135, 0);
+                animator.SetFloat("forward", 1);
+            }
+            else if (rb.velocity.z > 0)
+            {
+                rig.transform.eulerAngles = new Vector3(0, 0, 0);
+                animator.SetFloat("forward", 1);
+            }
+            else if (rb.velocity.z < 0)
+            {
+                rig.transform.eulerAngles = new Vector3(0, 180, 0);
+                animator.SetFloat("forward", 1);
+            }
+            else if (rb.velocity.x > 0)
+            {
+                rig.transform.eulerAngles = new Vector3(0, 90, 0);
+                animator.SetFloat("forward", 1);
+            }
+            else if (rb.velocity.x < 0)
+            {
+                rig.transform.eulerAngles = new Vector3(0, 270, 0);
+                animator.SetFloat("forward", 1);
+            }
+            else {
+                animator.SetFloat("forward", 0);
+            }
+            
+
             if (velocity == Vector2.zero)
             {
                 running = 0;
