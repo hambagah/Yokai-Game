@@ -15537,7 +15537,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2117824bc333683419143fcda19fe3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadPlayerState: 1
+  loadPlayerState: 0
   animator: {fileID: 1289161734}
   speed: 5
   rig: {fileID: 919132149264157071}
