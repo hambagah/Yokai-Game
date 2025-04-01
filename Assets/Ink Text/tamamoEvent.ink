@@ -13,6 +13,6 @@ It’s a shame you discovered our existence...Some of us here were actually begi
 *[Wait! Let’s talk!]
 There is nothing to talk about. Now, please die.
     ** [You have no other choice!]
-    ~ SceneEvent("The Rhythm Game Demo")
+    ~ SceneEvent("Rhythm")
     
 - -> END
