@@ -9395,7 +9395,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   score: 0
-  targetScore: 1000
+  targetScore: 1600
   scoreText: {fileID: 1268608810}
   gameOverPanel: {fileID: 1158410176}
   successPanel: {fileID: 1483581814}
