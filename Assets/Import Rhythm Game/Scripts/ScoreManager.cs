@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -5,15 +6,25 @@ using UnityEngine.UI;
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance;
-
     public int score = 0; // 当前得分
     public int targetScore = 100; // 通过关卡的最低分数
     public TextMeshProUGUI scoreText; // UI 显示分数
     public GameObject gameOverPanel; // 失败面板
     public GameObject successPanel; // 成功面板
     public AudioSource backgroundMusic; // 背景音乐
-
+    [SerializeField] AudioSource sfxAu;
+    [SerializeField] AudioClip hitClip;
+    [SerializeField] GameObject hitFX;
     private bool gameEnded = false;
+
+    public float delayTime = 5f;
+    public float offsetTime = 0f;
+
+    public float missTime => delayTime + offsetTime + level[level.Length-1];
+    public float[] level;
+    [SerializeField] int[] scores;
+
+    [SerializeField] GameInfo gameInfo;
 
     void Awake()
     {
@@ -34,54 +45,69 @@ public class ScoreManager : MonoBehaviour
         if (successPanel) successPanel.SetActive(false);
     }
 
-    public void AddScore(Tail.TailType tailType)
+    public void OnHit(NoteInfo info)
     {
-        int points = 0;
+        sfxAu.PlayOneShot(hitClip);
+       GameObject fx =  Instantiate(hitFX, info.pos, Quaternion.identity);
+        Destroy(fx, 4f);
+        int curLevel = GetScore(Mathf.Abs(delayTime - info.curTime + offsetTime));
+        score += scores[curLevel];
 
-        switch (tailType)
+        DamageNumManager.st.Create((NoteHitType)curLevel, info.pos);
+        UpdateScoreUI();
+        AddGrade(curLevel);
+    }
+    public void AddGrade(int level)
+    {
+        gameInfo.gradeCount[level]++;
+        gameInfo.gradeScore[level]+= scores[level];
+        gameInfo.totalScore += scores[level];
+    }
+
+    int GetScore(float value)
+    {
+        Debug.Log("value" + value);
+        for(int i=0; i < level.Length -1;i++)
         {
-            case Tail.TailType.Tap:
-                points = 10;
-                break;
-            case Tail.TailType.Hold:
-                points = 20;
-                break;
-            case Tail.TailType.Slide:
-                points = 30;
-                break;
+            if(value >= level[i] && value < level[i+1])
+            {
+                return i;
+            }
         }
 
-        score += points;
-        CheckGameResult();
-
-        UpdateScoreUI();
-        Debug.Log($"Scored {points} points! Total score: {score}");
+        return level.Length;
     }
 
     void UpdateScoreUI()
     {
-        if (scoreText)
-        {
-            scoreText.text = $"Score: {score}";
-        }
+        scoreText.text = $"Score: {score}";
     }
 
-    public void CheckGameResult()
+    public void EndGame()
     {
-        if (gameEnded) return;
-        if (backgroundMusic.isPlaying)
-            return;
-        gameEnded = true;
-
-        if (score >= targetScore)
-        {
-            Debug.Log("挑战成功!");
-            successPanel.SetActive(true);
-        }
-        else
-        {
-            Debug.Log("挑战失败!");
-            gameOverPanel.SetActive(true);
-        }
+        gameInfo.success = score >= targetScore;
+        UIManager.st.ShowEndPanel(gameInfo);
     }
+}
+[Serializable]
+public struct NoteInfo
+{
+    public Vector3 pos;
+    public float curTime;
+}
+
+public enum NoteHitType
+{
+    Perfect,
+    Good,
+    Bad,
+    Miss,
+}
+[Serializable]
+public struct GameInfo
+{
+    public bool success;
+    public int[] gradeCount;
+    public int[] gradeScore;
+    public int totalScore;
 }

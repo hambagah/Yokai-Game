@@ -6,17 +6,13 @@ public class BeatDetector : MonoBehaviour
     public AudioSource musicSource; // 背景音乐
     public float sensitivity = 0.5f; // 灵敏度（可调）
     public float minBeatInterval = 0.3f; // 最小鼓点间隔，防止连续误判
+    public static BeatDetector st;
 
     private List<float> detectedBeats = new List<float>();
 
     void Awake()
     {
-        if (!musicSource || !musicSource.clip)
-        {
-            Debug.LogError("音频源未设置或音频剪辑为空！");
-            return;
-        }
-
+        st = this;
         AnalyzeBeats();
     }
 

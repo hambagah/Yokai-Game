@@ -11,30 +11,27 @@ public class TailSpawner : MonoBehaviour
     private List<float> detectedBeats; // 记录鼓点时间
     private int nextTailIndex = 0;
 
+    public List<GameObject> tailList = new();
+    public float preEndTime = 3f;
     void Start()
     {
-        if (musicSource == null)
-        {
-            Debug.LogError("TailSpawner: Music Source is not assigned!");
-            return;
-        }
-
-        // 获取 `BeatDetector` 生成的节奏点数据
-        BeatDetector beatDetector = FindObjectOfType<BeatDetector>();
-        if (beatDetector != null)
-        {
-            detectedBeats = beatDetector.GetDetectedBeats();
-        }
-        
-        if (detectedBeats == null || detectedBeats.Count == 0)
-        {
-            Debug.LogError("TailSpawner: No detected beats found!");
-            return;
-        }
-
+        detectedBeats = BeatDetector.st.GetDetectedBeats();
         StartCoroutine(SpawnTailsWithMusic());
+        StartCoroutine(MusicPlay());
     }
-
+    IEnumerator MusicPlay()
+    {
+        yield return new WaitForSeconds(ScoreManager.Instance.delayTime);
+        musicSource.Play();
+        yield return new WaitForSeconds(musicSource.clip.length - preEndTime);
+        foreach(GameObject item in tailList)
+        {
+            if(item!= null)
+                Destroy(item);
+        }
+        StopAllCoroutines();
+        ScoreManager.Instance.EndGame();
+    }
     IEnumerator SpawnTailsWithMusic()
     {
         Debug.Log("TailSpawner: Starting tail generation...");
@@ -73,7 +70,7 @@ public class TailSpawner : MonoBehaviour
             rotation = Quaternion.LookRotation(Vector3.right); // 朝右
         }
 
-        Instantiate(tailPrefab, spawnPos, rotation);
+        tailList.Add(Instantiate(tailPrefab, spawnPos, rotation));
         /*
         // 计算随机位置，确保 Tail 在可触碰范围
         Vector3 spawnPosition = Camera.main.ViewportToWorldPoint(new Vector3(
@@ -101,7 +98,7 @@ public class TailSpawner : MonoBehaviour
         return center + new Vector3(
             Random.Range(-size.x / 2, size.x / 2),
             Random.Range(-size.y / 2, size.y / 2),
-            Random.Range(-size.z / 2, size.z / 2)
+            center.z
         );
     }
 
