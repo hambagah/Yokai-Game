@@ -30,11 +30,8 @@ public class PourDetector : MonoBehaviour
     public float refillTime = 0f;
 
     [Header("Audio")]
-    [Tooltip("Sound to play when pouring starts")]
-    public AudioClip pourStartSound;
-
-    [Tooltip("Sound to play when pouring ends")]
-    public AudioClip pourEndSound;
+    [Tooltip("Sound to play in a loop while pouring")]
+    public AudioClip pourLoopSound;
 
     [Tooltip("Sound to play when container is empty")]
     public AudioClip emptySound;
@@ -61,12 +58,13 @@ public class PourDetector : MonoBehaviour
     {
         // Get or add audio source component
         audioSource = GetComponent<AudioSource>();
-        if (audioSource == null && (pourStartSound != null || pourEndSound != null || emptySound != null))
+        if (audioSource == null && (pourLoopSound != null || emptySound != null))
         {
             audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
             audioSource.spatialBlend = 1.0f; // Make it 3D sound
             audioSource.volume = 0.7f;
+            audioSource.loop = true; // Set to loop for the pour sound
         }
     }
 
@@ -115,7 +113,7 @@ public class PourDetector : MonoBehaviour
             if (currentPourDuration >= maxPourTime && !isEmpty)
             {
                 isEmpty = true;
-                PlaySound(emptySound);
+                PlaySound(emptySound, false);
                 EndPour();
                 Debug.Log("Container is empty!");
             }
@@ -137,7 +135,13 @@ public class PourDetector : MonoBehaviour
         if (isEmpty) return;
 
         Debug.Log("Pouring started");
-        PlaySound(pourStartSound);
+        
+        // Start looping pour sound
+        if (audioSource != null && pourLoopSound != null)
+        {
+            audioSource.clip = pourLoopSound;
+            audioSource.Play();
+        }
 
         currentStream = CreateStream();
         if (currentStream != null)
@@ -158,7 +162,12 @@ public class PourDetector : MonoBehaviour
     private void EndPour()
     {
         Debug.Log("Pouring ended");
-        PlaySound(pourEndSound);
+        
+        // Stop the looping pour sound
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
 
         if (currentStream != null)
         {
@@ -196,12 +205,21 @@ public class PourDetector : MonoBehaviour
 
     /**
      * Plays the specified audio clip
+     * @param clip The audio clip to play
+     * @param looping Whether the clip should loop
      */
-    private void PlaySound(AudioClip clip)
+    private void PlaySound(AudioClip clip, bool looping = false)
     {
         if (audioSource != null && clip != null)
         {
+            // Stop any currently playing audio
+            audioSource.Stop();
+            
+            // Set up the audio source
             audioSource.clip = clip;
+            audioSource.loop = looping;
+            
+            // Play the sound
             audioSource.Play();
         }
     }
