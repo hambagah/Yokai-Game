@@ -5,45 +5,55 @@ using System.Collections;
 using System.Collections.Generic;
 using Leap;
 
+/// <summary>
+/// Manages the counting game where players count objects and show the answer with hand signs.
+/// This script handles the game flow, pose detection, score tracking, and UI updates.
+/// </summary>
 public class CountingGameManager : MonoBehaviour
 {
     [Header("Scene References")]
-    [SerializeField] private ObjectSpawnerManager objectSpawner;
-    [SerializeField] private HandPoseDetector handPoseDetector;
-    [SerializeField] private HandPoseScriptableObject[] numberPoses; // 0-9 poses
+    [SerializeField] private ObjectSpawnerManager objectSpawner;      // Manages spawning of countable objects
+    [SerializeField] private HandPoseDetector handPoseDetector;       // Detects hand poses from Leap Motion
+    [SerializeField] private HandPoseScriptableObject[] numberPoses;  // Array of hand poses for numbers 0-9
     
     [Header("UI Elements")]
-    [SerializeField] private TextMeshProUGUI instructionText;
-    [SerializeField] private TextMeshProUGUI roundText;
-    [SerializeField] private TextMeshProUGUI resultText;
-    [SerializeField] private GameObject resultPanel;
-    [SerializeField] private Button nextRoundButton;
-    [SerializeField] private GameObject countdownPanel;
-    [SerializeField] private TextMeshProUGUI countdownText;
+    [SerializeField] private TextMeshProUGUI instructionText;         // Shows instructions to the player
+    [SerializeField] private TextMeshProUGUI roundText;               // Shows current round info
+    [SerializeField] private TextMeshProUGUI resultText;              // Shows results after each round
+    [SerializeField] private GameObject resultPanel;                  // Panel showing results
+    [SerializeField] private Button nextRoundButton;                  // Button to proceed to next round
+    [SerializeField] private GameObject countdownPanel;               // Panel for countdown before round start
+    [SerializeField] private TextMeshProUGUI countdownText;           // Text for countdown numbers
     
     [Header("Game Settings")]
-    [SerializeField] private int totalRounds = 5;
-    [SerializeField] private float answerTimeLimit = 10f;
-    [SerializeField] private float requiredHoldTime = 2.0f;
-    [SerializeField] private Image holdProgressBar;
+    [SerializeField] private int totalRounds = 5;                     // Total number of rounds in the game
+    [SerializeField] private float answerTimeLimit = 10f;             // Time limit for player to answer
+    [SerializeField] private float requiredHoldTime = 2.0f;           // How long player must hold correct pose
+    [SerializeField] private Image holdProgressBar;                   // Visual feedback for hold progress
     
-    private int currentRound = 0;
-    private int score = 0;
-    private bool isWaitingForAnswer = false;
-    private float currentHoldTime = 0f;
-    private bool isHoldingCorrectPose = false;
-    private int expectedAnswer = 0;
-    private Coroutine timerCoroutine;
-    private GameState currentState = GameState.Idle;
+    private int currentRound = 0;                                     // Current round number
+    private int score = 0;                                            // Player's score (correct answers)
+    private bool isWaitingForAnswer = false;                          // Whether waiting for player's answer
+    private float currentHoldTime = 0f;                               // Time player has held current pose
+    private bool isHoldingCorrectPose = false;                        // Whether player is showing correct pose
+    private int expectedAnswer = 0;                                   // The correct count for this round
+    private Coroutine timerCoroutine;                                 // Reference to answer time limit coroutine
+    private GameState currentState = GameState.Idle;                  // Current state of the game
 
+    /// <summary>
+    /// Possible states of the game
+    /// </summary>
     private enum GameState
     {
-        Idle,
-        Spawning,
-        WaitingForPlayerAnswer,
-        ShowingResults
+        Idle,                       // Not currently running a round
+        Spawning,                   // Objects are being spawned
+        WaitingForPlayerAnswer,     // Waiting for player to show the correct sign
+        ShowingResults              // Displaying results of the round
     }
 
+    /// <summary>
+    /// Set up event listeners when component is enabled
+    /// </summary>
     private void OnEnable()
     {
         objectSpawner.OnSpawnFinished += HandleSpawnComplete;
@@ -54,6 +64,9 @@ public class CountingGameManager : MonoBehaviour
             nextRoundButton.onClick.AddListener(StartNextRound);
     }
 
+    /// <summary>
+    /// Clean up event listeners when component is disabled
+    /// </summary>
     private void OnDisable()
     {
         if (objectSpawner != null)
@@ -71,6 +84,9 @@ public class CountingGameManager : MonoBehaviour
             nextRoundButton.onClick.RemoveListener(StartNextRound);
     }
 
+    /// <summary>
+    /// Initialize the game and start first round
+    /// </summary>
     private void Start()
     {
         // Configure HandPoseDetector
@@ -84,6 +100,9 @@ public class CountingGameManager : MonoBehaviour
         StartGame();
     }
 
+    /// <summary>
+    /// Handle hold timer for poses in the answer phase
+    /// </summary>
     private void Update()
     {
         if (currentState == GameState.WaitingForPlayerAnswer && isHoldingCorrectPose)
@@ -102,6 +121,9 @@ public class CountingGameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Start a new game by resetting score and beginning first round
+    /// </summary>
     public void StartGame()
     {
         currentRound = 0;
@@ -110,6 +132,9 @@ public class CountingGameManager : MonoBehaviour
         StartCoroutine(StartRoundWithCountdown());
     }
 
+    /// <summary>
+    /// Start a round with a countdown animation
+    /// </summary>
     private IEnumerator StartRoundWithCountdown()
     {
         // Show countdown UI
@@ -125,6 +150,9 @@ public class CountingGameManager : MonoBehaviour
         StartRound();
     }
 
+    /// <summary>
+    /// Start a new round of the game
+    /// </summary>
     private void StartRound()
     {
         currentRound++;
@@ -144,6 +172,9 @@ public class CountingGameManager : MonoBehaviour
         isWaitingForAnswer = false;
     }
 
+    /// <summary>
+    /// Handle when all objects have been spawned
+    /// </summary>
     private void HandleSpawnComplete()
     {
         expectedAnswer = objectSpawner.GetTargetObjectCount();
@@ -164,6 +195,9 @@ public class CountingGameManager : MonoBehaviour
         timerCoroutine = StartCoroutine(AnswerTimeLimit());
     }
 
+    /// <summary>
+    /// Enforces a time limit for player to provide an answer
+    /// </summary>
     private IEnumerator AnswerTimeLimit()
     {
         yield return new WaitForSeconds(answerTimeLimit);
@@ -175,6 +209,9 @@ public class CountingGameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handle when a pose is detected by the HandPoseDetector
+    /// </summary>
     private void HandlePoseDetected()
     {
         if (currentState != GameState.WaitingForPlayerAnswer) return;
@@ -216,6 +253,9 @@ public class CountingGameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handle when a pose is lost by the HandPoseDetector
+    /// </summary>
     private void HandlePoseLost()
     {
         ResetHoldTimer();
@@ -226,6 +266,9 @@ public class CountingGameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Reset the hold timer when pose is lost or changed
+    /// </summary>
     private void ResetHoldTimer()
     {
         currentHoldTime = 0f;
@@ -236,6 +279,9 @@ public class CountingGameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Check if the player's answer is correct after holding pose
+    /// </summary>
     private void CheckAnswer()
     {
         if (currentState != GameState.WaitingForPlayerAnswer) return;
@@ -250,6 +296,11 @@ public class CountingGameManager : MonoBehaviour
         ShowResult(true, "Correct!");
     }
 
+    /// <summary>
+    /// Display result of the round to the player
+    /// </summary>
+    /// <param name="correct">Whether the answer was correct</param>
+    /// <param name="message">Message to display</param>
     private void ShowResult(bool correct, string message)
     {
         currentState = GameState.ShowingResults;
@@ -270,6 +321,9 @@ public class CountingGameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Start the next round of the game
+    /// </summary>
     public void StartNextRound()
     {
         resultPanel.SetActive(false);
@@ -277,6 +331,9 @@ public class CountingGameManager : MonoBehaviour
         StartCoroutine(StartRoundWithCountdown());
     }
 
+    /// <summary>
+    /// End the game and show final score
+    /// </summary>
     private void EndGame()
     {
         currentState = GameState.ShowingResults;
