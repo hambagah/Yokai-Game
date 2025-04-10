@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Leap;
+using System;
 
 /// <summary>
 /// Manages the counting game where players count objects and show the answer with hand signs.
@@ -11,25 +12,43 @@ using Leap;
 /// </summary>
 public class CountingGameManager : MonoBehaviour
 {
+    #region Serialized Fields
+    
     [Header("Scene References")]
     [SerializeField] private ObjectSpawnerManager objectSpawner;      // Manages spawning of countable objects
     [SerializeField] private HandPoseDetector handPoseDetector;       // Detects hand poses from Leap Motion
     [SerializeField] private HandPoseScriptableObject[] numberPoses;  // Array of hand poses for numbers 0-9
     
-    [Header("UI Elements")]
-    [SerializeField] private TextMeshProUGUI instructionText;         // Shows instructions to the player
+    [Header("UI - Text Elements")]
+    [SerializeField] private TextMeshProUGUI instructionText;         // Main instruction text
+    [SerializeField] private TextMeshProUGUI statusText;              // Text showing what sign player is holding
+    [SerializeField] private TextMeshProUGUI feedbackText;            // Text for feedback on incorrect answers
     [SerializeField] private TextMeshProUGUI roundText;               // Shows current round info
     [SerializeField] private TextMeshProUGUI resultText;              // Shows results after each round
+    
+    [Header("UI - Panels and Controls")]
     [SerializeField] private GameObject resultPanel;                  // Panel showing results
     [SerializeField] private Button nextRoundButton;                  // Button to proceed to next round
     [SerializeField] private GameObject countdownPanel;               // Panel for countdown before round start
     [SerializeField] private TextMeshProUGUI countdownText;           // Text for countdown numbers
+    [SerializeField] private GameObject feedbackPanel;                // Panel containing the feedback text
+    
+    [Header("Progress Bar Settings")]
+    [SerializeField] private Image holdProgressBar;                   // Visual feedback for hold progress
+    [SerializeField] private Color startColor = Color.red;            // Color when progress is 0
+    [SerializeField] private Color midColor = Color.yellow;           // Color when progress is 0.5
+    [SerializeField] private Color endColor = Color.green;            // Color when progress is 1.0
     
     [Header("Game Settings")]
     [SerializeField] private int totalRounds = 5;                     // Total number of rounds in the game
     [SerializeField] private int maxAttempts = 3;                     // Maximum number of attempts allowed
     [SerializeField] private float signHoldTime = 2.0f;               // Time to hold any sign before confirming it
-    [SerializeField] private Image holdProgressBar;                   // Visual feedback for hold progress
+    [SerializeField] private float feedbackDisplayTime = 2.0f;        // How long to show the feedback panel
+    [SerializeField] private float countdownInterval = 1.0f;          // Time between countdown numbers
+    
+    #endregion
+
+    #region Private Fields
     
     private int currentRound = 0;                                     // Current round number
     private int score = 0;                                            // Player's score (correct answers)
@@ -42,7 +61,21 @@ public class CountingGameManager : MonoBehaviour
     
     private int expectedAnswer = 0;                                   // The correct count for this round
     private GameState currentState = GameState.Idle;                  // Current state of the game
+    private Coroutine feedbackCoroutine;                              // Reference to feedback display coroutine
+    
+    #endregion
 
+    #region Events and Delegates
+    
+    // Add public events that other components could subscribe to
+    public event Action<int> OnRoundStarted;                          // Fired when a new round starts
+    public event Action<bool> OnRoundCompleted;                       // Fired when a round ends (success/failure)
+    public event Action<int> OnGameCompleted;                         // Fired when the game is completed with final score
+    
+    #endregion
+
+    #region Enums
+    
     /// <summary>
     /// Possible states of the game
     /// </summary>
@@ -53,15 +86,24 @@ public class CountingGameManager : MonoBehaviour
         WaitingForPlayerAnswer,     // Waiting for player to show the correct sign
         ShowingResults              // Displaying results of the round
     }
+    
+    #endregion
 
+    #region Unity Lifecycle Methods
+    
     /// <summary>
     /// Set up event listeners when component is enabled
     /// </summary>
     private void OnEnable()
     {
-        objectSpawner.OnSpawnFinished += HandleSpawnComplete;
-        handPoseDetector.OnPoseDetected.AddListener(HandlePoseDetected);
-        handPoseDetector.OnPoseLost.AddListener(HandlePoseLost);
+        if (objectSpawner != null)
+            objectSpawner.OnSpawnFinished += HandleSpawnComplete;
+            
+        if (handPoseDetector != null)
+        {
+            handPoseDetector.OnPoseDetected.AddListener(HandlePoseDetected);
+            handPoseDetector.OnPoseLost.AddListener(HandlePoseLost);
+        }
         
         if (nextRoundButton != null)
             nextRoundButton.onClick.AddListener(StartNextRound);
@@ -73,9 +115,7 @@ public class CountingGameManager : MonoBehaviour
     private void OnDisable()
     {
         if (objectSpawner != null)
-        {
             objectSpawner.OnSpawnFinished -= HandleSpawnComplete;
-        }
             
         if (handPoseDetector != null)
         {
@@ -85,6 +125,10 @@ public class CountingGameManager : MonoBehaviour
         
         if (nextRoundButton != null)
             nextRoundButton.onClick.RemoveListener(StartNextRound);
+            
+        // Clean up any active coroutines
+        if (feedbackCoroutine != null)
+            StopCoroutine(feedbackCoroutine);
     }
 
     /// <summary>
@@ -92,14 +136,7 @@ public class CountingGameManager : MonoBehaviour
     /// </summary>
     private void Start()
     {
-        // Configure HandPoseDetector
-        handPoseDetector.SetPosesToDetect(new List<HandPoseScriptableObject>(numberPoses));
-        
-        resultPanel.SetActive(false);
-        countdownPanel.SetActive(false);
-        if (holdProgressBar != null)
-            holdProgressBar.gameObject.SetActive(false);
-            
+        InitializeGame();
         StartGame();
     }
 
@@ -117,7 +154,11 @@ public class CountingGameManager : MonoBehaviour
         // Update progress bar
         if (holdProgressBar != null)
         {
-            holdProgressBar.fillAmount = currentHoldTime / signHoldTime;
+            float fillAmount = Mathf.Clamp01(currentHoldTime / signHoldTime);
+            holdProgressBar.fillAmount = fillAmount;
+            
+            // Update progress bar color based on fill amount
+            UpdateProgressBarColor(fillAmount);
         }
 
         // Check if sign has been held long enough
@@ -125,6 +166,49 @@ public class CountingGameManager : MonoBehaviour
         {
             VerifySign(lastDetectedNumber);
         }
+    }
+    
+    #endregion
+
+    #region Initialization and Game Flow
+    
+    /// <summary>
+    /// Initialize UI elements and configuration
+    /// </summary>
+    private void InitializeGame()
+    {
+        // Configure HandPoseDetector
+        if (handPoseDetector != null && numberPoses != null && numberPoses.Length > 0)
+            handPoseDetector.SetPosesToDetect(new List<HandPoseScriptableObject>(numberPoses));
+        
+        // Initialize UI elements
+        SetPanelStates(false);
+        
+        // Initialize progress bar
+        if (holdProgressBar != null)
+        {
+            holdProgressBar.gameObject.SetActive(false);
+            holdProgressBar.color = startColor;
+        }
+            
+        // Initialize text elements
+        if (statusText != null)
+            statusText.text = string.Empty;
+        if (feedbackText != null)
+            feedbackText.text = string.Empty;
+    }
+    
+    /// <summary>
+    /// Set active state of all panels at once
+    /// </summary>
+    private void SetPanelStates(bool active)
+    {
+        if (resultPanel != null)
+            resultPanel.SetActive(active);
+        if (countdownPanel != null)
+            countdownPanel.SetActive(active);
+        if (feedbackPanel != null)
+            feedbackPanel.SetActive(active);
     }
 
     /// <summary>
@@ -144,15 +228,19 @@ public class CountingGameManager : MonoBehaviour
     private IEnumerator StartRoundWithCountdown()
     {
         // Show countdown UI
-        countdownPanel.SetActive(true);
+        if (countdownPanel != null)
+            countdownPanel.SetActive(true);
         
         for (int i = 3; i > 0; i--)
         {
-            countdownText.text = i.ToString();
-            yield return new WaitForSeconds(1f);
+            if (countdownText != null)
+                countdownText.text = i.ToString();
+            yield return new WaitForSeconds(countdownInterval);
         }
         
-        countdownPanel.SetActive(false);
+        if (countdownPanel != null)
+            countdownPanel.SetActive(false);
+            
         StartRound();
     }
 
@@ -168,41 +256,85 @@ public class CountingGameManager : MonoBehaviour
             return;
         }
         
+        // Reset round state
         remainingAttempts = maxAttempts;
-        roundText.text = $"Round {currentRound}/{totalRounds}";
-        instructionText.text = "Get ready...";
         
+        // Update UI
+        if (roundText != null)
+            roundText.text = $"Round {currentRound}/{totalRounds}";
+        if (instructionText != null)
+            instructionText.text = "Get ready...";
+        if (statusText != null)
+            statusText.text = string.Empty;
+        
+        // Hide feedback panel
+        if (feedbackPanel != null)
+            feedbackPanel.SetActive(false);
+        
+        // Start spawning objects
         currentState = GameState.Spawning;
-        objectSpawner.BeginSpawning();
+        if (objectSpawner != null)
+            objectSpawner.BeginSpawning();
         
+        // Reset other state
         ResetHoldTimer();
         isWaitingForAnswer = false;
+        
+        // Trigger event
+        OnRoundStarted?.Invoke(currentRound);
     }
+    
+    /// <summary>
+    /// End the game and show final score
+    /// </summary>
+    private void EndGame()
+    {
+        currentState = GameState.ShowingResults;
+        
+        if (resultPanel != null)
+            resultPanel.SetActive(true);
+            
+        if (resultText != null)
+            resultText.text = $"Game Over!\nYour final score: {score}/{totalRounds}";
+        
+        // Update button text for restart
+        if (nextRoundButton != null && nextRoundButton.GetComponentInChildren<TextMeshProUGUI>() != null)
+            nextRoundButton.GetComponentInChildren<TextMeshProUGUI>().text = "Play Again";
+            
+        // Trigger game completed event
+        OnGameCompleted?.Invoke(score);
+    }
+    
+    #endregion
 
+    #region Event Handlers
+    
     /// <summary>
     /// Handle when all objects have been spawned
     /// </summary>
     private void HandleSpawnComplete()
     {
+        if (objectSpawner == null) return;
+        
         expectedAnswer = objectSpawner.GetTargetObjectCount();
         currentState = GameState.WaitingForPlayerAnswer;
         
-        // Wait for player's answer
-        UpdateInstructionForAttempts();
+        // Set the question text
+        if (instructionText != null)
+            instructionText.text = $"How many {objectSpawner.targetObjectName}s did you count?";
+        
+        // Set status text
+        UpdateStatusText();
+        
         isWaitingForAnswer = true;
         
         // Show hold progress bar
         if (holdProgressBar != null)
+        {
             holdProgressBar.gameObject.SetActive(true);
-    }
-
-    /// <summary>
-    /// Update the instruction text based on remaining attempts
-    /// </summary>
-    private void UpdateInstructionForAttempts()
-    {
-        instructionText.text = $"How many {objectSpawner.targetObjectName}s did you count? Show with your hand sign. " +
-                               $"(Attempts left: {remainingAttempts})";
+            holdProgressBar.color = startColor;
+            holdProgressBar.fillAmount = 0f;
+        }
     }
 
     /// <summary>
@@ -210,7 +342,8 @@ public class CountingGameManager : MonoBehaviour
     /// </summary>
     private void HandlePoseDetected()
     {
-        if (currentState != GameState.WaitingForPlayerAnswer) return;
+        if (currentState != GameState.WaitingForPlayerAnswer || handPoseDetector == null) 
+            return;
 
         HandPoseScriptableObject detectedPose = handPoseDetector.GetCurrentlyDetectedPose();
         if (detectedPose == null)
@@ -220,16 +353,7 @@ public class CountingGameManager : MonoBehaviour
         }
 
         // Find which number this pose represents
-        int detectedNumber = -1;
-        for (int i = 0; i < numberPoses.Length; i++)
-        {
-            if (detectedPose == numberPoses[i])
-            {
-                detectedNumber = i;
-                break;
-            }
-        }
-
+        int detectedNumber = GetNumberFromPose(detectedPose);
         if (detectedNumber == -1)
         {
             ResetHoldTimer();
@@ -243,15 +367,145 @@ public class CountingGameManager : MonoBehaviour
             lastDetectedNumber = detectedNumber;
             isHoldingSign = true;
             
-            // Update UI with the number being held
-            instructionText.text = $"Hold sign '{detectedNumber}' to confirm...";
+            // Update status text with the number being held
+            if (statusText != null)
+                statusText.text = $"Hold sign '{detectedNumber}' to confirm...";
         }
     }
 
     /// <summary>
+    /// Handle when a pose is lost by the HandPoseDetector
+    /// </summary>
+    private void HandlePoseLost()
+    {
+        ResetHoldTimer();
+        
+        if (currentState == GameState.WaitingForPlayerAnswer)
+        {
+            UpdateStatusText();
+        }
+    }
+
+    /// <summary>
+    /// Start the next round of the game
+    /// </summary>
+    public void StartNextRound()
+    {
+        if (resultPanel != null)
+            resultPanel.SetActive(false);
+            
+        if (objectSpawner != null)
+            objectSpawner.ClearObjects();
+            
+        StartCoroutine(StartRoundWithCountdown());
+    }
+    
+    #endregion
+
+    #region Helper Methods
+    
+    /// <summary>
+    /// Get the number associated with the detected pose
+    /// </summary>
+    private int GetNumberFromPose(HandPoseScriptableObject pose)
+    {
+        if (numberPoses == null) return -1;
+        
+        for (int i = 0; i < numberPoses.Length; i++)
+        {
+            if (pose == numberPoses[i])
+            {
+                return i;
+            }
+        }
+        
+        return -1;
+    }
+    
+    /// <summary>
+    /// Update the status text based on remaining attempts
+    /// </summary>
+    private void UpdateStatusText()
+    {
+        if (statusText != null)
+            statusText.text = $"Show the answer with your hand sign.\n(Attempts left: {remainingAttempts})";
+    }
+
+    /// <summary>
+    /// Show feedback when player makes an incorrect answer
+    /// </summary>
+    private void ShowFeedback(string message)
+    {
+        if (feedbackText == null || feedbackPanel == null) return;
+        
+        // Stop any existing feedback coroutine
+        if (feedbackCoroutine != null)
+            StopCoroutine(feedbackCoroutine);
+        
+        // Start new feedback display
+        feedbackCoroutine = StartCoroutine(ShowFeedbackCoroutine(message));
+    }
+    
+    /// <summary>
+    /// Coroutine to show feedback temporarily
+    /// </summary>
+    private IEnumerator ShowFeedbackCoroutine(string message)
+    {
+        feedbackText.text = message;
+        feedbackPanel.SetActive(true);
+        
+        yield return new WaitForSeconds(feedbackDisplayTime);
+        
+        feedbackPanel.SetActive(false);
+        feedbackCoroutine = null;
+    }
+    
+    /// <summary>
+    /// Update the progress bar color based on fill amount
+    /// </summary>
+    private void UpdateProgressBarColor(float fillAmount)
+    {
+        if (holdProgressBar == null) return;
+        
+        Color newColor;
+        
+        if (fillAmount <= 0.5f)
+        {
+            // Lerp from start color to mid color (0-0.5)
+            newColor = Color.Lerp(startColor, midColor, fillAmount * 2f);
+        }
+        else
+        {
+            // Lerp from mid color to end color (0.5-1)
+            newColor = Color.Lerp(midColor, endColor, (fillAmount - 0.5f) * 2f);
+        }
+        
+        holdProgressBar.color = newColor;
+    }
+
+    /// <summary>
+    /// Reset the hold timer when pose is lost or changed
+    /// </summary>
+    private void ResetHoldTimer()
+    {
+        currentHoldTime = 0f;
+        isHoldingSign = false;
+        lastDetectedNumber = -1;
+        
+        if (holdProgressBar != null)
+        {
+            holdProgressBar.fillAmount = 0f;
+            holdProgressBar.color = startColor;
+        }
+    }
+    
+    #endregion
+
+    #region Game Logic
+    
+    /// <summary>
     /// Verify if the held sign is correct and process the result
     /// </summary>
-    /// <param name="number">The number sign being shown</param>
     private void VerifySign(int number)
     {
         isHoldingSign = false;
@@ -276,86 +530,45 @@ public class CountingGameManager : MonoBehaviour
             else
             {
                 // Still have attempts left
-                instructionText.text = $"That's {number}, not the correct count. " +
-                                      $"Attempts left: {remainingAttempts}";
+                ShowFeedback($"That's {number}, not the correct count.\nAttempts left: {remainingAttempts}");
+                UpdateStatusText(); // Reset the status text
                 ResetHoldTimer();
             }
         }
     }
 
     /// <summary>
-    /// Handle when a pose is lost by the HandPoseDetector
-    /// </summary>
-    private void HandlePoseLost()
-    {
-        ResetHoldTimer();
-        
-        if (currentState == GameState.WaitingForPlayerAnswer)
-        {
-            UpdateInstructionForAttempts();
-        }
-    }
-
-    /// <summary>
-    /// Reset the hold timer when pose is lost or changed
-    /// </summary>
-    private void ResetHoldTimer()
-    {
-        currentHoldTime = 0f;
-        isHoldingSign = false;
-        lastDetectedNumber = -1;
-        
-        if (holdProgressBar != null)
-        {
-            holdProgressBar.fillAmount = 0f;
-        }
-    }
-
-    /// <summary>
     /// Display result of the round to the player
     /// </summary>
-    /// <param name="correct">Whether the answer was correct</param>
-    /// <param name="message">Message to display</param>
     private void ShowResult(bool correct, string message)
     {
         currentState = GameState.ShowingResults;
         
-        // Hide progress bar
+        // Hide UI elements
         if (holdProgressBar != null)
             holdProgressBar.gameObject.SetActive(false);
+        if (feedbackPanel != null)
+            feedbackPanel.SetActive(false);
             
-        resultPanel.SetActive(true);
+        // Show result
+        if (resultPanel != null)
+            resultPanel.SetActive(true);
         
-        if (correct)
+        if (resultText != null)
         {
-            resultText.text = $"Correct! There were {expectedAnswer} {objectSpawner.targetObjectName}s.";
+            if (correct)
+            {
+                resultText.text = $"Correct!\nThere were {expectedAnswer} {objectSpawner.targetObjectName}s.";
+            }
+            else
+            {
+                resultText.text = $"{message}\nThere were {expectedAnswer} {objectSpawner.targetObjectName}s.";
+            }
         }
-        else
-        {
-            resultText.text = $"{message} There were {expectedAnswer} {objectSpawner.targetObjectName}s.";
-        }
-    }
-
-    /// <summary>
-    /// Start the next round of the game
-    /// </summary>
-    public void StartNextRound()
-    {
-        resultPanel.SetActive(false);
-        objectSpawner.ClearObjects();
-        StartCoroutine(StartRoundWithCountdown());
-    }
-
-    /// <summary>
-    /// End the game and show final score
-    /// </summary>
-    private void EndGame()
-    {
-        currentState = GameState.ShowingResults;
-        resultPanel.SetActive(true);
-        resultText.text = $"Game Over!\nYour final score: {score}/{totalRounds}";
         
-        // Option to restart game
-        nextRoundButton.GetComponentInChildren<TextMeshProUGUI>().text = "Play Again";
+        // Trigger event
+        OnRoundCompleted?.Invoke(correct);
     }
-} 
+    
+    #endregion
+}
