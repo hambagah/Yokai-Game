@@ -27,17 +27,20 @@ public class CountingGameManager : MonoBehaviour
     
     [Header("Game Settings")]
     [SerializeField] private int totalRounds = 5;                     // Total number of rounds in the game
-    [SerializeField] private float answerTimeLimit = 10f;             // Time limit for player to answer
-    [SerializeField] private float requiredHoldTime = 2.0f;           // How long player must hold correct pose
+    [SerializeField] private int maxAttempts = 3;                     // Maximum number of attempts allowed
+    [SerializeField] private float signHoldTime = 2.0f;               // Time to hold any sign before confirming it
     [SerializeField] private Image holdProgressBar;                   // Visual feedback for hold progress
     
     private int currentRound = 0;                                     // Current round number
     private int score = 0;                                            // Player's score (correct answers)
+    private int remainingAttempts = 0;                                // Remaining attempts for current round
     private bool isWaitingForAnswer = false;                          // Whether waiting for player's answer
-    private float currentHoldTime = 0f;                               // Time player has held current pose
-    private bool isHoldingCorrectPose = false;                        // Whether player is showing correct pose
+    
+    private int lastDetectedNumber = -1;                              // Last number that was detected
+    private float currentHoldTime = 0f;                               // Time player has held current sign
+    private bool isHoldingSign = false;                               // Whether player is holding any sign
+    
     private int expectedAnswer = 0;                                   // The correct count for this round
-    private Coroutine timerCoroutine;                                 // Reference to answer time limit coroutine
     private GameState currentState = GameState.Idle;                  // Current state of the game
 
     /// <summary>
@@ -105,19 +108,22 @@ public class CountingGameManager : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (currentState == GameState.WaitingForPlayerAnswer && isHoldingCorrectPose)
-        {
-            currentHoldTime += Time.deltaTime;
+        if (currentState != GameState.WaitingForPlayerAnswer || !isHoldingSign)
+            return;
             
-            if (holdProgressBar != null)
-            {
-                holdProgressBar.fillAmount = currentHoldTime / requiredHoldTime;
-            }
+        // Update hold timer for any sign
+        currentHoldTime += Time.deltaTime;
+        
+        // Update progress bar
+        if (holdProgressBar != null)
+        {
+            holdProgressBar.fillAmount = currentHoldTime / signHoldTime;
+        }
 
-            if (currentHoldTime >= requiredHoldTime)
-            {
-                CheckAnswer();
-            }
+        // Check if sign has been held long enough
+        if (currentHoldTime >= signHoldTime)
+        {
+            VerifySign(lastDetectedNumber);
         }
     }
 
@@ -162,8 +168,9 @@ public class CountingGameManager : MonoBehaviour
             return;
         }
         
+        remainingAttempts = maxAttempts;
         roundText.text = $"Round {currentRound}/{totalRounds}";
-        instructionText.text = $"Watch and count the {objectSpawner.targetObjectName}s!";
+        instructionText.text = "Get ready...";
         
         currentState = GameState.Spawning;
         objectSpawner.BeginSpawning();
@@ -181,32 +188,21 @@ public class CountingGameManager : MonoBehaviour
         currentState = GameState.WaitingForPlayerAnswer;
         
         // Wait for player's answer
-        instructionText.text = $"How many {objectSpawner.targetObjectName}s did you count? Show with your hand sign.";
+        UpdateInstructionForAttempts();
         isWaitingForAnswer = true;
         
         // Show hold progress bar
         if (holdProgressBar != null)
             holdProgressBar.gameObject.SetActive(true);
-        
-        // Start timer for answer
-        if (timerCoroutine != null)
-            StopCoroutine(timerCoroutine);
-            
-        timerCoroutine = StartCoroutine(AnswerTimeLimit());
     }
 
     /// <summary>
-    /// Enforces a time limit for player to provide an answer
+    /// Update the instruction text based on remaining attempts
     /// </summary>
-    private IEnumerator AnswerTimeLimit()
+    private void UpdateInstructionForAttempts()
     {
-        yield return new WaitForSeconds(answerTimeLimit);
-        
-        if (currentState == GameState.WaitingForPlayerAnswer)
-        {
-            isWaitingForAnswer = false;
-            ShowResult(false, "Time's up!");
-        }
+        instructionText.text = $"How many {objectSpawner.targetObjectName}s did you count? Show with your hand sign. " +
+                               $"(Attempts left: {remainingAttempts})";
     }
 
     /// <summary>
@@ -240,16 +236,50 @@ public class CountingGameManager : MonoBehaviour
             return;
         }
 
-        // Check if it's the expected answer
-        if (detectedNumber == expectedAnswer)
+        // If we detect a different sign than before, reset the timer
+        if (lastDetectedNumber != detectedNumber)
         {
-            isHoldingCorrectPose = true;
-            instructionText.text = $"Hold the sign for {expectedAnswer}...";
+            ResetHoldTimer();
+            lastDetectedNumber = detectedNumber;
+            isHoldingSign = true;
+            
+            // Update UI with the number being held
+            instructionText.text = $"Hold sign '{detectedNumber}' to confirm...";
+        }
+    }
+
+    /// <summary>
+    /// Verify if the held sign is correct and process the result
+    /// </summary>
+    /// <param name="number">The number sign being shown</param>
+    private void VerifySign(int number)
+    {
+        isHoldingSign = false;
+        
+        // Check if the sign matches the expected answer
+        if (number == expectedAnswer)
+        {
+            // Correct answer
+            score++;
+            ShowResult(true, "Correct!");
         }
         else
         {
-            ResetHoldTimer();
-            instructionText.text = $"That's {detectedNumber}, not the correct count. Try again!";
+            // Incorrect answer - reduce attempts
+            remainingAttempts--;
+            
+            if (remainingAttempts <= 0)
+            {
+                // Out of attempts
+                ShowResult(false, "Out of attempts!");
+            }
+            else
+            {
+                // Still have attempts left
+                instructionText.text = $"That's {number}, not the correct count. " +
+                                      $"Attempts left: {remainingAttempts}";
+                ResetHoldTimer();
+            }
         }
     }
 
@@ -262,7 +292,7 @@ public class CountingGameManager : MonoBehaviour
         
         if (currentState == GameState.WaitingForPlayerAnswer)
         {
-            instructionText.text = $"How many {objectSpawner.targetObjectName}s did you count? Show with your hand sign.";
+            UpdateInstructionForAttempts();
         }
     }
 
@@ -272,28 +302,13 @@ public class CountingGameManager : MonoBehaviour
     private void ResetHoldTimer()
     {
         currentHoldTime = 0f;
-        isHoldingCorrectPose = false;
+        isHoldingSign = false;
+        lastDetectedNumber = -1;
+        
         if (holdProgressBar != null)
         {
             holdProgressBar.fillAmount = 0f;
         }
-    }
-
-    /// <summary>
-    /// Check if the player's answer is correct after holding pose
-    /// </summary>
-    private void CheckAnswer()
-    {
-        if (currentState != GameState.WaitingForPlayerAnswer) return;
-        
-        isWaitingForAnswer = false;
-        
-        if (timerCoroutine != null)
-            StopCoroutine(timerCoroutine);
-        
-        // Correct answer
-        score++;
-        ShowResult(true, "Correct!");
     }
 
     /// <summary>

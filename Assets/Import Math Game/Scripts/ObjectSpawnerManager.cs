@@ -22,16 +22,21 @@ public class ObjectSpawnerManager : MonoBehaviour
     public float spawnInterval = 0.5f;               // Time between spawning each object
     public Transform spawnPoint;                     // Location where objects spawn
     public float fallSpeed = 2.0f;                   // Speed at which objects fall down
-
+    
     [Header("Target Type")]
-    public string targetObjectName;                  // The name of the object players need to count (e.g., "Apple")
-    [HideInInspector] public int correctCount = 0;   // Counter for how many target objects were spawned
+    [HideInInspector] public string targetObjectName;                  // The name of the object players need to count (e.g., "Apple")
+    [HideInInspector] public int correctCount = 0;                     // Counter for how many target objects were spawned
+
+    [Header("Rotation Settings")]
+    public Vector2 rotationSpeedX = new Vector2(-90f, 90f);           // Range for X rotation speed
+    public Vector2 rotationSpeedY = new Vector2(-90f, 90f);           // Range for Y rotation speed
+    public Vector2 rotationSpeedZ = new Vector2(-45f, 45f);           // Range for Z rotation speed
 
     // Event fired when all objects have been spawned
     public delegate void SpawnComplete();
     public event SpawnComplete OnSpawnFinished;
 
-    private int spawnedCount = 0;                      // Tracks how many objects have been spawned so far
+    private int spawnedCount = 0;                                      // Tracks how many objects have been spawned so far
     private List<GameObject> spawnedObjects = new List<GameObject>();  // Keeps references to all spawned objects
 
     /// <summary>
@@ -42,9 +47,24 @@ public class ObjectSpawnerManager : MonoBehaviour
         // Clear any previous objects
         ClearObjects();
         
+        // Pick a random target object for this round
+        PickRandomTargetObject();
+        
         spawnedCount = 0;
         correctCount = 0;
         StartCoroutine(SpawnRoutine());
+    }
+
+    /// <summary>
+    /// Select a random object type to be the target for this round
+    /// </summary>
+    private void PickRandomTargetObject()
+    {
+        if (spawnableObjects.Count > 0)
+        {
+            int randomIndex = Random.Range(0, spawnableObjects.Count);
+            targetObjectName = spawnableObjects[randomIndex].objectName;
+        }
     }
 
     /// <summary>
@@ -91,6 +111,11 @@ public class ObjectSpawnerManager : MonoBehaviour
         FallingObject fallingObj = obj.AddComponent<FallingObject>();
         fallingObj.fallSpeed = fallSpeed;
         fallingObj.isTargetObject = (selected.objectName == targetObjectName);
+        fallingObj.rotationSpeed = new Vector3(
+            Random.Range(rotationSpeedX.x, rotationSpeedX.y),
+            Random.Range(rotationSpeedY.x, rotationSpeedY.y),
+            Random.Range(rotationSpeedZ.x, rotationSpeedZ.y)
+        );
     }
     
     /// <summary>
@@ -115,12 +140,13 @@ public class ObjectSpawnerManager : MonoBehaviour
 }
 
 /// <summary>
-/// Attached to spawned objects to handle their falling behavior and physics
+/// Attached to spawned objects to handle their falling behavior, physics, and rotation
 /// </summary>
 public class FallingObject : MonoBehaviour
 {
     public float fallSpeed = 2.0f;           // Speed at which the object falls
     public bool isTargetObject = false;      // Whether this is an object the player needs to count
+    public Vector3 rotationSpeed;            // Speed and direction of object rotation
     
     private Rigidbody rb;                    // Reference to the Rigidbody component
     
@@ -144,10 +170,13 @@ public class FallingObject : MonoBehaviour
     }
     
     /// <summary>
-    /// Destroy the object if it falls too far below the scene
+    /// Update the object's rotation and check if it's fallen too far
     /// </summary>
     void Update()
     {
+        // Rotate the object
+        transform.Rotate(rotationSpeed * Time.deltaTime);
+        
         // Destroy if fallen too far below
         if (transform.position.y < -10f)
         {
