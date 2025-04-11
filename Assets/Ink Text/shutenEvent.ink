@@ -1,4 +1,3 @@
-INCLUDE tamamoEvent.ink
 === shutenEvent ===
 Hello?
 Oi, you got anymore sake? I think Tamamo hid the rest of my stash again…

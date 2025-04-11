@@ -13,6 +13,12 @@ public class TimeManager : MonoBehaviour
     private int time; 
     private int day = 1;
     private int progress = 0;
+    private Color colorStart;
+    private Color colorMid;
+    private Color colorEnd;
+    public float stepMid = 0;
+    public float stepEnd = 0;
+
 
     [SerializeField] private GameObject sun, moon;
 
@@ -29,6 +35,10 @@ public class TimeManager : MonoBehaviour
             Debug.LogWarning("More than one Time Manager in scene.");
         }
         instance = this;
+        colorStart = new Color(169, 169, 169);
+        colorMid = new Color(212, 125, 85);
+        colorEnd = new Color(37, 54, 99);
+        RenderSettings.skybox.SetColor("_Tint", colorStart);
     }
 
     private void OnEnable() 
@@ -51,6 +61,7 @@ public class TimeManager : MonoBehaviour
         if (time >= 18) {
             time = 18;
         }
+
         else if (time <= 0) {
             time = 0;
         }
@@ -109,6 +120,18 @@ public class TimeManager : MonoBehaviour
         if (loadTimeState)
         {
             LoadTime();
+        }
+
+        if (Input.GetKeyUp(KeyCode.R))
+        {
+            ChangeTime(1);    
+        }
+
+        if (time > 9) {
+            RenderSettings.skybox.SetColor("_Tint", Color.Lerp(colorMid, colorEnd, time));
+        }
+        else {
+            RenderSettings.skybox.SetColor("_Tint", Color.Lerp(colorStart, colorMid, time));
         }
 
         if (sun.transform.eulerAngles.y < (time*15))
