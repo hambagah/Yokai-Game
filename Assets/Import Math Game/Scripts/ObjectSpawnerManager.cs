@@ -17,6 +17,8 @@ public class ObjectSpawnerManager : MonoBehaviour
     {
         public string objectName;   // Name identifier for the object
         public GameObject prefab;   // The prefab to spawn
+        public AudioClip spawnSound; // Sound effect for this object
+        public Vector2 pitchRange = new Vector2(0.9f, 1.1f); // Pitch range for randomization
     }
     
     #endregion
@@ -227,6 +229,22 @@ public class ObjectSpawnerManager : MonoBehaviour
         fallingObj.isTargetObject = isTarget;
         fallingObj.destroyBelowY = destroyBelowY;
         fallingObj.rotationSpeed = GenerateRandomRotation();
+        
+        // Play the spawn sound if it exists
+        if (selected.spawnSound != null)
+        {
+            // Randomize pitch within the specified range
+            float randomPitch = UnityEngine.Random.Range(selected.pitchRange.x, selected.pitchRange.y);
+            
+            // Create an AudioSource to play the sound
+            AudioSource audioSource = obj.AddComponent<AudioSource>();
+            audioSource.clip = selected.spawnSound;
+            audioSource.pitch = randomPitch;
+            audioSource.Play();
+            
+            // Optionally, destroy the AudioSource after the sound has finished playing
+            Destroy(audioSource, selected.spawnSound.length / randomPitch);
+        }
         
         // Trigger event for the newly spawned object
         OnObjectSpawned?.Invoke(obj, isTarget);
