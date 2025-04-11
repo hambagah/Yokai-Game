@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Leap;
 using System;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Manages the learning phase of the game where players learn to make hand signs for numbers.
@@ -30,6 +31,9 @@ public class SignLearningManager : MonoBehaviour
     [Header("Gesture Timing")]
     [SerializeField] private float requiredHoldTime = 2.0f;           // Time in seconds to hold the gesture
     [SerializeField] private Image holdProgressBar;                   // Visual feedback of hold progress
+    
+    [Header("Scene Settings")]
+    [SerializeField] private string sceneToLoad; // Scene name to load
     
     private int currentNumberIndex = 0;                               // Current number being learned (0-9)
     private bool isWaitingForPose = false;                            // Whether waiting for player input
@@ -206,6 +210,20 @@ public class SignLearningManager : MonoBehaviour
     {
         instructionText.text = "You're ready!";
         completionPanel.SetActive(true);
+        
+        // Start coroutine to load the counting game scene after a delay
+        StartCoroutine(LoadCountingGameSceneAfterDelay(3f));
+    }
+
+    /// <summary>
+    /// Coroutine to wait for a specified time and then load the counting game scene
+    /// </summary>
+    private IEnumerator LoadCountingGameSceneAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        
+        // Use the scene name from the serialized field
+        SceneManager.LoadScene(sceneToLoad);
     }
 
     /// <summary>
