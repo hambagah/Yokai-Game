@@ -4,7 +4,7 @@ using Leap.Unity;
 
 public class LeapEnterGestureTrigger : MonoBehaviour
 {
-    public float triggerVelocity = 1.2f; // 调整这个阈值控制敏感度
+    public float triggerVelocity = 1.2f;
     public float cooldownTime = 1.0f;
 
     private LeapProvider provider;
@@ -22,7 +22,8 @@ public class LeapEnterGestureTrigger : MonoBehaviour
         if (provider == null || Time.time - lastTriggerTime < cooldownTime) return;
 
         var frame = provider.CurrentFrame;
-        if (frame.Hands.Count == 0) {
+        if (frame.Hands.Count == 0)
+        {
             initialized = false;
             return;
         }
@@ -40,12 +41,33 @@ public class LeapEnterGestureTrigger : MonoBehaviour
         float velocityY = (currentY - previousY) / Time.deltaTime;
         previousY = currentY;
 
-        if (Mathf.Abs(velocityY) > triggerVelocity)
+        // ✅ 防止在选项阶段触发 ENTER
+        if (Mathf.Abs(velocityY) > triggerVelocity && !IsChoiceButtonsActive())
         {
-            // 模拟按下 Enter
             GameEventsManager.instance.inputEvents.SubmitPressed();
             Debug.Log("Leap ENTER gesture triggered.");
             lastTriggerTime = Time.time;
         }
+    }
+
+    /// <summary>
+    /// 检查是否有 DialogueChoices 中的按钮是激活的（Visible + Active）
+    /// </summary>
+    private bool IsChoiceButtonsActive()
+    {
+        GameObject choices = GameObject.Find("DialogueChoices");
+        if (choices == null || !choices.activeInHierarchy) return false;
+
+        foreach (Transform child in choices.transform)
+        {
+            if (child.gameObject.activeInHierarchy) return true;
+        }
+        return false;
+    }
+
+    private bool IsInDialogue()
+    {
+        GameObject dialogueCanvas = GameObject.Find("DialogueCanvas");
+        return dialogueCanvas != null && dialogueCanvas.activeInHierarchy;
     }
 }

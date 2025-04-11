@@ -996,6 +996,7 @@ GameObject:
   - component: {fileID: 223757053}
   - component: {fileID: 223757052}
   - component: {fileID: 223757051}
+  - component: {fileID: 223757054}
   m_Layer: 5
   m_Name: RestartButton
   m_TagString: Untagged
@@ -1105,6 +1106,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 223757049}
   m_CullTransparentMesh: 1
+--- !u!114 &223757054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223757049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a6f596eefa6fb54ebeca35a2b5eb861, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetButton: {fileID: 0}
+  dwellDuration: 1.5
+  cooldownTime: 1
+  allowRepeat: 0
+  progressBar: {fileID: 223757052}
+  idleColor: {r: 1, g: 1, b: 1, a: 0.2}
+  activeColor: {r: 0, g: 0.8, b: 0.2, a: 1}
+  scaleEffect: 1
+  hoverScale: 1.05
 --- !u!1 &246520497
 GameObject:
   m_ObjectHideFlags: 0
@@ -10092,6 +10114,7 @@ GameObject:
   - component: {fileID: 1546664734}
   - component: {fileID: 1546664733}
   - component: {fileID: 1546664732}
+  - component: {fileID: 1546664735}
   m_Layer: 5
   m_Name: OK Button
   m_TagString: Untagged
@@ -10201,6 +10224,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1546664730}
   m_CullTransparentMesh: 1
+--- !u!114 &1546664735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546664730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a6f596eefa6fb54ebeca35a2b5eb861, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetButton: {fileID: 0}
+  dwellDuration: 1.5
+  cooldownTime: 1
+  allowRepeat: 0
+  progressBar: {fileID: 1546664733}
+  idleColor: {r: 1, g: 1, b: 1, a: 0.2}
+  activeColor: {r: 0, g: 0.8, b: 0.2, a: 1}
+  scaleEffect: 1
+  hoverScale: 1.05
 --- !u!1 &1582259714
 GameObject:
   m_ObjectHideFlags: 0
