@@ -8762,11 +8762,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnableObjects:
   - objectName: Apple
-    prefab: {fileID: 4313634450463939794, guid: 1bbe83ea1804c7443b6748b0da09f442, type: 3}
+    prefab: {fileID: 6225472675474916906, guid: 2ecd8432b912240258cea9308e7b0244, type: 3}
     spawnSound: {fileID: 8300000, guid: 6dbafe4b8b447f841963baeb27600875, type: 3}
     pitchRange: {x: 0.9, y: 1.1}
-  - objectName: Pineapple
-    prefab: {fileID: 2267739507726984641, guid: 08f5993ebdac9cf46a4b13e808d749d7, type: 3}
+  - objectName: Sake
+    prefab: {fileID: 1767173530661582066, guid: 31ad9e057b25f4677967c8954919227c, type: 3}
     spawnSound: {fileID: 8300000, guid: 84b871d42f62ef14881418e43e2072a4, type: 3}
     pitchRange: {x: 0.9, y: 1.1}
   totalObjectsToSpawn: 10
