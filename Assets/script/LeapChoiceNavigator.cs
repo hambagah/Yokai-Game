@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Leap;
+using Leap.Unity;
 
 /// <summary>
 /// Handles navigation between dialogue choices using Leap Motion hand gestures.
@@ -24,10 +25,6 @@ public class LeapChoiceNavigator : MonoBehaviour
     void Start()
     {
         provider = FindObjectOfType<LeapProvider>();
-        if (provider == null)
-        {
-            Debug.LogWarning("No LeapProvider found in scene. Gesture navigation will not work.");
-        }
     }
 
     /// <summary>
@@ -40,7 +37,7 @@ public class LeapChoiceNavigator : MonoBehaviour
 
         var frame = provider.CurrentFrame;
         // Skip if no hands are detected
-        if (frame == null || frame.Hands.Count == 0) return;
+        if (frame.Hands.Count == 0) return;
 
         var hand = frame.Hands[0];
         float xVel = hand.PalmVelocity.x;
@@ -51,26 +48,18 @@ public class LeapChoiceNavigator : MonoBehaviour
             bool right = xVel > 0; // Determine swipe direction (right or left)
 
             // Find the current selected object and its parent container
-            if (EventSystem.current == null) return;
-            
             GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
             if (currentSelected == null) return;
 
             Transform parent = currentSelected.transform.parent;
-            if (parent == null) return;
-            
             int siblingCount = parent.childCount;
-            if (siblingCount == 0) return;
 
             // Count only active choice buttons
             int activeCount = 0;
             foreach (Transform child in parent)
             {
-                if (child != null && child.gameObject.activeInHierarchy) activeCount++;
+                if (child.gameObject.activeInHierarchy) activeCount++;
             }
-
-            // If no active choices, exit early
-            if (activeCount == 0) return;
 
             // Determine next index based on swipe direction
             if (right)
@@ -82,7 +71,7 @@ public class LeapChoiceNavigator : MonoBehaviour
             int activeIndex = 0;
             for (int i = 0; i < parent.childCount; i++)
             {
-                if (parent.GetChild(i) == null || !parent.GetChild(i).gameObject.activeInHierarchy) continue;
+                if (!parent.GetChild(i).gameObject.activeInHierarchy) continue;
 
                 if (activeIndex == currentIndex)
                 {
@@ -90,14 +79,7 @@ public class LeapChoiceNavigator : MonoBehaviour
                     EventSystem.current.SetSelectedGameObject(parent.GetChild(i).gameObject);
                     
                     // Update the dialogue system's current choice index
-                    if (GameEventsManager.instance != null && GameEventsManager.instance.dialogueEvents != null)
-                    {
-                        GameEventsManager.instance.dialogueEvents.UpdateChoiceIndex(activeIndex);
-                    }
-                    else
-                    {
-                        Debug.LogError("GameEventsManager.instance or dialogueEvents is null");
-                    }
+                    GameEventsManager.instance.dialogueEvents.UpdateChoiceIndex(activeIndex);
                     break;
                 }
                 activeIndex++;

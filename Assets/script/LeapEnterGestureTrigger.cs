@@ -1,5 +1,6 @@
 using UnityEngine;
 using Leap;
+using Leap.Unity;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -9,7 +10,6 @@ using UnityEngine.UI;
 /// </summary>
 public class LeapEnterGestureTrigger : MonoBehaviour
 {
-    [Header("Gesture Settings")]
     public float triggerVelocity = 1.2f;           // Minimum vertical velocity to trigger the action
     public float cooldownTime = 1.0f;              // Time between allowed triggers to prevent spam
 
@@ -24,10 +24,6 @@ public class LeapEnterGestureTrigger : MonoBehaviour
     void Start()
     {
         provider = FindObjectOfType<LeapProvider>();
-        if (provider == null)
-        {
-            Debug.LogWarning("No LeapProvider found in scene. Gesture detection will not work.");
-        }
     }
 
     /// <summary>
@@ -39,7 +35,7 @@ public class LeapEnterGestureTrigger : MonoBehaviour
         if (provider == null || Time.time - lastTriggerTime < cooldownTime) return;
 
         var frame = provider.CurrentFrame;
-        if (frame == null || frame.Hands.Count == 0)
+        if (frame.Hands.Count == 0)
         {
             // Reset if no hands detected
             initialized = false;
@@ -62,27 +58,15 @@ public class LeapEnterGestureTrigger : MonoBehaviour
         float velocityY = (currentY - previousY) / Time.deltaTime;
         previousY = currentY;
 
-        // Trigger submit action regardless of dialogue choice status - only for significant downward motion
-        if (velocityY < -triggerVelocity) // Changed to only trigger on downward motion
+        // Trigger submit action regardless of dialogue choice status
+        // The DialogueManager will handle the context appropriately
+        if (Mathf.Abs(velocityY) > triggerVelocity)
         {
-            // Check if GameEventsManager.instance exists before using it
-            if (GameEventsManager.instance != null)
-            {
-                if (GameEventsManager.instance.inputEvents != null)
-                {
-                    GameEventsManager.instance.inputEvents.SubmitPressed();
-                    Debug.Log("Leap ENTER gesture triggered with velocity: " + velocityY);
-                    lastTriggerTime = Time.time;
-                }
-                else
-                {
-                    Debug.LogError("InputEvents not initialized in GameEventsManager");
-                }
-            }
-            else
-            {
-                Debug.LogError("GameEventsManager.instance is null - check that a GameEventsManager exists in the scene");
-            }
+            // Always use the same event trigger - DialogueManager will handle the context
+            Debug.Log("Trigger");
+            GameEventsManager.instance.inputEvents.SubmitPressed();
+            Debug.Log("Leap ENTER gesture triggered with velocity: " + velocityY);
+            lastTriggerTime = Time.time;
         }
     }
 
