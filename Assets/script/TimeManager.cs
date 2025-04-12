@@ -10,9 +10,9 @@ public class TimeManager : MonoBehaviour
     public static TimeManager instance {get; private set;}
     [Header("Config")]
     [SerializeField] private bool loadTimeState = true;
-    private int time; 
-    private int day = 1;
-    private int progress = 0;
+    public int time; 
+    public int day = 1;
+    public int progress = 0;
     public float stepMid = 0;
     public float stepEnd = 0;
     private Color colorStart = new Color32(128, 128, 128, 128);
@@ -107,7 +107,7 @@ public class TimeManager : MonoBehaviour
             SaveTime(time, day, progress);
             player = GameObject.Find("Player").GetComponent<Player>();
             player.SavePlayer(player.transform.position);
-            SceneManager.LoadScene("Learning Scene");
+            SceneManager.LoadScene("Rhythm");
 
         if (sceneId.Equals("Spawn Shuten"))
         {
@@ -122,7 +122,7 @@ public class TimeManager : MonoBehaviour
             player = GameObject.Find("Player").GetComponent<Player>();
             player.SavePlayer(player.transform.position);
             PlayerPrefs.DeleteAll();
-            SceneManager.LoadScene("Couning Game Demo");
+            SceneManager.LoadScene("Learning Scene");
         }
     }
 
@@ -153,6 +153,16 @@ public class TimeManager : MonoBehaviour
             ChangeTime(1);    
         }
 
+        if (Input.GetKeyUp(KeyCode.P))
+        {
+            PlayerPrefs.DeleteAll();
+        }
+
+        if (Input.GetKeyUp(KeyCode.L))
+        {
+            SceneManager.LoadScene("PlayingScene Initial");
+        }
+
         if (time > 9) {
              RenderSettings.skybox.SetColor("_Tint", Color.Lerp(colorMid, colorEnd, time/9));
         }
@@ -174,14 +184,14 @@ public class TimeManager : MonoBehaviour
             //Load 5 Boxes
             //Load 3 Areas
             //Load Tengu, Fox, and Shuten
-            GameObject.Find("Day1Boxes").gameObject.SetActive(true);
-            GameObject.Find("Day1Checks").gameObject.SetActive(true);
+            GameObject.Find("Day1Boxes").transform.GetChild(0).gameObject.SetActive(true);
+            GameObject.Find("Day1Checks").transform.GetChild(0).gameObject.SetActive(true);
         }
 
         if (time >= 11 && day == 1 && progress == 1) //After the player collects 5 boxes and interacts with Tengu. 
         {
             //Destroy(GameObject.Find("Day1Boxes"));
-            GameObject.Find("Day1Tengu2").transform.GetChild(0).gameObject.SetActive(true);
+            GameObject.Find("Day1Tamamo").transform.GetChild(0).gameObject.SetActive(true);
         }
 
         if (time >= 12) //After the player interacts with Fox
@@ -201,8 +211,8 @@ public class TimeManager : MonoBehaviour
             //Instantiate Shuten
             GameObject.Find("Day1Shuten2").transform.GetChild(0).gameObject.SetActive(true);
             GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(false);
-            GameObject.Find("Bed2").gameObject.SetActive(true);
-            GameObject.Find("Bed").gameObject.SetActive(false);
+            GameObject.Find("Bed2").transform.GetChild(0).gameObject.SetActive(true);
+            GameObject.Find("Bed").transform.GetChild(0).gameObject.SetActive(false);
         }
 
         if (day == 2 && progress < 4)
@@ -212,6 +222,7 @@ public class TimeManager : MonoBehaviour
 
         if (day ==2 && progress > 3)
         {
+            GameObject.Find("Day2Tamamo").transform.GetChild(0).gameObject.SetActive(false);
             GameObject.Find("Day2Tamamo2").transform.GetChild(0).gameObject.SetActive(true);
             GameObject.Find("Day2Tanuki").transform.GetChild(0).gameObject.SetActive(true);
         }

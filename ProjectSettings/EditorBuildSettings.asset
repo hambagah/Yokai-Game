@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/PlayingScene_Initial.unity
     guid: 9e88692356f6c2742a58500e0a7a5bfb
   - enabled: 1
-    path: Assets/Scenes/PlayingScene.unity
+    path: Assets/script/PlayingScene.unity
     guid: 60f841d241a1a0840b766d948c855a72
   - enabled: 1
     path: Assets/Import Mixing Game/The Mixing Game Demo.unity

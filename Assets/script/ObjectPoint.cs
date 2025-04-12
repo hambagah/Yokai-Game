@@ -64,7 +64,7 @@ public class ObjectPoint : MonoBehaviour //Can potentially migrate to Interactab
             questIcon.SetActive(true);
             playerIsNear = true;
         }
-        if (collider.CompareTag("Player") && TimeManager.instance.ReturnTime() >= 18 && objectType == 2 && TimeManager.instance.ReturnProgress() == 1)//Bed
+        if (collider.CompareTag("Player") && TimeManager.instance.ReturnTime() >= 18 && objectType == 2 && TimeManager.instance.ReturnProgress() <= 2)//Bed
         {
             questIcon.SetActive(true);
             playerIsNear = true;
