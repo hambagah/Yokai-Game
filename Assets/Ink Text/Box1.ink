@@ -1,5 +1,5 @@
 === box1 ===
-It's a dirt box.
+It's a dirty box.
 * [You clean it up.]
     You catch some dust in your mouth.
     

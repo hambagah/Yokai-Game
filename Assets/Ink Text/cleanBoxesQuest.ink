@@ -24,8 +24,6 @@ Can you clean 5 boxes?
     ~ StartQuest("CleanBoxesQuest")
     Good.
     Come back to me when you're done.
-* [No]
-    ?
 - -> END
 
 = inProgress

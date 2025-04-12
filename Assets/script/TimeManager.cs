@@ -107,12 +107,22 @@ public class TimeManager : MonoBehaviour
             SaveTime(time, day, progress);
             player = GameObject.Find("Player").GetComponent<Player>();
             player.SavePlayer(player.transform.position);
-            SceneManager.LoadScene("Rhythm");
+            SceneManager.LoadScene("Learning Scene");
 
         if (sceneId.Equals("Spawn Shuten"))
         {
             spawnShuten = true;
             UpdateEvents();
+        }
+
+        if (sceneId.Equals("Third"))
+        {
+            progress = 5;
+            SaveTime(time, day, progress);
+            player = GameObject.Find("Player").GetComponent<Player>();
+            player.SavePlayer(player.transform.position);
+            PlayerPrefs.DeleteAll();
+            SceneManager.LoadScene("Couning Game Demo");
         }
     }
 
@@ -195,7 +205,7 @@ public class TimeManager : MonoBehaviour
             GameObject.Find("Bed").gameObject.SetActive(false);
         }
 
-        if (day == 2)
+        if (day == 2 && progress < 4)
         {
             GameObject.Find("Day2Tamamo").transform.GetChild(0).gameObject.SetActive(true);
         }
@@ -203,9 +213,10 @@ public class TimeManager : MonoBehaviour
         if (day ==2 && progress > 3)
         {
             GameObject.Find("Day2Tamamo2").transform.GetChild(0).gameObject.SetActive(true);
+            GameObject.Find("Day2Tanuki").transform.GetChild(0).gameObject.SetActive(true);
         }
 
-        if (time >= 0 && day == 3 && progress >= 3)
+        if (day == 2 && progress > 4)
         {
 
         }

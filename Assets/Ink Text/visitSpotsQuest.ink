@@ -24,9 +24,6 @@ And the Lake is in the backyard.
 Come back once you're satisfied with the view ~
 * [Ok]
     ~ StartQuest("VisitSpotsQuest")
-    Great! ~
-* [No]
-    Pardon?
 - -> END
 
 = inProgress
@@ -39,7 +36,6 @@ It's getting quite late now.
 You should go to bed.
 See you tomorrow. ~
 ~ CallFinishQuest("VisitSpotsQuest")
-//~ FinishQuest("VisitSpotsQuest")
 -> END
 
 = finished 
