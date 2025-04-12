@@ -3,28 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 //using TMPro;
 using Ink.Runtime;
-//using UnityEngine.EventSystems;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
+/// <summary>
+/// Core manager for the dialogue system.
+/// Handles the Ink story, processes dialogue flow, and manages dialogue state transitions.
+/// </summary>
 public class DialogueManager : MonoBehaviour
 {
     [Header("Ink Story")]
-    [SerializeField] private TextAsset inkJson;
+    [SerializeField] private TextAsset inkJson;           // The Ink story JSON asset
     
-    private Story story;
-
-    private int currentChoiceIndex = -1;
-
-    private bool dialoguePlaying = false;
-    private bool claimRewards = false;
-    private string id;
+    private Story story;                                  // The Ink runtime story instance
+    private int currentChoiceIndex = -1;                  // Currently selected choice
+    private bool dialoguePlaying = false;                 // Whether dialogue is currently active
+    private bool claimRewards = false;                    // Whether to claim quest rewards when dialogue ends
+    private string id;                                    // ID for quest completion
+    
+    // Ink story tags
     private const string SPEAKER_TAG = "speaker";
     private const string PORTRAIT_TAG = "portrait";
 
-    GameObject temp;
+    private GameObject temp;                             // Temporary reference to interacted object
 
-    private InkExternalFunctions inkExternalFunctions;
-    private InkDialogueVariables inkDialogueVariables;
+    private InkExternalFunctions inkExternalFunctions;   // Handles external function binding
+    private InkDialogueVariables inkDialogueVariables;   // Manages dialogue variables
 
+    /// <summary>
+    /// Initialize the Ink story and supporting systems
+    /// </summary>
     private void Awake()
     {
         story = new Story(inkJson.text);
@@ -33,11 +41,17 @@ public class DialogueManager : MonoBehaviour
         inkDialogueVariables = new InkDialogueVariables(story);
     }
 
+    /// <summary>
+    /// Clean up when component is destroyed
+    /// </summary>
     private void OnDestroy()
     {
         inkExternalFunctions.Unbind(story);
     }
 
+    /// <summary>
+    /// Subscribe to events when component is enabled
+    /// </summary>
     private void OnEnable()
     {
         GameEventsManager.instance.dialogueEvents.onEnterDialogue += EnterDialogue;
@@ -49,6 +63,9 @@ public class DialogueManager : MonoBehaviour
         GameEventsManager.instance.dialogueEvents.onCallFinishQuest += CallFinishQuest;
     }
 
+    /// <summary>
+    /// Unsubscribe from events when component is disabled
+    /// </summary>
     private void OnDisable()
     {
         GameEventsManager.instance.dialogueEvents.onEnterDialogue -= EnterDialogue;
@@ -61,6 +78,10 @@ public class DialogueManager : MonoBehaviour
         //GameEventsManager.instance.questEvents.onFinishQuest -= onFinishQuest;
     }
 
+    /// <summary>
+    /// Update quest state variables in the Ink story when quest state changes
+    /// </summary>
+    /// <param name="quest">The quest that changed state</param>
     private void QuestStateChange(Quest quest)
     {
         GameEventsManager.instance.dialogueEvents.UpdateInkDialogueVariable(
@@ -69,24 +90,42 @@ public class DialogueManager : MonoBehaviour
         );
     }
 
+    /// <summary>
+    /// Update an Ink dialogue variable
+    /// </summary>
+    /// <param name="name">Variable name</param>
+    /// <param name="value">New variable value</param>
     private void UpdateInkDialogueVariable(string name, Ink.Runtime.Object value)
     {
         inkDialogueVariables.UpdateVariableState(name, value);
     }
 
+    /// <summary>
+    /// Update the currently selected choice index
+    /// </summary>
+    /// <param name="choiceIndex">New choice index</param>
     private void UpdateChoiceIndex(int choiceIndex)
     {
         this.currentChoiceIndex = choiceIndex;
     }
 
+    /// <summary>
+    /// Set up a quest to complete when dialogue ends
+    /// </summary>
+    /// <param name="id">ID of the quest to finish</param>
     private void CallFinishQuest(string id)
     {
         claimRewards = true;
         this.id = id;
     }
 
+    /// <summary>
+    /// Process submit input during dialogue
+    /// </summary>
+    /// <param name="inputEventContext">Context of the input event</param>
     private void SubmitPressed(InputEventContext inputEventContext)
     {
+        // Only process input in dialogue context
         if (!inputEventContext.Equals(InputEventContext.DIALOGUE))
         {
             return;
@@ -95,6 +134,10 @@ public class DialogueManager : MonoBehaviour
         ContinueOrExitStory();
     }
 
+    /// <summary>
+    /// Enter dialogue mode with the specified story knot
+    /// </summary>
+    /// <param name="knotName">The Ink knot to start from</param>
     private void EnterDialogue(string knotName)
     {
         temp = null;
@@ -103,12 +146,15 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
+        // Set up dialogue state
         dialoguePlaying = true;
 
+        // Notify systems about dialogue start
         GameEventsManager.instance.dialogueEvents.DialogueStarted();
         GameEventsManager.instance.playerEvents.DisablePlayerMovement();
         GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DIALOGUE);
         
+        // Jump to the specified knot in the story
         if (!knotName.Equals(""))
         {
             story.ChoosePathString(knotName);
@@ -117,12 +163,18 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogWarning("Knot name was an empty string.");
         }
+        
+        // Sync variables with the Ink story
         inkDialogueVariables.SyncVariablesAndStartListening(story);
 
         ContinueOrExitStory();
     }
     
-    //Object's EnterDialogue will trigger events
+    /// <summary>
+    /// Enter dialogue mode with an interactive object
+    /// </summary>
+    /// <param name="knotName">The Ink knot to start from</param>
+    /// <param name="gameObject">The object being interacted with</param>
     private void ObjectDialogue(string knotName, GameObject gameObject)
     {
         temp = gameObject;
@@ -131,12 +183,15 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
+        // Set up dialogue state
         dialoguePlaying = true;
 
+        // Notify systems about dialogue start
         GameEventsManager.instance.dialogueEvents.DialogueStarted();
         GameEventsManager.instance.playerEvents.DisablePlayerMovement();
         GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DIALOGUE);
         
+        // Jump to the specified knot in the story
         if (!knotName.Equals(""))
         {
             story.ChoosePathString(knotName);
@@ -145,29 +200,42 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogWarning("Knot name was an empty string.");
         }
+        
+        // Sync variables with the Ink story
         inkDialogueVariables.SyncVariablesAndStartListening(story);
 
         //ObjectContinueOrExitStory(gameObject);
         ContinueOrExitStory();
     }
 
+    /// <summary>
+    /// Continue the story or exit if at the end
+    /// </summary>
     private void ContinueOrExitStory()
     {
+        // Process choice selection if a choice is selected
         if (story.currentChoices.Count > 0 && currentChoiceIndex != -1)
         {
+            // Don't invoke the button's onClick - it causes a circular reference
+            // and stack overflow with DialogueChoiceButton.OnButtonClicked
+            
+            // Proceed with Ink choice selection
             story.ChooseChoiceIndex(currentChoiceIndex);
             currentChoiceIndex = -1;
         }
 
+        // Continue the story if possible
         if (story.canContinue)
         {
             string dialogueLine = story.Continue();
 
+            // Skip blank lines
             while (IsLineBlank(dialogueLine) && story.canContinue)
             {
                 dialogueLine = story.Continue();
             }
 
+            // Exit if at end of content
             if (IsLineBlank(dialogueLine) && !story.canContinue)
             {
                 ExitDialogue();
@@ -175,42 +243,60 @@ public class DialogueManager : MonoBehaviour
             }
             else
             {
+                // Display the current dialogue line and choices
                 GameEventsManager.instance.dialogueEvents.DisplayDialogue(dialogueLine, story.currentChoices);
                 Debug.Log("2");
             }
         }
         else if (story.currentChoices.Count == 0)
         {
+            // No choices and can't continue means end of dialogue
             ExitDialogue();
             Debug.Log("3");
         }
     }
 
+    /// <summary>
+    /// Exit dialogue mode and clean up
+    /// </summary>
     private void ExitDialogue()
     {
+        // Handle object cleanup if interacting with an object
         if (temp != null)
         {
             ObjectPoint comp = temp.GetComponent<ObjectPoint>();
-            if (comp.objectType == 1 || comp.objectType == 3) //Boxes
+            if (comp.objectType == 1 || comp.objectType == 3) // Boxes
             {
                 comp.Cleaned();
             }
         }
 
+        // Reset dialogue state
         dialoguePlaying = false;
+        
+        // Notify systems about dialogue end
         GameEventsManager.instance.dialogueEvents.DialogueFinished();
         GameEventsManager.instance.playerEvents.EnablePlayerMovement();
         GameEventsManager.instance.inputEvents.ChangeInputEventContext(InputEventContext.DEFAULT);
+        
+        // Complete quest if needed
         if (claimRewards)
-            {
+        {
             GameEventsManager.instance.questEvents.FinishQuest(id);
             id = "";
             claimRewards = false;
         }
+        
+        // Clean up Ink story state
         inkDialogueVariables.StopListening(story);
         story.ResetState();
     }
 
+    /// <summary>
+    /// Check if a dialogue line is blank (empty or just whitespace)
+    /// </summary>
+    /// <param name="dialogueLine">Line to check</param>
+    /// <returns>True if the line is blank</returns>
     private bool IsLineBlank(string dialogueLine)
     {
         return dialogueLine.Trim().Equals("") || dialogueLine.Trim().Equals("\n");
