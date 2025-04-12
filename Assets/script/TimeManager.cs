@@ -15,9 +15,9 @@ public class TimeManager : MonoBehaviour
     private int progress = 0;
     public float stepMid = 0;
     public float stepEnd = 0;
-    private Color colorStart = new Color(128, 128, 128, 128);
-    private Color colorMid = new Color(212, 125, 85, 128);
-    private Color colorEnd = new Color(27, 15, 58, 128);
+    private Color colorStart = new Color32(128, 128, 128, 128);
+    private Color colorMid = new Color32(212, 125, 85, 128);
+    private Color colorEnd = new Color32(27, 15, 58, 128);
     [SerializeField] private Material skyboxTexture;
 
     [SerializeField] private GameObject sun, moon;
@@ -38,7 +38,7 @@ public class TimeManager : MonoBehaviour
         RenderSettings.skybox = new Material(skyboxTexture);
         colorStart = new Color32(128, 128, 128, 128);
         colorMid = new Color32(212, 125, 85, 128);
-        colorEnd = new Color32(37, 54, 99, 128);
+        colorEnd = new Color32(27, 15, 58, 128);
         RenderSettings.skybox.SetColor("_Tint", colorStart);
     }
 
