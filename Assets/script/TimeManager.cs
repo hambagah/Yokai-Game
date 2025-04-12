@@ -123,8 +123,6 @@ public class TimeManager : MonoBehaviour
             LoadTime();
         }
 
-        Debug.Log(RenderSettings.skybox.GetColor("_Tint"));
-
         if (Input.GetKeyUp(KeyCode.R))
         {
             ChangeTime(1);    

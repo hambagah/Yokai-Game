@@ -27864,6 +27864,7 @@ MonoBehaviour:
   loadTimeState: 0
   stepMid: 0
   stepEnd: 0
+  skyboxTexture: {fileID: 2100000, guid: dbdf8b2e10246a6419fdfa9cac6a5e17, type: 2}
   sun: {fileID: 685240843}
   moon: {fileID: 1924307929}
   gameState: {fileID: 1726299009}
