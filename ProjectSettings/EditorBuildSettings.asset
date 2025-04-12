@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/PlayingScene.unity
-    guid: 490700c4606819b4a9679abf8dfdc70a
+    path: Assets/PlayingScene.unity
+    guid: 24b436ad555799f428555a47a352899d
   - enabled: 1
     path: Assets/Import Mixing Game/The Mixing Game Demo.unity
     guid: 310565db97604964c908431071d1d450

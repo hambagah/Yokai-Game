@@ -144,7 +144,7 @@ using UnityEngine.InputSystem;
         SavePlayer(gameObject.transform.position);
     }
 
-    private void SavePlayer(Vector3 playerPosition)
+    public void SavePlayer(Vector3 playerPosition)
     {
         try 
         {

@@ -12,5 +12,12 @@ You haven't even pissed your pants yet! Haha
 You got two minutes, impress me.
     ** [You have no other choice!]
     ~ SceneEvent("The Mixing Game Demo")
+- -> END
+    
+=== shutenEvent2 ===
+Not bad!
+I'll let you go for now.
+Next time I'll be expecting way more though.
+Cya!
     
 - -> END

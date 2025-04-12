@@ -27,6 +27,7 @@ public class TimeManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timerText;
 
     private bool spawnShuten = false;
+    Player player;
 
     private void Awake()
     {
@@ -95,9 +96,17 @@ public class TimeManager : MonoBehaviour
     public void SceneEvent(string sceneId)
     {
         if (sceneId.Equals("The Mixing Game Demo"))
+            progress = 3;
+            SaveTime(time, day, progress);
+            player = GameObject.Find("Player").GetComponent<Player>();
+            player.SavePlayer(player.transform.position);
             SceneManager.LoadScene("The Mixing Game Demo");
 
         if (sceneId.Equals("Rhythm"))
+            progress = 4;
+            SaveTime(time, day, progress);
+            player = GameObject.Find("Player").GetComponent<Player>();
+            player.SavePlayer(player.transform.position);
             SceneManager.LoadScene("Rhythm");
 
         if (sceneId.Equals("Spawn Shuten"))
@@ -111,9 +120,12 @@ public class TimeManager : MonoBehaviour
     {
         sun = GameObject.Find("Sun");
         moon = GameObject.Find("Moon");
-        sun.transform.eulerAngles = new Vector3(0, 15, 0);
-        moon.transform.eulerAngles = new Vector3(0, -45, 0);
-        ChangeTime(0);
+        if (!loadTimeState)
+        {
+            sun.transform.eulerAngles = new Vector3(0, 15, 0);
+            moon.transform.eulerAngles = new Vector3(0, -45, 0);
+            ChangeTime(0);
+        }
     }
 
     void Update()
@@ -121,6 +133,9 @@ public class TimeManager : MonoBehaviour
         if (loadTimeState)
         {
             LoadTime();
+            sun.transform.eulerAngles = new Vector3(0, 15 + time*15, 0);
+            moon.transform.eulerAngles = new Vector3(0, -45 + time * 10, 0);
+            ChangeTime(0);
         }
 
         if (Input.GetKeyUp(KeyCode.R))
@@ -144,11 +159,13 @@ public class TimeManager : MonoBehaviour
 
     private void UpdateEvents() 
     {
-        if (time == 0 && day == 1 && progress == 1) //DAY 1
+        if (time == 0 && day == 1 && progress < 2) //DAY 1
         {
             //Load 5 Boxes
             //Load 3 Areas
             //Load Tengu, Fox, and Shuten
+            GameObject.Find("Day1Boxes").gameObject.SetActive(true);
+            GameObject.Find("Day1Checks").gameObject.SetActive(true);
         }
 
         if (time >= 11 && day == 1 && progress == 1) //After the player collects 5 boxes and interacts with Tengu. 
@@ -162,20 +179,30 @@ public class TimeManager : MonoBehaviour
             GameObject.Find("Day1Tengu1").transform.GetChild(0).gameObject.SetActive(false);
         }
 
-        if (time >= 18 && day == 1 && spawnShuten) //At night time.
+        if (time >= 18 && day == 1 && (spawnShuten || progress == 2)) //At night time.
         {
             //Instantiate Shuten
             GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(true);
+            progress = 2;
         }
 
-        if (time == 0 && day == 2)
+        if (time >= 18 && day == 1 && progress == 3) //At night time.
         {
-
+            //Instantiate Shuten
+            GameObject.Find("Day1Shuten2").transform.GetChild(0).gameObject.SetActive(true);
+            GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(false);
+            GameObject.Find("Bed2").gameObject.SetActive(true);
+            GameObject.Find("Bed").gameObject.SetActive(false);
         }
 
-        if (time >= 0 && day ==2 && progress == 2)
+        if (day == 2)
         {
+            GameObject.Find("Day2Tamamo").transform.GetChild(0).gameObject.SetActive(true);
+        }
 
+        if (day ==2 && progress > 3)
+        {
+            GameObject.Find("Day2Tamamo2").transform.GetChild(0).gameObject.SetActive(true);
         }
 
         if (time >= 0 && day == 3 && progress >= 3)

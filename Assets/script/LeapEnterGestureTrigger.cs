@@ -63,6 +63,7 @@ public class LeapEnterGestureTrigger : MonoBehaviour
         if (Mathf.Abs(velocityY) > triggerVelocity)
         {
             // Always use the same event trigger - DialogueManager will handle the context
+            Debug.Log("Trigger");
             GameEventsManager.instance.inputEvents.SubmitPressed();
             Debug.Log("Leap ENTER gesture triggered with velocity: " + velocityY);
             lastTriggerTime = Time.time;
