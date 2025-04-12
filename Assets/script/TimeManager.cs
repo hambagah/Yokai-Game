@@ -200,7 +200,7 @@ public class TimeManager : MonoBehaviour
             GameObject.Find("Day2Tamamo").transform.GetChild(0).gameObject.SetActive(true);
         }
 
-        if (day == 2 && progress > 3)
+        if (day ==2 && progress > 3)
         {
             GameObject.Find("Day2Tamamo2").transform.GetChild(0).gameObject.SetActive(true);
         }

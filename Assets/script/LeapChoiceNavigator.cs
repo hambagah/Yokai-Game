@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Leap;
-using Leap.Unity;
 
 /// <summary>
 /// Handles navigation between dialogue choices using Leap Motion hand gestures.

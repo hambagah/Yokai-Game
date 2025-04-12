@@ -1,5 +1,4 @@
 using UnityEngine;
-using Leap.Unity;
 using Leap;
 using System.Collections;
 

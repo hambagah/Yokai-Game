@@ -1,6 +1,5 @@
 using UnityEngine;
 using Leap;
-using Leap.Unity;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
