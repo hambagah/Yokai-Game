@@ -1,6 +1,7 @@
 using UnityEngine;
 using Leap.Unity;
 using Leap;
+using System.Collections;
 
 /// <summary>
 /// Translates Leap Motion hand tracking data into player movement inputs.
@@ -19,6 +20,8 @@ public class LeapMotionMovement : MonoBehaviour
     public Vector2 centerOffset = Vector2.zero;    // Correction offset for the center position
     public bool useCalibration = true;             // Whether to use the calibrated center
     public KeyCode calibrateKey = KeyCode.C;       // Key to press for calibration
+    public bool autoCalibrate = true;              // Whether to auto-calibrate on startup
+    public float autoCalibrationDelay = 1f;      // Delay before auto-calibration (seconds)
     
     [Header("Debug")]
     public bool enableDebugLogs = true;            // Toggle for debug logs
@@ -27,6 +30,7 @@ public class LeapMotionMovement : MonoBehaviour
     private LeapProvider provider;                 // Reference to the Leap Motion data provider
     private float lastLogTime = 0f;                // Timestamp for throttling logs
     private Vector3 calibrationPosition;           // Stored calibration position
+    private bool calibrationAttempted = false;     // Whether auto-calibration has been attempted
 
     /// <summary>
     /// Initializes the component by finding the Leap Motion provider.
@@ -41,7 +45,63 @@ public class LeapMotionMovement : MonoBehaviour
         else
         {
             Debug.Log("LeapMotionMovement: Successfully found LeapProvider: " + provider.name);
+            
+            // Start auto-calibration timer if enabled
+            if (autoCalibrate)
+            {
+                StartCoroutine(AutoCalibrateWithRetry());
+            }
         }
+    }
+
+    /// <summary>
+    /// Attempt auto-calibration with retry logic to ensure hands are detected
+    /// </summary>
+    private IEnumerator AutoCalibrateWithRetry()
+    {
+        yield return new WaitForSeconds(autoCalibrationDelay);
+        
+        // Try calibration for up to 5 seconds
+        float attemptTime = 0f;
+        bool calibrationSuccessful = false;
+        
+        while (attemptTime < 5.0f && !calibrationSuccessful)
+        {
+            calibrationSuccessful = AttemptCalibration();
+            
+            if (!calibrationSuccessful)
+            {
+                Debug.Log("LeapMotionMovement: Auto-calibration waiting for hands to be detected...");
+                yield return new WaitForSeconds(0.5f);
+                attemptTime += 0.5f;
+            }
+        }
+        
+        calibrationAttempted = true;
+        
+        if (!calibrationSuccessful)
+        {
+            Debug.LogWarning("LeapMotionMovement: Auto-calibration failed. Please press '" + calibrateKey + "' to manually calibrate.");
+        }
+    }
+    
+    /// <summary>
+    /// Attempt a single calibration, returning true if successful
+    /// </summary>
+    private bool AttemptCalibration()
+    {
+        if (provider == null) return false;
+        
+        var frame = provider.CurrentFrame;
+        if (frame == null || frame.Hands.Count == 0) return false;
+        
+        // If we have a hand, perform calibration
+        var hand = frame.Hands[0];
+        Vector3 palmPosition = hand.PalmPosition;
+        centerOffset = new Vector2(palmPosition.x, palmPosition.z);
+        
+        Debug.Log($"LeapMotionMovement: Auto-calibrated center position to {centerOffset}");
+        return true;
     }
 
     /// <summary>
