@@ -1,5 +1,4 @@
 using UnityEngine;
-using Leap.Unity;
 using Leap;
 using System.Collections;
 
@@ -123,6 +122,17 @@ public class LeapMotionMovement : MonoBehaviour
             if (shouldLog)
             {
                 Debug.LogWarning("LeapMotionMovement: LeapProvider is null");
+                lastLogTime = Time.time;
+            }
+            return;
+        }
+
+        // Check if player script reference exists
+        if (playerScript == null)
+        {
+            if (shouldLog)
+            {
+                Debug.LogError("LeapMotionMovement: playerScript reference is missing");
                 lastLogTime = Time.time;
             }
             return;
