@@ -9,11 +9,24 @@ using Leap;
 public class LeapMotionMovement : MonoBehaviour
 {
     public Player playerScript;                    // Reference to the player controller
+    
+    [Header("Movement Settings")]
     public float movementSpeed = 1f;               // Multiplier for movement speed
     public float deadZoneRadius = 0.05f;           // Minimum hand movement before registering input
     public float maxOffset = 0.15f;                // Maximum hand offset for full speed
+    
+    [Header("Calibration")]
+    public Vector2 centerOffset = Vector2.zero;    // Correction offset for the center position
+    public bool useCalibration = true;             // Whether to use the calibrated center
+    public KeyCode calibrateKey = KeyCode.C;       // Key to press for calibration
+    
+    [Header("Debug")]
+    public bool enableDebugLogs = true;            // Toggle for debug logs
+    public float logInterval = 1.0f;               // How often to log (seconds)
 
     private LeapProvider provider;                 // Reference to the Leap Motion data provider
+    private float lastLogTime = 0f;                // Timestamp for throttling logs
+    private Vector3 calibrationPosition;           // Stored calibration position
 
     /// <summary>
     /// Initializes the component by finding the Leap Motion provider.
@@ -21,6 +34,14 @@ public class LeapMotionMovement : MonoBehaviour
     void Start()
     {
         provider = FindObjectOfType<LeapProvider>();
+        if (provider == null)
+        {
+            Debug.LogError("LeapMotionMovement: No LeapProvider found in scene!");
+        }
+        else
+        {
+            Debug.Log("LeapMotionMovement: Successfully found LeapProvider: " + provider.name);
+        }
     }
 
     /// <summary>
@@ -28,8 +49,24 @@ public class LeapMotionMovement : MonoBehaviour
     /// </summary>
     void Update()
     {
+        // Check for calibration request
+        if (Input.GetKeyDown(calibrateKey))
+        {
+            CalibrateCenter();
+        }
+        
+        bool shouldLog = enableDebugLogs && Time.time - lastLogTime > logInterval;
+        
         // Check if provider exists
-        if (provider == null) return;
+        if (provider == null)
+        {
+            if (shouldLog)
+            {
+                Debug.LogWarning("LeapMotionMovement: LeapProvider is null");
+                lastLogTime = Time.time;
+            }
+            return;
+        }
 
         var frame = provider.CurrentFrame;
         // If no frame data or no hands detected, stop movement
@@ -37,6 +74,12 @@ public class LeapMotionMovement : MonoBehaviour
         {
             // No hand detected, stop player movement
             playerScript.SendMessage("MovePressed", Vector2.zero);
+            
+            if (shouldLog)
+            {
+                Debug.Log("LeapMotionMovement: No hands detected, sending zero movement");
+                lastLogTime = Time.time;
+            }
             return;
         }
 
@@ -45,18 +88,61 @@ public class LeapMotionMovement : MonoBehaviour
         Vector3 palmPosition = hand.PalmPosition;
 
         // Extract horizontal position (x and z axes)
-        Vector2 offset = new Vector2(palmPosition.x, palmPosition.z);
+        Vector2 rawOffset = new Vector2(palmPosition.x, palmPosition.z);
+        
+        // Apply calibration if enabled
+        Vector2 offset = useCalibration ? rawOffset - centerOffset : rawOffset;
+
+        if (shouldLog)
+        {
+            Debug.Log($"LeapMotionMovement: Hand detected - Raw palm position: {palmPosition}, " +
+                      $"Raw offset: {rawOffset}, Calibrated offset: {offset}, " +
+                      $"Center offset: {centerOffset}, Magnitude: {offset.magnitude}");
+            lastLogTime = Time.time;
+        }
 
         // Apply dead zone - if hand is close to center position, don't move
         if (offset.magnitude < deadZoneRadius)
         {
             playerScript.SendMessage("MovePressed", Vector2.zero);
+            if (shouldLog)
+            {
+                Debug.Log("LeapMotionMovement: Within dead zone, sending zero movement");
+            }
         }
         else
         {
             // Normalize movement vector based on maximum offset and apply speed
             Vector2 clamped = Vector2.ClampMagnitude(offset / maxOffset, 1.0f);
-            playerScript.SendMessage("MovePressed", clamped * movementSpeed);
+            Vector2 moveVector = clamped * movementSpeed;
+            
+            playerScript.SendMessage("MovePressed", moveVector);
+            
+            if (shouldLog)
+            {
+                Debug.Log($"LeapMotionMovement: Sending movement - Clamped: {clamped}, Final vector: {moveVector}");
+            }
         }
+    }
+    
+    /// <summary>
+    /// Calibrates the center position based on the current hand position
+    /// </summary>
+    public void CalibrateCenter()
+    {
+        if (provider == null) return;
+        
+        var frame = provider.CurrentFrame;
+        if (frame == null || frame.Hands.Count == 0)
+        {
+            Debug.LogWarning("LeapMotionMovement: Cannot calibrate - no hands detected");
+            return;
+        }
+        
+        var hand = frame.Hands[0];
+        Vector3 palmPosition = hand.PalmPosition;
+        centerOffset = new Vector2(palmPosition.x, palmPosition.z);
+        
+        Debug.Log($"LeapMotionMovement: Calibrated center position to {centerOffset}");
     }
 }
