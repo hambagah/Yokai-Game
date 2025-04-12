@@ -17,8 +17,8 @@ public class TimeManager : MonoBehaviour
     public float stepEnd = 0;
     private Color colorStart = new Color(128, 128, 128, 128);
     private Color colorMid = new Color(212, 125, 85, 128);
-    private Color colorEnd = new Color(37, 54, 99, 128);
-
+    private Color colorEnd = new Color(27, 15, 58, 128);
+    [SerializeField] private Material skyboxTexture;
 
     [SerializeField] private GameObject sun, moon;
 
@@ -35,12 +35,11 @@ public class TimeManager : MonoBehaviour
             Debug.LogWarning("More than one Time Manager in scene.");
         }
         instance = this;
-        // colorStart = new Color(169, 169, 169);
-        // colorMid = new Color(212, 125, 85);
-        // colorEnd = new Color(37, 54, 99);
-        // RenderSettings.skybox.SetColor("_Tint", colorStart);
-        // RenderSettings.skybox.SetColor("_Tint", colorStart);
-        // RenderSettings.skybox = new Material(RenderSettings.skybox);
+        RenderSettings.skybox = new Material(skyboxTexture);
+        colorStart = new Color32(128, 128, 128, 128);
+        colorMid = new Color32(212, 125, 85, 128);
+        colorEnd = new Color32(37, 54, 99, 128);
+        RenderSettings.skybox.SetColor("_Tint", colorStart);
     }
 
     private void OnEnable() 
@@ -131,18 +130,18 @@ public class TimeManager : MonoBehaviour
             ChangeTime(1);    
         }
 
-        // if (time > 9) {
-        //     RenderSettings.skybox.SetColor("_Tint", Color.Lerp(colorMid, colorEnd, time/9));
-        // }
-        // else if (time > 1) {
-        //     RenderSettings.skybox.SetColor("_Tint", Color.Lerp(colorStart, colorMid, time/9));
-        // }
+        if (time > 9) {
+             RenderSettings.skybox.SetColor("_Tint", Color.Lerp(colorMid, colorEnd, time/9));
+        }
+        else if (time > 1) {
+             RenderSettings.skybox.SetColor("_Tint", Color.Lerp(colorStart, colorMid, time/9));
+        }
 
-        // if (sun.transform.eulerAngles.y < (time*15))
-        // {
-        //     sun.transform.Rotate(Vector3.up * (2+(time*15)/sun.transform.eulerAngles.y) * Time.deltaTime);
-        //     moon.transform.Rotate(Vector3.up * (2+(time*15)/moon.transform.eulerAngles.y) * Time.deltaTime);
-        // }
+        if (sun.transform.eulerAngles.y < (time*15))
+        {
+           sun.transform.Rotate(Vector3.up * (2+(time*15)/sun.transform.eulerAngles.y) * Time.deltaTime);
+           moon.transform.Rotate(Vector3.up * (2+(time*10)/moon.transform.eulerAngles.y) * Time.deltaTime);
+        }
     }
 
     private void UpdateEvents() 
