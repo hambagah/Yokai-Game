@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: dbdf8b2e10246a6419fdfa9cac6a5e17, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -5082,7 +5082,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8650290ff4df8404f93e830403f98903, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadQuestState: 1
+  loadQuestState: 0
 --- !u!4 &444234655 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 57018627950740296, guid: e7e358565e530214c97adba8c82fedc6, type: 3}
@@ -27820,7 +27820,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88777917c7f4e3d4ba259efdf90a1f81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadTimeState: 1
+  loadTimeState: 0
   stepMid: 0
   stepEnd: 0
   sun: {fileID: 685240843}
