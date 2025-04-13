@@ -95,7 +95,7 @@ public class TimeManager : MonoBehaviour
 
     public void SceneEvent(string sceneId)
     {
-        if (sceneId.Equals("The Mixing Game Demo"))
+        if (sceneId.Equals("Mixing"))
             progress = 3;
             SaveTime(time, day, progress);
             player = GameObject.Find("Player").GetComponent<Player>();
@@ -122,7 +122,7 @@ public class TimeManager : MonoBehaviour
             player = GameObject.Find("Player").GetComponent<Player>();
             player.SavePlayer(player.transform.position);
             PlayerPrefs.DeleteAll();
-            SceneManager.LoadScene("Learning Scene");
+            SceneManager.LoadScene("Couning Scene");
         }
     }
 
@@ -188,7 +188,15 @@ public class TimeManager : MonoBehaviour
             GameObject.Find("Day1Checks").transform.GetChild(0).gameObject.SetActive(true);
         }
 
-        if (time >= 11 && day == 1 && progress == 1) //After the player collects 5 boxes and interacts with Tengu. 
+        if (time >= 0 && day >= 0 && progress >= 0)
+        {
+            GameObject.Find("Day2Tamamo").transform.GetChild(0).gameObject.SetActive(true);
+            GameObject.Find("Day2Tanuki").transform.GetChild(0).gameObject.SetActive(true);
+            GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(true);
+
+        }
+
+        /*if (time >= 11 && day == 1 && progress == 1) //After the player collects 5 boxes and interacts with Tengu. 
         {
             //Destroy(GameObject.Find("Day1Boxes"));
             GameObject.Find("Day1Tamamo").transform.GetChild(0).gameObject.SetActive(true);
@@ -230,7 +238,7 @@ public class TimeManager : MonoBehaviour
         if (day == 2 && progress > 4)
         {
 
-        }
+        }*/
     }
 
     private void UpdateText() 

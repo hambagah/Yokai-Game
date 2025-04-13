@@ -11,7 +11,7 @@ You're more amusing than the last humans inhabiting this place.
 You haven't even pissed your pants yet! Haha
 You got two minutes, impress me.
     ** [You have no other choice!]
-    ~ SceneEvent("The Mixing Game Demo")
+        ~ SceneEvent("Mixing")
 - -> END
     
 === shutenEvent2 ===
