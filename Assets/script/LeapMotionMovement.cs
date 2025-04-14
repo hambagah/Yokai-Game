@@ -2,6 +2,9 @@ using UnityEngine;
 using Leap;
 using System.Collections;
 
+/// <summary>
+/// 支持 Leap Motion + 键盘 (WASD) 混合控制的角色移动脚本
+/// </summary>
 public class LeapMotionMovement : MonoBehaviour
 {
     public Player playerScript;
@@ -20,23 +23,18 @@ public class LeapMotionMovement : MonoBehaviour
 
     [Header("Debug")]
     public bool enableDebugLogs = true;
-    public float logInterval = 1f;
+    public float logInterval = 1.0f;
 
     private LeapProvider provider;
     private float lastLogTime = 0f;
     private bool calibrationAttempted = false;
-
-    // 新增防抖动 / 悬浮移动状态修复
-    private Vector2 lastValidInput = Vector2.zero;
-    private int noHandFrameCount = 0;
-    private const int maxLostFrames = 5;
 
     void Start()
     {
         provider = FindObjectOfType<LeapProvider>();
         if (provider == null)
         {
-            Debug.LogError("LeapMotionMovement: No LeapProvider found.");
+            Debug.LogError("LeapMotionMovement: No LeapProvider found!");
             return;
         }
 
@@ -50,32 +48,41 @@ public class LeapMotionMovement : MonoBehaviour
     {
         yield return new WaitForSeconds(autoCalibrationDelay);
 
-        float timeout = 5f;
-        float elapsed = 0f;
-        while (elapsed < timeout)
-        {
-            if (AttemptCalibration())
-            {
-                calibrationAttempted = true;
-                yield break;
-            }
+        float attemptTime = 0f;
+        bool calibrationSuccessful = false;
 
-            yield return new WaitForSeconds(0.5f);
-            elapsed += 0.5f;
+        while (attemptTime < 5f && !calibrationSuccessful)
+        {
+            calibrationSuccessful = AttemptCalibration();
+
+            if (!calibrationSuccessful)
+            {
+                if (enableDebugLogs) Debug.Log("等待手部检测以完成自动校准...");
+                yield return new WaitForSeconds(0.5f);
+                attemptTime += 0.5f;
+            }
         }
 
-        Debug.LogWarning("LeapMotionMovement: Auto-calibration failed. Use 'C' to manually calibrate.");
         calibrationAttempted = true;
+
+        if (!calibrationSuccessful)
+        {
+            Debug.LogWarning("LeapMotionMovement: 自动校准失败，请按 '" + calibrateKey + "' 手动校准");
+        }
     }
 
     private bool AttemptCalibration()
     {
+        if (provider == null) return false;
+
         var frame = provider.CurrentFrame;
         if (frame == null || frame.Hands.Count == 0) return false;
 
         var hand = frame.Hands[0];
-        centerOffset = new Vector2(hand.PalmPosition.x, hand.PalmPosition.z);
-        Debug.Log("LeapMotionMovement: Auto-calibrated to " + centerOffset);
+        Vector3 palmPosition = hand.PalmPosition;
+        centerOffset = new Vector2(palmPosition.x, palmPosition.z);
+
+        Debug.Log($"LeapMotionMovement: Auto-calibrated center position to {centerOffset}");
         return true;
     }
 
@@ -86,48 +93,38 @@ public class LeapMotionMovement : MonoBehaviour
             CalibrateCenter();
         }
 
-        if (provider == null)
-        {
-            LogIfNeeded("LeapProvider is null");
-            return;
-        }
+        Vector2 moveInput = Vector2.zero;
 
-        var frame = provider.CurrentFrame;
-        if (frame == null || frame.Hands.Count == 0)
-        {
-            noHandFrameCount++;
+        var frame = provider?.CurrentFrame;
+        bool handDetected = frame != null && frame.Hands.Count > 0;
 
-            // 如果连续几帧都没有手，才真正清除输入（避免闪断）
-            if (noHandFrameCount > maxLostFrames)
+        if (handDetected)
+        {
+            var hand = frame.Hands[0];
+            Vector3 palmPosition = hand.PalmPosition;
+            Vector2 rawOffset = new Vector2(palmPosition.x, palmPosition.z);
+            Vector2 offset = useCalibration ? rawOffset - centerOffset : rawOffset;
+
+            if (enableDebugLogs && Time.time - lastLogTime > logInterval)
             {
-                playerScript.SendMessage("MovePressed", Vector2.zero);
-                lastValidInput = Vector2.zero;
-                LogIfNeeded("No hands detected - sending zero input");
+                Debug.Log($"LeapMotion: offset={offset}, center={centerOffset}");
+                lastLogTime = Time.time;
             }
-            return;
-        }
 
-        noHandFrameCount = 0;
-
-        var hand = frame.Hands[0];
-        Vector3 palmPos = hand.PalmPosition;
-        Vector2 raw = new Vector2(palmPos.x, palmPos.z);
-        Vector2 offset = useCalibration ? raw - centerOffset : raw;
-
-        if (offset.magnitude < deadZoneRadius)
-        {
-            playerScript.SendMessage("MovePressed", Vector2.zero);
-            lastValidInput = Vector2.zero;
-            LogIfNeeded("Within dead zone");
+            if (offset.magnitude > deadZoneRadius)
+            {
+                Vector2 clamped = Vector2.ClampMagnitude(offset / maxOffset, 1f);
+                moveInput = clamped * movementSpeed;
+            }
         }
         else
         {
-            Vector2 clamped = Vector2.ClampMagnitude(offset / maxOffset, 1f);
-            Vector2 move = clamped * movementSpeed;
-            playerScript.SendMessage("MovePressed", move);
-            lastValidInput = move;
-            LogIfNeeded($"Move sent: {move}");
+            float h = Input.GetAxisRaw("Horizontal");
+            float v = Input.GetAxisRaw("Vertical");
+            moveInput = new Vector2(h, v).normalized * movementSpeed;
         }
+
+        playerScript.SendMessage("MovePressed", moveInput);
     }
 
     public void CalibrateCenter()
@@ -135,21 +132,14 @@ public class LeapMotionMovement : MonoBehaviour
         var frame = provider?.CurrentFrame;
         if (frame == null || frame.Hands.Count == 0)
         {
-            Debug.LogWarning("LeapMotionMovement: Cannot calibrate - no hand found.");
+            Debug.LogWarning("LeapMotionMovement: 无法校准 - 没有检测到手");
             return;
         }
 
         var hand = frame.Hands[0];
-        centerOffset = new Vector2(hand.PalmPosition.x, hand.PalmPosition.z);
-        Debug.Log("LeapMotionMovement: Manual calibration set to " + centerOffset);
-    }
+        Vector3 palmPosition = hand.PalmPosition;
+        centerOffset = new Vector2(palmPosition.x, palmPosition.z);
 
-    private void LogIfNeeded(string message)
-    {
-        if (enableDebugLogs && Time.time - lastLogTime > logInterval)
-        {
-            Debug.Log("LeapMotionMovement: " + message);
-            lastLogTime = Time.time;
-        }
+        Debug.Log($"LeapMotionMovement: Calibrated center position to {centerOffset}");
     }
 }
