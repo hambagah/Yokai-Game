@@ -5553,7 +5553,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8650290ff4df8404f93e830403f98903, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadQuestState: 1
+  loadQuestState: 0
 --- !u!4 &444234655 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 57018627950740296, guid: e7e358565e530214c97adba8c82fedc6, type: 3}
@@ -24542,7 +24542,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2117824bc333683419143fcda19fe3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadPlayerState: 1
+  loadPlayerState: 0
   animator: {fileID: 1289161734}
   speed: 5
   rig: {fileID: 1076898508}
@@ -29989,7 +29989,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88777917c7f4e3d4ba259efdf90a1f81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadTimeState: 1
+  loadTimeState: 0
   time: 0
   day: 1
   progress: 0

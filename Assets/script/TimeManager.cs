@@ -95,19 +95,24 @@ public class TimeManager : MonoBehaviour
 
     public void SceneEvent(string sceneId)
     {
+        Debug.Log(sceneId);
         if (sceneId.Equals("Mixing"))
+        {
             progress = 3;
             SaveTime(time, day, progress);
             player = GameObject.Find("Player").GetComponent<Player>();
             player.SavePlayer(player.transform.position);
             SceneManager.LoadScene("The Mixing Game Demo");
+        }
 
-        if (sceneId.Equals("Rhythm"))
+        if (sceneId.Equals("Rhythm")) 
+        {
             progress = 4;
             SaveTime(time, day, progress);
             player = GameObject.Find("Player").GetComponent<Player>();
             player.SavePlayer(player.transform.position);
             SceneManager.LoadScene("Rhythm");
+        }
 
         if (sceneId.Equals("Spawn Shuten"))
         {
@@ -188,15 +193,15 @@ public class TimeManager : MonoBehaviour
             GameObject.Find("Day1Checks").transform.GetChild(0).gameObject.SetActive(true);
         }
 
-        if (time >= 0 && day >= 0 && progress >= 0)
-        {
-            GameObject.Find("Day2Tamamo").transform.GetChild(0).gameObject.SetActive(true);
-            GameObject.Find("Day2Tanuki").transform.GetChild(0).gameObject.SetActive(true);
-            GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(true);
+        // if (time >= 0 && day >= 0 && progress >= 0)
+        // {
+        //     GameObject.Find("Day2Tamamo").transform.GetChild(0).gameObject.SetActive(true);
+        //     GameObject.Find("Day2Tanuki").transform.GetChild(0).gameObject.SetActive(true);
+        //     GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(true);
 
-        }
+        // }
 
-        /*if (time >= 11 && day == 1 && progress == 1) //After the player collects 5 boxes and interacts with Tengu. 
+        if (time >= 11 && day == 1 && progress == 1) //After the player collects 5 boxes and interacts with Tengu. 
         {
             //Destroy(GameObject.Find("Day1Boxes"));
             GameObject.Find("Day1Tamamo").transform.GetChild(0).gameObject.SetActive(true);
@@ -219,8 +224,8 @@ public class TimeManager : MonoBehaviour
             //Instantiate Shuten
             GameObject.Find("Day1Shuten2").transform.GetChild(0).gameObject.SetActive(true);
             GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(false);
-            GameObject.Find("Bed2").transform.GetChild(0).gameObject.SetActive(true);
             GameObject.Find("Bed").transform.GetChild(0).gameObject.SetActive(false);
+            GameObject.Find("Bed2").transform.GetChild(0).gameObject.SetActive(true);
         }
 
         if (day == 2 && progress < 4)
@@ -228,7 +233,7 @@ public class TimeManager : MonoBehaviour
             GameObject.Find("Day2Tamamo").transform.GetChild(0).gameObject.SetActive(true);
         }
 
-        if (day ==2 && progress > 3)
+        if (day == 2 && progress > 3)
         {
             GameObject.Find("Day2Tamamo").transform.GetChild(0).gameObject.SetActive(false);
             GameObject.Find("Day2Tamamo2").transform.GetChild(0).gameObject.SetActive(true);
@@ -238,7 +243,7 @@ public class TimeManager : MonoBehaviour
         if (day == 2 && progress > 4)
         {
 
-        }*/
+        }
     }
 
     private void UpdateText() 
@@ -257,6 +262,11 @@ public class TimeManager : MonoBehaviour
     public int ReturnProgress()
     {
         return progress;
+    }
+
+    public int ReturnDay()
+    {
+        return day;
     }
 
     private void OnApplicationQuit()

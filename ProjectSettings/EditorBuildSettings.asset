@@ -11,19 +11,19 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/PlayingScene_Initial.unity
     guid: 9e88692356f6c2742a58500e0a7a5bfb
-  - enabled: 0
-    path: Assets/script/PlayingScene.unity
-    guid: 60f841d241a1a0840b766d948c855a72
+  - enabled: 1
+    path: Assets/Scenes/PlayingScene.unity
+    guid: 602fcaf850ed24525b6db19d431fc95f
   - enabled: 1
     path: Assets/Import Mixing Game/The Mixing Game Demo.unity
     guid: 310565db97604964c908431071d1d450
-  - enabled: 0
+  - enabled: 1
     path: Assets/Import Rhythm Game/Rhythm.unity
     guid: fcad51d246a764040858986a118d565b
-  - enabled: 0
+  - enabled: 1
     path: Assets/Import Math Game/Learning Scene.unity
     guid: cc662f59aed3c774d9b5fb8e635788f3
-  - enabled: 0
+  - enabled: 1
     path: Assets/Import Math Game/Couning Game Demo.unity
     guid: 06bd850478c0bdc4bab9a3343e88f4e6
   m_configObjects:
