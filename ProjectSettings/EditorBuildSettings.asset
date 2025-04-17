@@ -26,6 +26,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Import Math Game/Couning Game Demo.unity
     guid: 06bd850478c0bdc4bab9a3343e88f4e6
+  - enabled: 0
+    path: Assets/Scenes/PlayingSceneStart.unity
+    guid: 81c83a988a1f38c4b99298c5bcff1448
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 0325d9722b6ded946b53740487dd8fe5, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: c6b07b85c2453ce4eb76bebe432926a4, type: 2}
