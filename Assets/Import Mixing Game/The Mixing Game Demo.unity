@@ -8113,6 +8113,7 @@ GameObject:
   - component: {fileID: 868778767}
   - component: {fileID: 868778766}
   - component: {fileID: 868778769}
+  - component: {fileID: 868778770}
   m_Layer: 5
   m_Name: UI Canva
   m_TagString: Untagged
@@ -8211,6 +8212,21 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &868778770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 868778764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b0097f3aa83a7e4c8f40aa06baf966e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoFixIssues: 1
+  checkAllCanvases: 1
+  checkOnStart: 1
 --- !u!1001 &924519849
 PrefabInstance:
   m_ObjectHideFlags: 0
