@@ -14,7 +14,7 @@ public class EventSystemManager : MonoBehaviour
     public bool dontDestroyOnLoad = true;
     
     [Tooltip("Whether to create an EventSystem if none exists in the scene")]
-    public bool createIfMissing = true;
+    public bool createIfMissing = false;
     
     // Static reference to maintain singleton pattern
     private static EventSystemManager instance;
@@ -39,47 +39,58 @@ public class EventSystemManager : MonoBehaviour
             return;
         }
         
-        // Check for and manage EventSystems
-        EnsureActiveEventSystem();
+        // Check for and remove duplicate EventSystems
+        CheckForDuplicateEventSystems();
     }
     
     private void OnEnable()
     {
-        // Check for EventSystem whenever this object is enabled
-        EnsureActiveEventSystem();
+        // Check for duplicates whenever this object is enabled
+        CheckForDuplicateEventSystems();
+    }
+    
+    private void Start()
+    {
+        // Additional check for duplicates on Start
+        CheckForDuplicateEventSystems();
     }
     
     /**
-     * Ensures there is exactly one active EventSystem in the scene
+     * Checks for duplicate EventSystem components in the scene and removes them
      */
-    public void EnsureActiveEventSystem()
+    public void CheckForDuplicateEventSystems()
     {
         // Find all EventSystems in the scene
-        EventSystem[] eventSystems = FindObjectsOfType<EventSystem>(true); // Include inactive objects
+        EventSystem[] eventSystems = FindObjectsOfType<EventSystem>();
         
-        if (eventSystems.Length > 0)
+        // Log if multiple systems are found
+        if (eventSystems.Length > 1)
         {
-            // Make sure the first one is active
-            if (!eventSystems[0].gameObject.activeInHierarchy)
-            {
-                Debug.Log("Activating the first EventSystem found in the scene");
-                eventSystems[0].gameObject.SetActive(true);
-            }
+            Debug.LogWarning($"Found {eventSystems.Length} EventSystems in the scene. Keeping only one.");
             
-            // Log if multiple systems are found
-            if (eventSystems.Length > 1)
+            // Keep the first one, disable the rest
+            for (int i = 1; i < eventSystems.Length; i++)
             {
-                Debug.LogWarning($"Found {eventSystems.Length} EventSystems in the scene. Keeping only the first one active.");
+                EventSystem duplicate = eventSystems[i];
                 
-                // Keep the first one active, disable the rest
-                for (int i = 1; i < eventSystems.Length; i++)
+                // Keep our own EventSystem if it's part of our GameObject
+                if (duplicate.gameObject == this.gameObject)
                 {
-                    eventSystems[i].gameObject.SetActive(false);
+                    // Disable the other one instead
+                    eventSystems[0].gameObject.SetActive(false);
+                    Debug.Log($"Disabled EventSystem on {eventSystems[0].gameObject.name}");
+                    break;
+                }
+                else
+                {
+                    // Disable the duplicate
+                    duplicate.gameObject.SetActive(false);
+                    Debug.Log($"Disabled EventSystem on {duplicate.gameObject.name}");
                 }
             }
         }
         // If no EventSystem exists and createIfMissing is true, create one
-        else if (createIfMissing)
+        else if (eventSystems.Length == 0 && createIfMissing)
         {
             CreateEventSystem();
         }
@@ -101,14 +112,14 @@ public class EventSystemManager : MonoBehaviour
     }
     
     /**
-     * Static method to ensure there is exactly one active EventSystem
+     * Static method to ensure only one EventSystem exists
      * Can be called from other scripts if needed
      */
     public static void EnsureSingleEventSystem()
     {
         if (instance != null)
         {
-            instance.EnsureActiveEventSystem();
+            instance.CheckForDuplicateEventSystems();
         }
         else
         {
@@ -116,7 +127,9 @@ public class EventSystemManager : MonoBehaviour
             GameObject tempManager = new GameObject("Temporary Event System Manager");
             EventSystemManager manager = tempManager.AddComponent<EventSystemManager>();
             manager.createIfMissing = true;
-            manager.EnsureActiveEventSystem();
+            manager.CheckForDuplicateEventSystems();
+            
+            // The manager will clean itself up if another instance already exists
         }
     }
 } 

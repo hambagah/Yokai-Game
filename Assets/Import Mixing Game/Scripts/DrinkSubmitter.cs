@@ -7,7 +7,6 @@
  */
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class DrinkSubmitter : MonoBehaviour
 {
@@ -35,9 +34,6 @@ public class DrinkSubmitter : MonoBehaviour
      */
     private void Start()
     {
-        // Ensure we have an active EventSystem
-        EnsureEventSystem();
-        
         if (timer != null)
         {
             timer.onTimerEnd.AddListener(AutoSubmitDrink);
@@ -57,58 +53,6 @@ public class DrinkSubmitter : MonoBehaviour
         {
             // Hide the submit button at the start of the game
             submitButton.gameObject.SetActive(false);
-            // Make sure the canvas is enabled and configured for input
-            EnsureCanvasIsConfigured(submitButton.gameObject);
-        }
-    }
-
-    /**
-     * Makes sure there's an active EventSystem
-     */
-    private void EnsureEventSystem()
-    {
-        EventSystem[] systems = FindObjectsOfType<EventSystem>(true);
-        if (systems.Length == 0)
-        {
-            Debug.LogWarning("No EventSystem found in scene! Creating one...");
-            GameObject eventSystem = new GameObject("EventSystem");
-            eventSystem.AddComponent<EventSystem>();
-            eventSystem.AddComponent<StandaloneInputModule>();
-        }
-        else if (!systems[0].gameObject.activeInHierarchy)
-        {
-            Debug.LogWarning("EventSystem found but inactive, activating it");
-            systems[0].gameObject.SetActive(true);
-        }
-    }
-
-    /**
-     * Ensures the UI Canvas is properly configured for input
-     */
-    private void EnsureCanvasIsConfigured(GameObject buttonObject)
-    {
-        Canvas canvas = buttonObject.GetComponentInParent<Canvas>();
-        if (canvas != null)
-        {
-            // Make sure the canvas has a GraphicRaycaster
-            if (canvas.GetComponent<GraphicRaycaster>() == null)
-            {
-                Debug.LogWarning("Canvas missing GraphicRaycaster, adding one");
-                canvas.gameObject.AddComponent<GraphicRaycaster>();
-            }
-            
-            if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
-            {
-                Debug.Log("Canvas is using ScreenSpaceOverlay mode, this should work for UI interactions");
-            }
-            else
-            {
-                Debug.LogWarning("Canvas is not using ScreenSpaceOverlay mode, this might cause input issues");
-            }
-        }
-        else
-        {
-            Debug.LogError("Submit button is not under a Canvas hierarchy!");
         }
     }
 
@@ -153,27 +97,8 @@ public class DrinkSubmitter : MonoBehaviour
                   $"Drink complete={isDrinkComplete}");
 
         // Only show the button when the drink is complete
-        if (isDrinkComplete)
-        {
-            if (!submitButton.gameObject.activeSelf)
-            {
-                Debug.Log("Activating submit button - drink is complete!");
-                submitButton.gameObject.SetActive(true);
-            }
-            if (!submitButton.interactable)
-            {
-                Debug.Log("Making submit button interactable");
-                submitButton.interactable = true;
-            }
-        }
-        else
-        {
-            if (submitButton.gameObject.activeSelf)
-            {
-                Debug.Log("Deactivating submit button - drink not complete");
-                submitButton.gameObject.SetActive(false);
-            }
-        }
+        submitButton.gameObject.SetActive(isDrinkComplete);
+        submitButton.interactable = isDrinkComplete;
     }
 
     /**
@@ -195,24 +120,13 @@ public class DrinkSubmitter : MonoBehaviour
      */
     public void SubmitDrink()
     {
-        Debug.Log("SubmitDrink method called");
-        
-        if (isSubmitted)
-        {
-            Debug.Log("Drink already submitted, ignoring");
-            return; // Prevent multiple submissions
-        }
-        
+        if (isSubmitted) return; // Prevent multiple submissions
         isSubmitted = true;
+
         Debug.Log("Drink submitted!");
-        
         if (demoWinCheck != null)
         {
             demoWinCheck.CheckWinCondition();
-        }
-        else
-        {
-            Debug.LogError("demoWinCheck is null!");
         }
 
         // Disable the submit button after submission
