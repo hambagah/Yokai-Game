@@ -135,33 +135,7 @@ public class TimeManager : MonoBehaviour
     {
         sun = GameObject.Find("Sun");
         moon = GameObject.Find("Moon");
-        
-        // Check if we need to force load the time state from a minigame return
-        if (PlayerPrefs.HasKey("ForceLoadTimeState") && PlayerPrefs.GetInt("ForceLoadTimeState") == 1)
-        {
-            // Force loading of saved state
-            LoadTime();
-            // Update sun and moon positions based on loaded time
-            sun.transform.eulerAngles = new Vector3(0, 15 + time*15, 0);
-            moon.transform.eulerAngles = new Vector3(0, -45 + time * 10, 0);
-            
-            // Make sure GameState is updated as well
-            if (gameState != null)
-            {
-                gameState.day = day;
-                gameState.progress = progress;
-                Debug.Log("Start(): Updated GameState with day: " + day + ", progress: " + progress);
-            }
-            
-            // Call update events to set up scene based on day and progress
-            UpdateEvents();
-            // Clear the force load flag
-            PlayerPrefs.DeleteKey("ForceLoadTimeState");
-            // Make sure loadTimeState is false to prevent double loading
-            loadTimeState = false;
-            Debug.Log("Forced loading time state from PlayerPrefs");
-        }
-        else if (!loadTimeState)
+        if (!loadTimeState)
         {
             sun.transform.eulerAngles = new Vector3(0, 15, 0);
             moon.transform.eulerAngles = new Vector3(0, -45, 0);
@@ -318,31 +292,18 @@ public class TimeManager : MonoBehaviour
     {
         try 
         {
-            int savedTime = PlayerPrefs.GetInt("Time");
-            int savedDay = PlayerPrefs.GetInt("Day");
-            int savedProgress = PlayerPrefs.GetInt("Progress");
+            int savedTime = PlayerPrefs.GetInt ("Time");
+            int savedDay = PlayerPrefs.GetInt ("Day");
+            int savedProgress = PlayerPrefs.GetInt ("Progress");
             time = savedTime;
             day = savedDay;
             progress = savedProgress;
-            
-            // Update the GameState component if it exists
-            if (gameState != null)
-            {
-                gameState.day = savedDay;
-                gameState.progress = savedProgress;
-                Debug.Log("Updated GameState with day: " + savedDay + ", progress: " + savedProgress);
-            }
-            else
-            {
-                Debug.LogWarning("GameState reference is null in TimeManager. Cannot update GameState values.");
-            }
-            
             loadTimeState = false;
             Debug.Log("Loaded Time: " + savedTime + " Loaded Day: " + savedDay + " Loaded Progress: " + savedProgress);
         }
         catch (System.Exception e)
         {
-            Debug.LogError("Time failed to load: " + e.Message);
+            Debug.LogError("Time failed");
         }
     }
 }

@@ -25,16 +25,13 @@ public class CountingGameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI feedbackText;            // Text for feedback on incorrect answers
     [SerializeField] private TextMeshProUGUI roundText;               // Shows current round info
     [SerializeField] private TextMeshProUGUI resultText;              // Shows results after each round
-    [SerializeField] private TextMeshProUGUI finalResultText;         // Shows final results at the end of the game
 
     [Header("UI - Panels and Controls")]
     [SerializeField] private GameObject resultPanel;                  // Panel showing results
     [SerializeField] private Button nextRoundButton;                  // Button to proceed to next round
-    [SerializeField] private Button returnToMainGameButton;           // Button to return to main game after completing all rounds
     [SerializeField] private GameObject countdownPanel;               // Panel for countdown before round start
     [SerializeField] private TextMeshProUGUI countdownText;           // Text for countdown numbers
     [SerializeField] private GameObject feedbackPanel;                // Panel containing the feedback text
-    [SerializeField] private GameObject finalResultPanel;             // Panel for displaying the final results
 
     [Header("Progress Bar Settings")]
     [SerializeField] private Image holdProgressBar;                   // Visual feedback for hold progress
@@ -55,9 +52,6 @@ public class CountingGameManager : MonoBehaviour
     [Header("Audio Manager")]
     [SerializeField] private CountingGameAudioManager audioManager;   // Manages game audio
 
-    [Header("Scene Transition")]
-    [SerializeField] private SceneLoader sceneLoader;                 // Reference to the SceneLoader for returning to main game
-
     #endregion
 
     #region Private Fields
@@ -74,7 +68,6 @@ public class CountingGameManager : MonoBehaviour
     private int expectedAnswer = 0;                                   // The correct count for this round
     private GameState currentState = GameState.Idle;                  // Current state of the game
     private Coroutine feedbackCoroutine;                              // Reference to feedback display coroutine
-    private bool isGameFinished = false;                              // Whether the game is finished
 
     #endregion
 
@@ -97,8 +90,7 @@ public class CountingGameManager : MonoBehaviour
         Idle,                       // Not currently running a round
         Spawning,                   // Objects are being spawned
         WaitingForPlayerAnswer,     // Waiting for player to show the correct sign
-        ShowingResults,             // Displaying results of the round
-        GameOver                    // Game has ended, showing final results
+        ShowingResults              // Displaying results of the round
     }
 
     #endregion
@@ -121,9 +113,6 @@ public class CountingGameManager : MonoBehaviour
 
         if (nextRoundButton != null)
             nextRoundButton.onClick.AddListener(StartNextRound);
-
-        if (returnToMainGameButton != null)
-            returnToMainGameButton.onClick.AddListener(ReturnToMainGame);
     }
 
     /// <summary>
@@ -142,9 +131,6 @@ public class CountingGameManager : MonoBehaviour
 
         if (nextRoundButton != null)
             nextRoundButton.onClick.RemoveListener(StartNextRound);
-
-        if (returnToMainGameButton != null)
-            returnToMainGameButton.onClick.RemoveListener(ReturnToMainGame);
 
         // Clean up any active coroutines
         if (feedbackCoroutine != null)
@@ -204,14 +190,6 @@ public class CountingGameManager : MonoBehaviour
         // Initialize UI elements
         SetPanelStates(false);
 
-        // Make sure return button is disabled at the start
-        if (returnToMainGameButton != null)
-            returnToMainGameButton.gameObject.SetActive(false);
-
-        // Initialize final result panel
-        if (finalResultPanel != null)
-            finalResultPanel.SetActive(false);
-
         // Initialize progress bar
         if (holdProgressBar != null)
         {
@@ -224,8 +202,6 @@ public class CountingGameManager : MonoBehaviour
             statusText.text = string.Empty;
         if (feedbackText != null)
             feedbackText.text = string.Empty;
-
-        isGameFinished = false;
     }
 
     /// <summary>
@@ -239,8 +215,6 @@ public class CountingGameManager : MonoBehaviour
             countdownPanel.SetActive(active);
         if (feedbackPanel != null)
             feedbackPanel.SetActive(active);
-        if (finalResultPanel != null)
-            finalResultPanel.SetActive(active);
     }
 
     /// <summary>
@@ -251,7 +225,6 @@ public class CountingGameManager : MonoBehaviour
         currentRound = 0;
         score = 0;
         currentState = GameState.Idle;
-        isGameFinished = false;
         StartCoroutine(StartRoundWithCountdown());
     }
 
@@ -288,6 +261,8 @@ public class CountingGameManager : MonoBehaviour
 
         StartRound();
     }
+
+
 
     /// <summary>
     /// Start a new round of the game
@@ -336,51 +311,20 @@ public class CountingGameManager : MonoBehaviour
     /// </summary>
     private void EndGame()
     {
-        currentState = GameState.GameOver;
-        isGameFinished = true;
+        currentState = GameState.ShowingResults;
 
-        // Set up the final result display
-        if (finalResultPanel != null)
-        {
-            finalResultPanel.SetActive(true);
-            if (resultPanel != null)
-                resultPanel.SetActive(false);
-        }
-        else if (resultPanel != null) // Fall back to resultPanel if finalResultPanel doesn't exist
+        if (resultPanel != null)
             resultPanel.SetActive(true);
 
-        // Show final result text
-        if (finalResultText != null)
-            finalResultText.text = $"Game Over!\nYour final score: {score}/{totalRounds}";
-        else if (resultText != null) // Fall back to resultText if finalResultText doesn't exist
+        if (resultText != null)
             resultText.text = $"Game Over!\nYour final score: {score}/{totalRounds}";
 
-        // Hide the next round button and show the return button
-        if (nextRoundButton != null)
-            nextRoundButton.gameObject.SetActive(false);
-
-        // Show return to main game button
-        if (returnToMainGameButton != null)
-            returnToMainGameButton.gameObject.SetActive(true);
+        // Update button text for restart
+        if (nextRoundButton != null && nextRoundButton.GetComponentInChildren<TextMeshProUGUI>() != null)
+            nextRoundButton.GetComponentInChildren<TextMeshProUGUI>().text = "Play Again";
 
         // Trigger game completed event
         OnGameCompleted?.Invoke(score);
-    }
-
-    /// <summary>
-    /// Handle returning to the main game
-    /// </summary>
-    private void ReturnToMainGame()
-    {
-        if (sceneLoader != null)
-        {
-            sceneLoader.ReturnFromMathGame();
-        }
-        else
-        {
-            // Fallback if no SceneLoader is assigned
-            Debug.LogWarning("SceneLoader is not assigned. Unable to return to main game.");
-        }
     }
 
     #endregion
@@ -469,9 +413,6 @@ public class CountingGameManager : MonoBehaviour
     /// </summary>
     public void StartNextRound()
     {
-        if (isGameFinished)
-            return;
-
         if (resultPanel != null)
             resultPanel.SetActive(false);
 
@@ -637,60 +578,15 @@ public class CountingGameManager : MonoBehaviour
         if (resultPanel != null)
             resultPanel.SetActive(true);
 
-        // Check if this is the final round
-        bool isFinalRound = (currentRound >= totalRounds);
-
-        // Make sure next round button is visible if not the final round
-        if (nextRoundButton != null)
-            nextRoundButton.gameObject.SetActive(!isFinalRound);
-
-        // Only show return button if this is the final round
-        if (returnToMainGameButton != null)
-            returnToMainGameButton.gameObject.SetActive(isFinalRound);
-
         if (resultText != null)
         {
             if (correct)
             {
                 resultText.text = $"Correct!\nThere were {expectedAnswer} {objectSpawner.targetObjectName}s.";
-
-                // Add overall score if this is the final round
-                if (isFinalRound)
-                {
-                    resultText.text += $"\n\nFinal Score: {score}/{totalRounds}";
-                    // If this is the final round, we should also update the game state
-                    isGameFinished = true;
-                }
             }
             else
             {
                 resultText.text = $"{message}\nThere were {expectedAnswer} {objectSpawner.targetObjectName}s.";
-
-                // Add overall score if this is the final round
-                if (isFinalRound)
-                {
-                    resultText.text += $"\n\nFinal Score: {score}/{totalRounds}";
-                    // If this is the final round, we should also update the game state
-                    isGameFinished = true;
-                }
-            }
-        }
-
-        // If this is the final round, we should show the final results immediately
-        if (isFinalRound)
-        {
-            // Change the state to GameOver
-            currentState = GameState.GameOver;
-            
-            // Show the final result panel if available
-            if (finalResultPanel != null)
-            {
-                finalResultPanel.SetActive(true);
-                if (resultPanel != null)
-                    resultPanel.SetActive(false);
-                
-                if (finalResultText != null)
-                    finalResultText.text = $"Game Complete!\nYour final score: {score}/{totalRounds}";
             }
         }
 
