@@ -127,7 +127,7 @@ public class TimeManager : MonoBehaviour
             player = GameObject.Find("Player").GetComponent<Player>();
             player.SavePlayer(player.transform.position);
             PlayerPrefs.DeleteAll();
-            SceneManager.LoadScene("Couning Scene");
+            SceneManager.LoadScene("Learning Scene");
         }
     }
 
@@ -161,11 +161,6 @@ public class TimeManager : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.P))
         {
             PlayerPrefs.DeleteAll();
-        }
-
-        if (Input.GetKeyUp(KeyCode.L))
-        {
-            SceneManager.LoadScene("PlayingScene Initial");
         }
 
         if (time > 9) {
@@ -224,13 +219,15 @@ public class TimeManager : MonoBehaviour
             //Instantiate Shuten
             GameObject.Find("Day1Shuten2").transform.GetChild(0).gameObject.SetActive(true);
             GameObject.Find("Day1Shuten").transform.GetChild(0).gameObject.SetActive(false);
-            GameObject.Find("Bed").transform.GetChild(0).gameObject.SetActive(false);
-            GameObject.Find("Bed2").transform.GetChild(0).gameObject.SetActive(true);
+            GameObject.Find("Beddy").transform.GetChild(0).gameObject.SetActive(false);
+            GameObject.Find("Beddy2").transform.GetChild(0).gameObject.SetActive(true);
         }
 
         if (day == 2 && progress < 4)
         {
             GameObject.Find("Day2Tamamo").transform.GetChild(0).gameObject.SetActive(true);
+            GameObject.Find("Beddy").transform.GetChild(0).gameObject.SetActive(true);
+            GameObject.Find("Beddy2").transform.GetChild(0).gameObject.SetActive(false);
         }
 
         if (day == 2 && progress > 3)

@@ -16247,7 +16247,7 @@ GameObject:
   m_Component:
   - component: {fileID: 846916020}
   m_Layer: 0
-  m_Name: Bed
+  m_Name: Beddy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22529,7 +22529,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1171200230}
   m_Layer: 0
-  m_Name: Bed2
+  m_Name: Beddy2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29968,7 +29968,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1726299010}
-  - component: {fileID: 1726299009}
   - component: {fileID: 1726299008}
   m_Layer: 0
   m_Name: GameState
@@ -29998,23 +29997,8 @@ MonoBehaviour:
   skyboxTexture: {fileID: 2100000, guid: dbdf8b2e10246a6419fdfa9cac6a5e17, type: 2}
   sun: {fileID: 685240843}
   moon: {fileID: 1924307929}
-  gameState: {fileID: 1726299009}
+  gameState: {fileID: 0}
   timerText: {fileID: 1540413399}
---- !u!114 &1726299009
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1726299007}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3ea17fc76f141d4492918c5bbcae6a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  progress: 0
-  day: 0
-  playerPos: {x: 0, y: 0, z: 0}
 --- !u!4 &1726299010
 Transform:
   m_ObjectHideFlags: 0
@@ -42418,6 +42402,10 @@ PrefabInstance:
     - target: {fileID: 4463855768621887754, guid: b61173ea43d8f2748b3e19c15b6df767, type: 3}
       propertyPath: m_Name
       value: Bed
+      objectReference: {fileID: 0}
+    - target: {fileID: 4463855768621887754, guid: b61173ea43d8f2748b3e19c15b6df767, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5031754933055376034, guid: b61173ea43d8f2748b3e19c15b6df767, type: 3}
       propertyPath: m_Size.z

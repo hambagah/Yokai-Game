@@ -19,6 +19,7 @@ public class SceneLoader : MonoBehaviour
     public void StartGameplay(string stageToPlay)
     {
         SceneManager.LoadScene(stageToPlay);
+        Debug.Log(stageToPlay);
     }
 
     /**
