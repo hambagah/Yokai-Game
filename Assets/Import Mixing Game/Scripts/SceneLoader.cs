@@ -46,7 +46,7 @@ public class SceneLoader : MonoBehaviour
         PlayerPrefs.Save();
         
         // Load the main game scene - use PlayingSceneStart not PlayingScene Initial
-        SceneManager.LoadScene("PlayingScene");
+        SceneManager.LoadScene("PlayingSceneStart");
     }
     
     /**

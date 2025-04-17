@@ -127,7 +127,7 @@ public class TimeManager : MonoBehaviour
             player = GameObject.Find("Player").GetComponent<Player>();
             player.SavePlayer(player.transform.position);
             PlayerPrefs.DeleteAll();
-            SceneManager.LoadScene("Learning Scene");
+            SceneManager.LoadScene("Couning Scene");
         }
     }
 
