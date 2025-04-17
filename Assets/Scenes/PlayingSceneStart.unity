@@ -29968,6 +29968,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1726299010}
+  - component: {fileID: 1726299009}
   - component: {fileID: 1726299008}
   m_Layer: 0
   m_Name: GameState
@@ -29997,8 +29998,23 @@ MonoBehaviour:
   skyboxTexture: {fileID: 2100000, guid: dbdf8b2e10246a6419fdfa9cac6a5e17, type: 2}
   sun: {fileID: 685240843}
   moon: {fileID: 1924307929}
-  gameState: {fileID: 0}
+  gameState: {fileID: 1726299009}
   timerText: {fileID: 1540413399}
+--- !u!114 &1726299009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1726299007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3ea17fc76f141d4492918c5bbcae6a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  progress: 0
+  day: 0
+  playerPos: {x: 0, y: 0, z: 0}
 --- !u!4 &1726299010
 Transform:
   m_ObjectHideFlags: 0
